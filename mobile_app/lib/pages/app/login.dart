@@ -80,7 +80,7 @@ class _LoginState extends State<Login> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          height: AppSizes().getScreenHeight() * 0.9,
+          height: AppSizes().getScreenHeight(),
           color: StyleSheet().uiBackground,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),

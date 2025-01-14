@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:health_care/constants/consts.dart';
+import 'package:health_care/pages/app/before_login.dart';
 import 'package:health_care/pages/app/home.dart';
 import 'package:health_care/pages/app/login.dart';
 import 'package:health_care/pages/app/signup.dart';
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
         // Sample routes
         '/login': (context) => const Login(),
         '/signup': (context) => const Signup(),
+        '/before_login': (context) => const BeforeLogin(),
         '/home': (context) => const Home(),
       },
     );
