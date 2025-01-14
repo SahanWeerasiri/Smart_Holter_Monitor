@@ -1,14 +1,10 @@
-import 'package:health_care/components/dialogues/action_dialogue.dart';
-import 'package:health_care/components/drawer/simple_drawer/drawer_index_controller.dart';
-import 'package:health_care/components/drawer/simple_drawer/simple_drawer.dart';
-import 'package:health_care/components/top_app_bar/top_app_bar.dart';
-import 'package:health_care/constants/consts.dart';
-import 'package:health_care/pages/app/pages/chat.dart';
-import 'package:health_care/pages/app/pages/groups.dart';
-import 'package:health_care/pages/app/pages/profile.dart';
-import 'package:health_care/pages/app/pages/settings.dart';
-import 'package:health_care/pages/app/pages/status.dart';
 import 'package:flutter/material.dart';
+import '../../constants/consts.dart';
+import '../../components/bottom_app_bars/bottom_app_bar_1/bottom_navigation_custom1.dart';
+import '../../components/bottom_app_bars/bottom_app_bar_1/menuController.dart';
+import '../../components/bottom_app_bars/bottom_app_bar_1/bottom_nav_button_1.dart';
+import 'package:iconly/iconly.dart';
+import '../../components/bottom_app_bars/bottom_app_bar_1/constants1.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -18,133 +14,78 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final List<Widget> _pages = const [
-    Chat(),
-    Status(),
-    Groups(),
-    Profile(),
-    Settings()
+  final List<Widget> _pages = [
+    const Center(child: Text("Home")),
+    const Center(child: Text("Search")),
+    const Center(child: Text("Profile")),
+    const Center(child: Text("Settings")),
   ];
-  DrawerIndexController drawerIndexController = DrawerIndexController();
-  int _selectedIndex = 0; // Add state variable to track selected index
+  late final CustomMenuController menuController;
 
-  void logout() {
-    showDialog(
-        context: context,
-        builder: (context) => DialogFb1(
-              icon: Icons.logout,
-              onYes: () {
-                Navigator.pop(context);
-                Navigator.pop(context);
-              },
-              onNo: () {
-                Navigator.pop(context);
-              },
-              topic: "Logout",
-              subtext: "Do you really want to logout?",
-              iconColor: CustomColors().blueLight,
-              primaryColor: CustomColors().blue,
-              accentColor: CustomColors().blueLight,
-            ));
+  @override
+  void initState() {
+    super.initState();
+    menuController = CustomMenuController(0, _pages);
   }
 
   @override
   Widget build(BuildContext context) {
+    AppSizes appSizes = AppSizes();
+    appSizes.initSizes(context);
     return Scaffold(
-      body: _pages[
-          _selectedIndex], // Use _selectedIndex instead of drawerIndexController
-      drawer: DrawerFb1(
-          title: "Chat App",
-          items: [
-            DrawerItems(
-                index: 0,
-                title: "Chats",
-                icon: Icons.chat,
-                onTap: () {
-                  setState(() {
-                    _selectedIndex = 0;
-                  });
-                  drawerIndexController.setSelectedIndex(0);
-                }),
-            DrawerItems(
-                index: 1,
-                title: "Status",
-                icon: Icons.star,
-                onTap: () {
-                  setState(() {
-                    _selectedIndex = 1;
-                  });
-                  drawerIndexController.setSelectedIndex(1);
-                }),
-            DrawerItems(
-                index: 2,
-                title: "Groups",
-                icon: Icons.group,
-                onTap: () {
-                  setState(() {
-                    _selectedIndex = 2;
-                  });
-                  drawerIndexController.setSelectedIndex(2);
-                }),
-            DrawerItems(
-                index: 3,
-                title: "",
-                icon: Icons.chat,
-                onTap: () {
-                  setState(() {
-                    _selectedIndex = 3;
-                  });
-                  drawerIndexController.setSelectedIndex(3);
-                }),
-            DrawerItems(
-                index: 4,
-                title: "Profile",
-                icon: Icons.person,
-                onTap: () {
-                  setState(() {
-                    _selectedIndex = 4;
-                  });
-                  drawerIndexController.setSelectedIndex(4);
-                }),
-            DrawerItems(
-                index: 5,
-                title: "Settings",
-                icon: Icons.settings,
-                onTap: () {
-                  setState(() {
-                    _selectedIndex = 4;
-                  });
-                  drawerIndexController.setSelectedIndex(5);
-                }),
-          ],
-          backgroundColor: CustomColors().blueLight,
-          textColor: Colors.white,
-          selectedTextColor: CustomColors().blueDark,
-          dividerColor: CustomColors().blueDark,
-          drawerWidth: AppSizes.blockSizeHorizontal * 70,
-          drawerRadius: 10,
-          drawerIndexController: drawerIndexController),
-      appBar: MallikaAppBar5(
-        automaticLeading: true,
-        title: "Chat App",
-        actions: [
-          IconButton(
-              onPressed: () {
-                Navigator.pushNamed(context, "/add_contact");
-              },
-              icon: const Icon(Icons.add, color: Colors.white)),
-          IconButton(
-              onPressed: logout,
-              icon: const Icon(
-                Icons.logout,
-                color: Colors.white,
-              ))
-        ],
-        backButton: false,
-        backgroundColor: CustomColors().blue,
-        titleColor: Colors.white,
+      appBar: AppBar(
+        title: const Text("Test Bottom Navigation Bar 1"),
       ),
-      bottomNavigationBar: null,
+      body: Center(
+        child: _pages[menuController.getCurrentIndex()],
+      ),
+      bottomNavigationBar: BottomNavigationCustom1(
+        animatedPositionedLeftValue:
+            animatedPositionedLeftValueTest(menuController.getCurrentIndex()),
+        menuController: menuController,
+        navBtnList: [
+          BottomNavBtn(
+            icon: IconlyLight.home,
+            currentIndex: menuController.getCurrentIndex(),
+            index: 0,
+            onPressed: (val) {
+              setState(() {
+                menuController.setCurrentIndex(val);
+              });
+            },
+          ),
+          BottomNavBtn(
+            icon: IconlyLight.search,
+            currentIndex: menuController.getCurrentIndex(),
+            index: 1,
+            onPressed: (val) {
+              setState(() {
+                menuController.setCurrentIndex(val);
+              });
+            },
+          ),
+          BottomNavBtn(
+            icon: IconlyLight.profile,
+            currentIndex: menuController.getCurrentIndex(),
+            index: 2,
+            onPressed: (val) {
+              setState(() {
+                menuController.setCurrentIndex(val);
+              });
+            },
+          ),
+          BottomNavBtn(
+            icon: IconlyLight.setting,
+            currentIndex: menuController.getCurrentIndex(),
+            index: 3,
+            onPressed: (val) {
+              setState(() {
+                menuController.setCurrentIndex(val);
+              });
+            },
+          ),
+        ],
+      ),
     );
   }
 }
