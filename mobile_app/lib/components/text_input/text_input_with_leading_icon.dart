@@ -65,7 +65,10 @@ class _InputFieldFb3State extends State<InputFieldFb3> {
         keyboardType: widget.inputType,
         style: TextStyle(fontSize: widget.fontSize, color: widget.textColor),
         decoration: InputDecoration(
-          prefixIcon: Icon(widget.icon as IconData?),
+          prefixIcon: Icon(
+            widget.icon as IconData?,
+            color: widget.textColor,
+          ),
           filled: true,
           hintText: widget.hint,
           fillColor: widget.shadowColor,

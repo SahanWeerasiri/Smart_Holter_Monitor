@@ -1,6 +1,7 @@
 import 'package:health_care/components/buttons/custom_button_1/custom_button.dart';
 import 'package:health_care/components/dialogues/simple_dialogue.dart';
 import 'package:health_care/components/text_input/text_input_with_leading_icon.dart';
+import 'package:health_care/components/top_app_bar/top_app_bar2.dart';
 import 'package:health_care/constants/consts.dart';
 import 'package:health_care/controllers/textController.dart';
 import 'package:flutter/material.dart';
@@ -70,7 +71,13 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     AppSizes().initSizes(context);
     return Scaffold(
-      appBar: null,
+      appBar: CustomTopAppBar2(
+        title: "Sign In",
+        backButton: true,
+        backgroundColor: Colors.white,
+        titleColor: Colors.black,
+        backOnPressed: () {},
+      ),
       body: SingleChildScrollView(
         child: Container(
           height: AppSizes().getScreenHeight(),
@@ -81,17 +88,17 @@ class _LoginState extends State<Login> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "Welcome !",
+                  "Sign In",
                   style: textStyleHeading,
                 ),
                 SizedBox(
-                  height: AppSizes.screenHeight / 5,
+                  height: 5,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      "User Name",
+                      "Email",
                       style: textStyleTextInputTopic,
                     )
                   ],
@@ -101,8 +108,8 @@ class _LoginState extends State<Login> {
                 ),
                 InputFieldFb3(
                     inputController: credentialController,
-                    hint: "User name",
-                    icon: Icons.person,
+                    hint: "Email",
+                    icon: Icons.email,
                     hintColor: CustomColors().greyHint,
                     textColor: CustomColors().blueDark,
                     shadowColor: CustomColors().blueLighter,
@@ -155,6 +162,36 @@ class _LoginState extends State<Login> {
                 ),
                 const SizedBox(
                   height: 10,
+                ),
+                Divider(
+                  color: CustomColors().greyHint,
+                  endIndent: 5,
+                  height: 2,
+                  thickness: 2,
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: AppSizes.blockSizeHorizontal * 10,
+                  children: [
+                    CustomButton(
+                      label: "Google",
+                      onPressed: () {},
+                      icon: Icons.g_mobiledata_rounded,
+                      textColor: Colors.white,
+                      backgroundColor: CustomColors().blue,
+                    ),
+                    CustomButton(
+                      label: "Facebook",
+                      onPressed: () {},
+                      icon: Icons.facebook_rounded,
+                      textColor: Colors.white,
+                      backgroundColor: CustomColors().blue,
+                    ),
+                  ],
                 ),
                 Divider(
                   color: CustomColors().greyHint,
