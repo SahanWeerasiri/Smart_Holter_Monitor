@@ -12,7 +12,9 @@ class CustomButton extends StatelessWidget {
   final double elevation;
   final double cornerRadius;
   final double width;
+  final Color? borderColor;
   final double height;
+  final String? img;
 
   static const String shapeRounded = 'rounded';
   static const String shapeSquare = 'square';
@@ -24,7 +26,9 @@ class CustomButton extends StatelessWidget {
     this.backgroundColor,
     this.textColor,
     this.icon,
+    this.img,
     this.isLoading = false,
+    this.borderColor,
     this.shape = shapeRounded,
     this.borderRadius = 30,
     this.elevation = 3,
@@ -73,6 +77,15 @@ class CustomButton extends StatelessWidget {
                   Icon(
                     icon,
                     color: textColor,
+                  ),
+                  const SizedBox(width: 8),
+                ] else if (img != null) ...[
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: Image.asset(
+                      img ?? "", // Assuming `img` is a String path to an assets
+                    ),
                   ),
                   const SizedBox(width: 8),
                 ],

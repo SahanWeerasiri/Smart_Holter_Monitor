@@ -74,26 +74,20 @@ class _LoginState extends State<Login> {
       appBar: CustomTopAppBar2(
         title: "Sign In",
         backButton: true,
-        backgroundColor: Colors.white,
-        titleColor: Colors.black,
+        backgroundColor: StyleSheet().topbarBackground,
+        titleColor: StyleSheet().topbarText,
         backOnPressed: () {},
       ),
       body: SingleChildScrollView(
         child: Container(
-          height: AppSizes().getScreenHeight(),
-          color: Colors.white,
+          height: AppSizes().getScreenHeight() * 0.9,
+          color: StyleSheet().uiBackground,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  "Sign In",
-                  style: textStyleHeading,
-                ),
-                SizedBox(
-                  height: 5,
-                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -110,12 +104,12 @@ class _LoginState extends State<Login> {
                     inputController: credentialController,
                     hint: "Email",
                     icon: Icons.email,
-                    hintColor: CustomColors().greyHint,
-                    textColor: CustomColors().blueDark,
-                    shadowColor: CustomColors().blueLighter,
-                    enableBorderColor: CustomColors().blueLight,
-                    borderColor: CustomColors().blueDark,
-                    focusedBorderColor: CustomColors().blueDark,
+                    hintColor: StyleSheet().greyHint,
+                    textColor: StyleSheet().text,
+                    shadowColor: StyleSheet().textBackground,
+                    enableBorderColor: StyleSheet().disabledBorder,
+                    borderColor: StyleSheet().greyHint,
+                    focusedBorderColor: StyleSheet().enableBorder,
                     typeKey: CustomTextInputTypes().username),
                 const SizedBox(
                   height: 10,
@@ -131,40 +125,53 @@ class _LoginState extends State<Login> {
                     inputController: CredentialController(),
                     hint: "Password",
                     icon: Icons.key,
-                    hintColor: CustomColors().greyHint,
-                    textColor: CustomColors().blueDark,
-                    shadowColor: CustomColors().blueLighter,
-                    enableBorderColor: CustomColors().blueLight,
-                    borderColor: CustomColors().blueDark,
-                    focusedBorderColor: CustomColors().blueDark,
+                    hintColor: StyleSheet().greyHint,
+                    textColor: StyleSheet().text,
+                    shadowColor: StyleSheet().textBackground,
+                    enableBorderColor: StyleSheet().disabledBorder,
+                    borderColor: StyleSheet().greyHint,
+                    focusedBorderColor: StyleSheet().enableBorder,
                     isPassword: true,
                     typeKey: CustomTextInputTypes().password),
                 const SizedBox(
                   height: 10,
                 ),
+                CustomButton(
+                  width: AppSizes.blockSizeHorizontal * 310,
+                  label: "Sign In",
+                  onPressed: () {
+                    if (checkCredentials()) {
+                      navigateToHome();
+                    } else {
+                      loginError();
+                    }
+                  },
+                  backgroundColor: StyleSheet().btnBackground,
+                  textColor: StyleSheet().btnText,
+                  icon: Icons.login,
+                ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    CustomButton(
-                      label: "Sign In",
-                      onPressed: () {
-                        if (checkCredentials()) {
-                          navigateToHome();
-                        } else {
-                          loginError();
-                        }
-                      },
-                      backgroundColor: CustomColors().blue,
-                      textColor: Colors.white,
-                      icon: Icons.login,
-                    )
+                    const Text("Don't you have an account?"),
+                    TextButton(
+                        child: Text(
+                          "Sign up",
+                          style: TextStyle(
+                            color: StyleSheet().btnBackground,
+                          ),
+                        ),
+                        onPressed: () {
+                          navigateToSignUp();
+                        }),
                   ],
                 ),
                 const SizedBox(
                   height: 10,
                 ),
                 Divider(
-                  color: CustomColors().greyHint,
+                  color: StyleSheet().divider,
                   endIndent: 5,
                   height: 2,
                   thickness: 2,
@@ -172,44 +179,24 @@ class _LoginState extends State<Login> {
                 const SizedBox(
                   height: 10,
                 ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  spacing: AppSizes.blockSizeHorizontal * 10,
-                  children: [
-                    CustomButton(
-                      label: "Google",
-                      onPressed: () {},
-                      icon: Icons.g_mobiledata_rounded,
-                      textColor: Colors.white,
-                      backgroundColor: CustomColors().blue,
-                    ),
-                    CustomButton(
-                      label: "Facebook",
-                      onPressed: () {},
-                      icon: Icons.facebook_rounded,
-                      textColor: Colors.white,
-                      backgroundColor: CustomColors().blue,
-                    ),
-                  ],
-                ),
-                Divider(
-                  color: CustomColors().greyHint,
-                  endIndent: 5,
-                  thickness: 2,
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                const Text("Don't you have an account?"),
                 CustomButton(
-                    label: "Sign up",
-                    backgroundColor: CustomColors().blue,
-                    textColor: Colors.white,
-                    icon: Icons.create,
-                    onPressed: () {
-                      navigateToSignUp();
-                    }),
+                  label: "Sign in with Google",
+                  borderRadius: 5,
+                  width: 400,
+                  onPressed: () {},
+                  img: 'assetes/icons/google.png',
+                  textColor: StyleSheet().elebtnText,
+                  backgroundColor: StyleSheet().elebtnBackground,
+                ),
+                CustomButton(
+                  borderRadius: 5,
+                  label: "Sign in with Facebook",
+                  onPressed: () {},
+                  width: 300,
+                  img: 'assetes/icons/facebook.png',
+                  textColor: StyleSheet().elebtnText,
+                  backgroundColor: StyleSheet().elebtnBackground,
+                ),
               ],
             ),
           ),

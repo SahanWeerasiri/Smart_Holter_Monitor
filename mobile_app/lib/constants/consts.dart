@@ -24,6 +24,35 @@ class CustomColors {
   final Color bottomNavigationColor = const Color.fromARGB(255, 1, 12, 95);
 }
 
+class StyleSheet {
+  final Color btnBackground = const Color.fromARGB(255, 64, 124, 226);
+  final Color btnText = Colors.white;
+
+  final Color elebtnBackground = const Color.fromARGB(255, 240, 240, 240);
+  final Color elebtnText = Colors.black;
+
+  final Color greyHint = const Color.fromARGB(255, 62, 62, 62);
+  final Color textBackground = const Color.fromARGB(255, 229, 229, 229);
+  final Color text = const Color.fromARGB(255, 64, 124, 226);
+  final Color disabledBorder = const Color.fromARGB(255, 135, 135, 135);
+  final Color enableBorder = const Color.fromARGB(255, 64, 124, 226);
+
+  final Color topbarBackground = Colors.white;
+  final Color topbarText = Colors.black;
+
+  final Color divider = const Color.fromARGB(255, 229, 229, 229);
+
+  final uiBackground = Colors.white;
+
+  final List<Color> gradientForBottomAppBar = [
+    const Color.fromARGB(255, 20, 153, 255).withOpacity(0.8),
+    const Color.fromARGB(255, 20, 153, 255).withOpacity(0.6),
+    const Color.fromARGB(255, 20, 153, 255).withOpacity(0.3),
+    Colors.transparent,
+  ];
+  final Color bottomNavigationColor = const Color.fromARGB(255, 1, 12, 95);
+}
+
 class AppSizes {
   static late MediaQueryData _mediaQueryData;
   static late double screenWidth;
