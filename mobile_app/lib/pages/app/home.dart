@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:health_care/components/top_app_bar/top_app_bar2.dart';
 import '../../constants/consts.dart';
 import '../../components/bottom_app_bars/bottom_app_bar_1/bottom_navigation_custom1.dart';
 import '../../components/bottom_app_bars/bottom_app_bar_1/menuController.dart';
@@ -16,9 +17,9 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final List<Widget> _pages = [
     const Center(child: Text("Home")),
-    const Center(child: Text("Search")),
+    const Center(child: Text("Reports")),
+    const Center(child: Text("Chatbot")),
     const Center(child: Text("Profile")),
-    const Center(child: Text("Settings")),
   ];
   late final CustomMenuController menuController;
 
@@ -33,13 +34,29 @@ class _HomeState extends State<Home> {
     AppSizes appSizes = AppSizes();
     appSizes.initSizes(context);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Test Bottom Navigation Bar 1"),
+      appBar: CustomTopAppBar2(
+        title: "Smart Care",
+        backOnPressed: () {},
+        backgroundColor: StyleSheet().topbarBackground,
+        titleColor: StyleSheet().topbarText,
+        actions: [
+          IconButton(
+            icon: Icon(
+              IconlyLight.logout,
+              color: StyleSheet().topbarText,
+            ),
+            color: StyleSheet().topbarText,
+            onPressed: () {},
+          )
+        ],
       ),
       body: Center(
         child: _pages[menuController.getCurrentIndex()],
       ),
       bottomNavigationBar: BottomNavigationCustom1(
+        backgroundColor: StyleSheet().bottomNavigationBackground,
+        baseColor: StyleSheet().bottomNavigationBase,
+        gradient: StyleSheet().gradientForBottomAppBar,
         animatedPositionedLeftValue:
             animatedPositionedLeftValueTest(menuController.getCurrentIndex()),
         menuController: menuController,
@@ -48,6 +65,8 @@ class _HomeState extends State<Home> {
             icon: IconlyLight.home,
             currentIndex: menuController.getCurrentIndex(),
             index: 0,
+            iconColor: StyleSheet().bottomNavigationIcon,
+            shadowColor: StyleSheet().bottomNavigationShadow,
             onPressed: (val) {
               setState(() {
                 menuController.setCurrentIndex(val);
@@ -55,7 +74,9 @@ class _HomeState extends State<Home> {
             },
           ),
           BottomNavBtn(
-            icon: IconlyLight.search,
+            icon: IconlyLight.document,
+            iconColor: StyleSheet().bottomNavigationIcon,
+            shadowColor: StyleSheet().bottomNavigationShadow,
             currentIndex: menuController.getCurrentIndex(),
             index: 1,
             onPressed: (val) {
@@ -65,7 +86,9 @@ class _HomeState extends State<Home> {
             },
           ),
           BottomNavBtn(
-            icon: IconlyLight.profile,
+            icon: IconlyLight.chat,
+            iconColor: StyleSheet().bottomNavigationIcon,
+            shadowColor: StyleSheet().bottomNavigationShadow,
             currentIndex: menuController.getCurrentIndex(),
             index: 2,
             onPressed: (val) {
@@ -75,7 +98,9 @@ class _HomeState extends State<Home> {
             },
           ),
           BottomNavBtn(
-            icon: IconlyLight.setting,
+            icon: IconlyLight.profile,
+            iconColor: StyleSheet().bottomNavigationIcon,
+            shadowColor: StyleSheet().bottomNavigationShadow,
             currentIndex: menuController.getCurrentIndex(),
             index: 3,
             onPressed: (val) {

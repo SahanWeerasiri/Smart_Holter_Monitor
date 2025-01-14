@@ -49,12 +49,18 @@ class StyleSheet {
   final uiBackground = Colors.white;
 
   final List<Color> gradientForBottomAppBar = [
-    const Color.fromARGB(255, 20, 153, 255).withOpacity(0.8),
-    const Color.fromARGB(255, 20, 153, 255).withOpacity(0.6),
-    const Color.fromARGB(255, 20, 153, 255).withOpacity(0.3),
+    const Color.fromARGB(255, 0, 170, 255).withOpacity(0.8),
+    const Color.fromARGB(255, 0, 170, 255).withOpacity(0.6),
+    const Color.fromARGB(255, 0, 170, 255).withOpacity(0.3),
+    const Color.fromARGB(255, 0, 170, 255).withOpacity(0.1),
     Colors.transparent,
   ];
-  final Color bottomNavigationColor = const Color.fromARGB(255, 1, 12, 95);
+  final Color bottomNavigationColor = const Color.fromARGB(255, 64, 124, 226);
+  final Color bottomNavigationBase = const Color.fromARGB(255, 0, 170, 255);
+  final Color bottomNavigationIcon = const Color.fromARGB(255, 0, 149, 255);
+  final Color bottomNavigationShadow = const Color.fromARGB(255, 64, 124, 226);
+  final Color bottomNavigationBackground =
+      const Color.fromARGB(255, 232, 232, 232);
 }
 
 class AppSizes {
