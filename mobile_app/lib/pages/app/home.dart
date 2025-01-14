@@ -54,6 +54,9 @@ class _HomeState extends State<Home> {
         child: _pages[menuController.getCurrentIndex()],
       ),
       bottomNavigationBar: BottomNavigationCustom1(
+        backgroundColor: StyleSheet().bottomNavigationBackground,
+        baseColor: StyleSheet().bottomNavigationBase,
+        gradient: StyleSheet().gradientForBottomAppBar,
         animatedPositionedLeftValue:
             animatedPositionedLeftValueTest(menuController.getCurrentIndex()),
         menuController: menuController,
@@ -62,6 +65,8 @@ class _HomeState extends State<Home> {
             icon: IconlyLight.home,
             currentIndex: menuController.getCurrentIndex(),
             index: 0,
+            iconColor: StyleSheet().bottomNavigationIcon,
+            shadowColor: StyleSheet().bottomNavigationShadow,
             onPressed: (val) {
               setState(() {
                 menuController.setCurrentIndex(val);
@@ -70,6 +75,8 @@ class _HomeState extends State<Home> {
           ),
           BottomNavBtn(
             icon: IconlyLight.document,
+            iconColor: StyleSheet().bottomNavigationIcon,
+            shadowColor: StyleSheet().bottomNavigationShadow,
             currentIndex: menuController.getCurrentIndex(),
             index: 1,
             onPressed: (val) {
@@ -80,6 +87,8 @@ class _HomeState extends State<Home> {
           ),
           BottomNavBtn(
             icon: IconlyLight.chat,
+            iconColor: StyleSheet().bottomNavigationIcon,
+            shadowColor: StyleSheet().bottomNavigationShadow,
             currentIndex: menuController.getCurrentIndex(),
             index: 2,
             onPressed: (val) {
@@ -90,6 +99,8 @@ class _HomeState extends State<Home> {
           ),
           BottomNavBtn(
             icon: IconlyLight.profile,
+            iconColor: StyleSheet().bottomNavigationIcon,
+            shadowColor: StyleSheet().bottomNavigationShadow,
             currentIndex: menuController.getCurrentIndex(),
             index: 3,
             onPressed: (val) {
