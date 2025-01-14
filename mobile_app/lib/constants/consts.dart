@@ -39,6 +39,7 @@ class StyleSheet {
   final Color enableBorder = const Color.fromARGB(255, 64, 124, 226);
 
   final Color titleText = const Color.fromARGB(255, 64, 124, 226);
+  final Color titleSupport = const Color.fromARGB(255, 135, 135, 135);
 
   final Color topbarBackground = Colors.white;
   final Color topbarText = Colors.black;

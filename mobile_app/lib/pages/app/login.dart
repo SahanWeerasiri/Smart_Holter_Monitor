@@ -76,7 +76,9 @@ class _LoginState extends State<Login> {
         backButton: true,
         backgroundColor: StyleSheet().topbarBackground,
         titleColor: StyleSheet().topbarText,
-        backOnPressed: () {},
+        backOnPressed: () {
+          Navigator.pop(context);
+        },
       ),
       body: SingleChildScrollView(
         child: Container(

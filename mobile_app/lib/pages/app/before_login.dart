@@ -43,7 +43,7 @@ class BeforeLogin extends StatelessWidget {
               "Login to stay healthy and fit",
               style: TextStyle(
                 fontSize: 17,
-                color: StyleSheet().greyHint,
+                color: StyleSheet().titleSupport,
               ),
             ),
             SizedBox(
@@ -51,7 +51,9 @@ class BeforeLogin extends StatelessWidget {
             ),
             CustomTextButton(
               label: "Login",
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context, '/login');
+              },
               backgroundColor: StyleSheet().btnBackground,
               textColor: StyleSheet().btnText,
             ),
@@ -60,7 +62,9 @@ class BeforeLogin extends StatelessWidget {
             ),
             CustomTextButton(
               label: "Sign Up",
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context, '/signup');
+              },
               backgroundColor: StyleSheet().uiBackground,
               borderColor: StyleSheet().btnBackground,
               textColor: StyleSheet().btnBackground,
