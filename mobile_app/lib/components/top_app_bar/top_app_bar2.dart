@@ -31,13 +31,18 @@ class CustomTopAppBar2 extends StatelessWidget implements PreferredSizeWidget {
         surfaceTintColor: backgroundColor,
         elevation: 1,
         automaticallyImplyLeading: automaticLeading,
-        leading: backButton
-            ? IconButton(
-                icon: Icon(Icons.keyboard_arrow_left, color: titleColor),
-                onPressed: backOnPressed ?? () {},
-              )
-            : null,
-        title: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        leading: null,
+        title:
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          SizedBox(
+            width: AppSizes().getBlockSizeHorizontal(10),
+            child: backButton
+                ? IconButton(
+                    icon: Icon(Icons.keyboard_arrow_left, color: titleColor),
+                    onPressed: backOnPressed ?? () {},
+                  )
+                : null,
+          ),
           Text(
             title,
             style: TextStyle(
