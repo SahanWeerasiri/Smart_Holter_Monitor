@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:health_care/components/top_app_bar/top_app_bar2.dart';
+import 'package:health_care/pages/app/pages/chat_screen.dart';
+import 'package:health_care/pages/app/pages/profile.dart';
+import 'package:health_care/pages/app/pages/report_list.dart';
+import 'package:health_care/pages/app/pages/summary.dart';
 import '../../constants/consts.dart';
 import '../../components/bottom_app_bars/bottom_app_bar_1/bottom_navigation_custom1.dart';
 import '../../components/bottom_app_bars/bottom_app_bar_1/menuController.dart';
@@ -16,10 +20,10 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final List<Widget> _pages = [
-    const Center(child: Text("Home")),
-    const Center(child: Text("Reports")),
-    const Center(child: Text("Chatbot")),
-    const Center(child: Text("Profile")),
+    const Center(child: Summary()),
+    const Center(child: ReportList()),
+    const Center(child: ChatScreen()),
+    const Center(child: Profile(uid: 1)),
   ];
   late final CustomMenuController menuController;
 
@@ -34,6 +38,7 @@ class _HomeState extends State<Home> {
     AppSizes appSizes = AppSizes();
     appSizes.initSizes(context);
     return Scaffold(
+      backgroundColor: StyleSheet().uiBackground,
       appBar: CustomTopAppBar2(
         title: "Smart Care",
         backOnPressed: () {},

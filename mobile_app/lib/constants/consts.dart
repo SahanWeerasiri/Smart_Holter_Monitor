@@ -5,6 +5,7 @@ class CustomTextInputTypes {
   final String password = "PASSWORD";
   final String confirmPassword = "CONFIRM_PASSWORD";
   final String text = "TEXT";
+  final String name = "NAME";
 }
 
 class CustomColors {
@@ -61,6 +62,19 @@ class StyleSheet {
   final Color bottomNavigationShadow = const Color.fromARGB(255, 64, 124, 226);
   final Color bottomNavigationBackground =
       const Color.fromARGB(255, 232, 232, 232);
+
+  final Color currentHeartBox = const Color.fromARGB(255, 180, 216, 255);
+  final Color avgHeartBox = const Color.fromARGB(255, 168, 255, 212);
+  final Color stateHeartBox = const Color.fromARGB(255, 255, 252, 173);
+
+  final Color chatIcon = const Color.fromARGB(255, 64, 124, 226);
+  final Color sendChatBuble1 = const Color.fromARGB(255, 64, 124, 226);
+  final Color sendChatBuble2 = const Color.fromARGB(255, 235, 242, 255);
+  final Color recieveChatBuble1 = const Color.fromARGB(255, 235, 242, 255);
+  final Color recieveChatBuble2 = const Color.fromARGB(255, 64, 124, 226);
+
+  final Color profileBase = const Color.fromARGB(255, 180, 216, 255);
+  final Color profiletext = const Color.fromARGB(255, 0, 0, 0);
 }
 
 class AppSizes {

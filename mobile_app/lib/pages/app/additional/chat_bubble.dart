@@ -6,46 +6,88 @@ class ChatBubble extends StatelessWidget {
   const ChatBubble({super.key, required this.chatModel});
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment:
-          chatModel.isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(15),
-          child: Container(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(Radius.circular(10)),
-                color: chatModel.isSender
-                    ? CustomColors().blueLighter
-                    : Colors.white,
-              ),
-              width: AppSizes().getBlockSizeHorizontal(30),
-              child: Padding(
-                padding: const EdgeInsets.all(5),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [Text(chatModel.name)],
+    AppSizes().initSizes(context);
+    return SizedBox(
+        width: AppSizes().getScreenWidth() / 3 * 2,
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: chatModel.isSender
+              ? MainAxisAlignment.end
+              : MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      color: chatModel.isSender
+                          ? StyleSheet().sendChatBuble1
+                          : StyleSheet().recieveChatBuble1,
+                      boxShadow: const [
+                        BoxShadow(
+                            blurRadius: 6,
+                            color: Colors.black,
+                            spreadRadius: BorderSide.strokeAlignCenter,
+                            offset: Offset(2, 2))
+                      ]),
+                  child: Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: Column(
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: chatModel.isSender
+                              ? CrossAxisAlignment.end
+                              : CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              chatModel.name,
+                              style: TextStyle(
+                                  color: chatModel.isSender
+                                      ? StyleSheet().sendChatBuble2
+                                      : StyleSheet().recieveChatBuble2,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Container(
+                                width: AppSizes().getBlockSizeHorizontal(45),
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(10)),
+                                  color: chatModel.isSender
+                                      ? StyleSheet().sendChatBuble2
+                                      : StyleSheet().recieveChatBuble2,
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: chatModel.isSender
+                                        ? CrossAxisAlignment.start
+                                        : CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        chatModel.msg,
+                                        style: TextStyle(
+                                            color: chatModel.isSender
+                                                ? StyleSheet().sendChatBuble1
+                                                : StyleSheet()
+                                                    .recieveChatBuble1,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: AppSizes()
+                                                .getBlockSizeHorizontal(5)),
+                                      ),
+                                    ],
+                                  ),
+                                )),
+                          ],
+                        )
+                      ],
                     ),
-                    Divider(
-                      height: 1,
-                      color: CustomColors().blueDark,
-                    ),
-                    Text(chatModel.msg),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [Text(chatModel.timestamp.split("T").last)],
-                    ),
-                  ],
-                ),
-              )),
-        )
-      ],
-    );
+                  )),
+            )
+          ],
+        ));
   }
 }
 
