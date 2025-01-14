@@ -2,6 +2,7 @@ import 'package:health_care/components/list/design1/list1.dart';
 import 'package:health_care/components/list/design1/list_item_data.dart';
 import 'package:health_care/constants/consts.dart';
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 
 class ReportList extends StatefulWidget {
   const ReportList({super.key});
@@ -13,36 +14,27 @@ class ReportList extends StatefulWidget {
 class _ReportListState extends State<ReportList> {
   @override
   Widget build(BuildContext context) {
+    AppSizes().initSizes(context);
     return Center(
-      child: List1(
-        data: [
-          ListItem1Data(
-              title: "Sahan",
-              icon: Icons.person,
-              onPressed: () {
-                Navigator.pushNamed(context, "/chat_screen");
-              }),
-          ListItem1Data(
-              title: "Asel",
-              icon: Icons.person_2,
-              onPressed: () {
-                Navigator.pushNamed(context, "/chat_screen");
-              }),
-          ListItem1Data(
-              title: "Hasindu",
-              icon: Icons.person_2_outlined,
-              onPressed: () {
-                Navigator.pushNamed(context, "/chat_screen");
-              }),
-          ListItem1Data(
-              title: "Nishan",
-              icon: Icons.person_3,
-              onPressed: () {
-                Navigator.pushNamed(context, "/chat_screen");
-              }),
-        ],
-        color: CustomColors().blueLighter,
-      ),
-    );
+        child: Container(
+            color: StyleSheet().uiBackground,
+            padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
+            child: Expanded(
+                child: List1(
+                    color: StyleSheet().uiBackground,
+                    data: List.of([
+                      ListItem1Data(
+                          title: "Generatl Report 01",
+                          icon: IconlyLight.document,
+                          onPressed: () {}),
+                      ListItem1Data(
+                          title: "Generatl Report 02",
+                          icon: IconlyLight.document,
+                          onPressed: () {}),
+                      ListItem1Data(
+                          title: "Generatl Report 03",
+                          icon: IconlyLight.document,
+                          onPressed: () {})
+                    ])))));
   }
 }

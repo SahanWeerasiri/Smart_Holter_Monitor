@@ -12,6 +12,7 @@ class TextInputWithSend extends StatefulWidget {
   final Color enableBorderColor;
   final Color shadowColor;
   final Color hintColor;
+  final Color iconColor;
   final bool isPassword;
   final TextInputType inputType;
   final String typeKey;
@@ -33,6 +34,7 @@ class TextInputWithSend extends StatefulWidget {
       this.shadowColor = Colors.blue,
       this.hintColor = Colors.grey,
       this.isPassword = false,
+      this.iconColor = Colors.blue,
       this.inputType = TextInputType.name,
       this.fontSize = 14,
       this.textColor = Colors.black});
@@ -72,7 +74,10 @@ class _TextInputWithSendState extends State<TextInputWithSend> {
               style:
                   TextStyle(fontSize: widget.fontSize, color: widget.textColor),
               decoration: InputDecoration(
-                prefixIcon: Icon(widget.icon as IconData?),
+                prefixIcon: Icon(
+                  widget.icon as IconData?,
+                  color: widget.iconColor,
+                ),
                 filled: true,
                 hintText: widget.hint,
                 fillColor: widget.shadowColor,
@@ -112,7 +117,7 @@ class _TextInputWithSendState extends State<TextInputWithSend> {
               });
             }
           },
-          icon: Icon(Icons.send, color: widget.enableBorderColor),
+          icon: Icon(Icons.send, color: widget.iconColor),
         ),
       ],
     );

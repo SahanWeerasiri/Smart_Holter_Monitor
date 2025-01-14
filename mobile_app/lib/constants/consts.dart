@@ -65,6 +65,8 @@ class StyleSheet {
   final Color currentHeartBox = const Color.fromARGB(255, 180, 216, 255);
   final Color avgHeartBox = const Color.fromARGB(255, 168, 255, 212);
   final Color stateHeartBox = const Color.fromARGB(255, 255, 252, 173);
+
+  final Color chatIcon = const Color.fromARGB(255, 64, 124, 226);
 }
 
 class AppSizes {
