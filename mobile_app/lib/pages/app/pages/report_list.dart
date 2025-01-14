@@ -19,22 +19,63 @@ class _ReportListState extends State<ReportList> {
         child: Container(
             color: StyleSheet().uiBackground,
             padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
-            child: Expanded(
-                child: List1(
-                    color: StyleSheet().uiBackground,
-                    data: List.of([
-                      ListItem1Data(
-                          title: "Generatl Report 01",
-                          icon: IconlyLight.document,
-                          onPressed: () {}),
-                      ListItem1Data(
-                          title: "Generatl Report 02",
-                          icon: IconlyLight.document,
-                          onPressed: () {}),
-                      ListItem1Data(
-                          title: "Generatl Report 03",
-                          icon: IconlyLight.document,
-                          onPressed: () {})
-                    ])))));
+            child: Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.only(
+                      left: AppSizes().getBlockSizeHorizontal(3)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Latest Report",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                Expanded(
+                    child: List1(
+                        color: StyleSheet().uiBackground,
+                        data: List.of([
+                          ListItem1Data(
+                              title: "Generatl Report 01",
+                              icon: IconlyLight.document,
+                              onPressed: () {}),
+                        ]))),
+                Container(
+                  padding: EdgeInsets.only(
+                      left: AppSizes().getBlockSizeHorizontal(3)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Old Reports",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                Expanded(
+                    child: List1(
+                        color: StyleSheet().uiBackground,
+                        data: List.of([
+                          ListItem1Data(
+                              title: "Generatl Report 02",
+                              icon: IconlyLight.document,
+                              onPressed: () {}),
+                          ListItem1Data(
+                              title: "Generatl Report 03",
+                              icon: IconlyLight.document,
+                              onPressed: () {})
+                        ]))),
+              ],
+            )));
   }
 }
