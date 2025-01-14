@@ -1,4 +1,4 @@
-import 'package:health_care/components/buttons/custom_button_1/custom_button.dart';
+import 'package:health_care/components/buttons/custom_text_button/custom_text_button.dart';
 import 'package:health_care/components/dialogues/simple_dialogue.dart';
 import 'package:health_care/components/text_input/text_input_with_leading_icon.dart';
 import 'package:health_care/components/top_app_bar/top_app_bar2.dart';
@@ -76,18 +76,23 @@ class _LoginState extends State<Login> {
         backButton: true,
         backgroundColor: StyleSheet().topbarBackground,
         titleColor: StyleSheet().topbarText,
-        backOnPressed: () {},
+        backOnPressed: () {
+          Navigator.pop(context);
+        },
       ),
       body: SingleChildScrollView(
         child: Container(
-          height: AppSizes().getScreenHeight() * 0.9,
+          height: AppSizes().getScreenHeight(),
           color: StyleSheet().uiBackground,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(5),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -97,8 +102,8 @@ class _LoginState extends State<Login> {
                     )
                   ],
                 ),
-                const SizedBox(
-                  height: 5,
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(1),
                 ),
                 InputFieldFb3(
                     inputController: credentialController,
@@ -111,15 +116,15 @@ class _LoginState extends State<Login> {
                     borderColor: StyleSheet().greyHint,
                     focusedBorderColor: StyleSheet().enableBorder,
                     typeKey: CustomTextInputTypes().username),
-                const SizedBox(
-                  height: 10,
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(3),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [Text("Password", style: textStyleTextInputTopic)],
                 ),
-                const SizedBox(
-                  height: 5,
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(1),
                 ),
                 InputFieldFb3(
                     inputController: CredentialController(),
@@ -133,11 +138,10 @@ class _LoginState extends State<Login> {
                     focusedBorderColor: StyleSheet().enableBorder,
                     isPassword: true,
                     typeKey: CustomTextInputTypes().password),
-                const SizedBox(
-                  height: 10,
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(5),
                 ),
-                CustomButton(
-                  width: AppSizes.blockSizeHorizontal * 310,
+                CustomTextButton(
                   label: "Sign In",
                   onPressed: () {
                     if (checkCredentials()) {
@@ -154,21 +158,25 @@ class _LoginState extends State<Login> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Text("Don't you have an account?"),
+                    const Text("Don't you have an account?",
+                        style: TextStyle(
+                          fontSize: 15,
+                        )),
                     TextButton(
                         child: Text(
                           "Sign up",
                           style: TextStyle(
-                            color: StyleSheet().btnBackground,
-                          ),
+                              fontSize: 15,
+                              color: StyleSheet().btnBackground,
+                              fontWeight: FontWeight.w900),
                         ),
                         onPressed: () {
                           navigateToSignUp();
                         }),
                   ],
                 ),
-                const SizedBox(
-                  height: 10,
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(5),
                 ),
                 Divider(
                   color: StyleSheet().divider,
@@ -176,26 +184,29 @@ class _LoginState extends State<Login> {
                   height: 2,
                   thickness: 2,
                 ),
-                const SizedBox(
-                  height: 10,
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(5),
                 ),
-                CustomButton(
+                CustomTextButton(
                   label: "Sign in with Google",
                   borderRadius: 5,
-                  width: 400,
                   onPressed: () {},
+                  borderColor: StyleSheet().elebtnBorder,
                   img: 'assetes/icons/google.png',
                   textColor: StyleSheet().elebtnText,
-                  backgroundColor: StyleSheet().elebtnBackground,
+                  backgroundColor: StyleSheet().uiBackground,
                 ),
-                CustomButton(
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(2),
+                ),
+                CustomTextButton(
                   borderRadius: 5,
                   label: "Sign in with Facebook",
                   onPressed: () {},
-                  width: 300,
                   img: 'assetes/icons/facebook.png',
                   textColor: StyleSheet().elebtnText,
-                  backgroundColor: StyleSheet().elebtnBackground,
+                  backgroundColor: StyleSheet().uiBackground,
+                  borderColor: StyleSheet().elebtnBorder,
                 ),
               ],
             ),
