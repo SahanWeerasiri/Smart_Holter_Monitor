@@ -32,29 +32,41 @@ class CustomTopAppBar2 extends StatelessWidget implements PreferredSizeWidget {
         elevation: 1,
         automaticallyImplyLeading: automaticLeading,
         leading: null,
-        title:
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          SizedBox(
-            width: AppSizes().getBlockSizeHorizontal(10),
-            child: backButton
-                ? IconButton(
-                    icon: Icon(Icons.keyboard_arrow_left, color: titleColor),
-                    onPressed: backOnPressed ?? () {},
-                  )
-                : null,
-          ),
-          Text(
-            title,
-            style: TextStyle(
-                backgroundColor: backgroundColor,
-                color: titleColor,
-                fontWeight: FontWeight.w900,
-                fontSize: 25),
-          ),
-          SizedBox(
-            width: AppSizes().getBlockSizeHorizontal(10),
-          )
-        ]),
+        title: backButton
+            ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                SizedBox(
+                    width: AppSizes().getBlockSizeHorizontal(10),
+                    child: IconButton(
+                      icon: Icon(Icons.keyboard_arrow_left, color: titleColor),
+                      onPressed: backOnPressed ?? () {},
+                    )),
+                Text(
+                  title,
+                  style: TextStyle(
+                      backgroundColor: backgroundColor,
+                      color: titleColor,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 25),
+                ),
+                SizedBox(
+                  width: AppSizes().getBlockSizeHorizontal(10),
+                )
+              ])
+            : Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                SizedBox(
+                    width: AppSizes().getBlockSizeHorizontal(5), child: null),
+                Text(
+                  title,
+                  style: TextStyle(
+                      backgroundColor: backgroundColor,
+                      color: titleColor,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 25),
+                ),
+                SizedBox(
+                  width: AppSizes().getBlockSizeHorizontal(10),
+                )
+              ]),
         actions: actions);
   }
 }
