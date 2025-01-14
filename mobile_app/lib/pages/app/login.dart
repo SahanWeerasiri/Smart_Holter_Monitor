@@ -1,4 +1,4 @@
-import 'package:health_care/components/buttons/custom_button_1/custom_button.dart';
+import 'package:health_care/components/buttons/custom_text_button/custom_text_button.dart';
 import 'package:health_care/components/dialogues/simple_dialogue.dart';
 import 'package:health_care/components/text_input/text_input_with_leading_icon.dart';
 import 'package:health_care/components/top_app_bar/top_app_bar2.dart';
@@ -139,8 +139,7 @@ class _LoginState extends State<Login> {
                 SizedBox(
                   height: AppSizes().getBlockSizeVertical(5),
                 ),
-                CustomButton(
-                  width: AppSizes.blockSizeHorizontal * 310,
+                CustomTextButton(
                   label: "Sign In",
                   onPressed: () {
                     if (checkCredentials()) {
@@ -157,13 +156,17 @@ class _LoginState extends State<Login> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Text("Don't you have an account?"),
+                    const Text("Don't you have an account?",
+                        style: TextStyle(
+                          fontSize: 15,
+                        )),
                     TextButton(
                         child: Text(
                           "Sign up",
                           style: TextStyle(
-                            color: StyleSheet().btnBackground,
-                          ),
+                              fontSize: 15,
+                              color: StyleSheet().btnBackground,
+                              fontWeight: FontWeight.w900),
                         ),
                         onPressed: () {
                           navigateToSignUp();
@@ -182,23 +185,26 @@ class _LoginState extends State<Login> {
                 SizedBox(
                   height: AppSizes().getBlockSizeVertical(5),
                 ),
-                CustomButton(
+                CustomTextButton(
                   label: "Sign in with Google",
                   borderRadius: 5,
-                  width: 400,
                   onPressed: () {},
+                  borderColor: StyleSheet().elebtnBorder,
                   img: 'assetes/icons/google.png',
                   textColor: StyleSheet().elebtnText,
-                  backgroundColor: StyleSheet().elebtnBackground,
+                  backgroundColor: StyleSheet().uiBackground,
                 ),
-                CustomButton(
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(2),
+                ),
+                CustomTextButton(
                   borderRadius: 5,
                   label: "Sign in with Facebook",
                   onPressed: () {},
-                  width: 300,
                   img: 'assetes/icons/facebook.png',
                   textColor: StyleSheet().elebtnText,
-                  backgroundColor: StyleSheet().elebtnBackground,
+                  backgroundColor: StyleSheet().uiBackground,
+                  borderColor: StyleSheet().elebtnBorder,
                 ),
               ],
             ),

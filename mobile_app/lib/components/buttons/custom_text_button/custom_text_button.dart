@@ -49,13 +49,13 @@ class CustomTextButton extends StatelessWidget {
             ? RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(borderRadius),
                 side: borderColor != null
-                    ? BorderSide(color: borderColor!)
+                    ? BorderSide(color: borderColor!, width: 2)
                     : BorderSide.none,
               )
             : RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(cornerRadius),
                 side: borderColor != null
-                    ? BorderSide(color: borderColor!)
+                    ? BorderSide(color: borderColor!, width: 2)
                     : BorderSide.none,
               ),
       ),

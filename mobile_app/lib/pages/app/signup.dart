@@ -205,6 +205,7 @@ class _SignupState extends State<Signup> {
                   img: 'assetes/icons/google.png',
                   textColor: StyleSheet().elebtnText,
                   backgroundColor: StyleSheet().elebtnBackground,
+                  borderColor: StyleSheet().elebtnBorder,
                 ),
                 SizedBox(
                   height: AppSizes().getBlockSizeVertical(2),
@@ -216,6 +217,7 @@ class _SignupState extends State<Signup> {
                   img: 'assetes/icons/facebook.png',
                   textColor: StyleSheet().elebtnText,
                   backgroundColor: StyleSheet().elebtnBackground,
+                  borderColor: StyleSheet().elebtnBorder,
                 ),
               ],
             ),

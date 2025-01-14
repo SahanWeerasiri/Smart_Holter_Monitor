@@ -28,8 +28,9 @@ class StyleSheet {
   final Color btnBackground = const Color.fromARGB(255, 64, 124, 226);
   final Color btnText = Colors.white;
 
-  final Color elebtnBackground = const Color.fromARGB(255, 240, 240, 240);
+  final Color elebtnBackground = Colors.white;
   final Color elebtnText = Colors.black;
+  final Color elebtnBorder = const Color.fromARGB(255, 163, 163, 163);
 
   final Color greyHint = const Color.fromARGB(255, 62, 62, 62);
   final Color textBackground = const Color.fromARGB(255, 229, 229, 229);
