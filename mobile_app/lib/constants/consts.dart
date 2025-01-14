@@ -67,6 +67,10 @@ class StyleSheet {
   final Color stateHeartBox = const Color.fromARGB(255, 255, 252, 173);
 
   final Color chatIcon = const Color.fromARGB(255, 64, 124, 226);
+  final Color sendChatBuble1 = const Color.fromARGB(255, 64, 124, 226);
+  final Color sendChatBuble2 = const Color.fromARGB(255, 235, 242, 255);
+  final Color recieveChatBuble1 = const Color.fromARGB(255, 235, 242, 255);
+  final Color recieveChatBuble2 = const Color.fromARGB(255, 64, 124, 226);
 }
 
 class AppSizes {

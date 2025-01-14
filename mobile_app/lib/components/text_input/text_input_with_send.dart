@@ -71,8 +71,10 @@ class _TextInputWithSendState extends State<TextInputWithSend> {
               cursorColor: widget.enableBorderColor,
               obscureText: widget.isPassword,
               keyboardType: widget.inputType,
-              style:
-                  TextStyle(fontSize: widget.fontSize, color: widget.textColor),
+              style: TextStyle(
+                  fontSize: widget.fontSize,
+                  color: widget.textColor,
+                  fontWeight: FontWeight.w500),
               decoration: InputDecoration(
                 prefixIcon: Icon(
                   widget.icon as IconData?,

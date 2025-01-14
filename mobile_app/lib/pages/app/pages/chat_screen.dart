@@ -12,7 +12,10 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  List<ChatBubble> _chatBubbles = [];
+  final List<ChatBubble> _chatBubbles = [
+    ChatBubble(
+        chatModel: ChatModel("msg1", "2024-01-01 11:01:14", false, "AI")),
+  ];
   bool _isLoading = true; // Loading state
   final CredentialController credentialController = CredentialController();
 
@@ -44,7 +47,7 @@ class _ChatScreenState extends State<ChatScreen> {
         "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}_${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
     setState(() {
       _chatBubbles.add(ChatBubble(
-          chatModel: ChatModel(credentialController.text, d, true, "Me", 1)));
+          chatModel: ChatModel(credentialController.text, d, true, "Me")));
     });
   }
 
@@ -77,6 +80,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   hintColor: StyleSheet().greyHint,
                   textColor: StyleSheet().text,
                   iconColor: StyleSheet().chatIcon,
+                  fontSize: AppSizes().getBlockSizeHorizontal(5),
                   shadowColor: StyleSheet().textBackground,
                   enableBorderColor: StyleSheet().disabledBorder,
                   focusedBorderColor: StyleSheet().enableBorder,

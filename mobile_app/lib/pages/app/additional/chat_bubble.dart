@@ -22,10 +22,14 @@ class ChatBubble extends StatelessWidget {
                   decoration: BoxDecoration(
                       borderRadius: const BorderRadius.all(Radius.circular(10)),
                       color: chatModel.isSender
-                          ? CustomColors().blueLight
-                          : Colors.white,
+                          ? StyleSheet().sendChatBuble1
+                          : StyleSheet().recieveChatBuble1,
                       boxShadow: const [
-                        BoxShadow(blurRadius: 10, color: Colors.black)
+                        BoxShadow(
+                            blurRadius: 6,
+                            color: Colors.black,
+                            spreadRadius: BorderSide.strokeAlignCenter,
+                            offset: Offset(2, 2))
                       ]),
                   child: Padding(
                     padding: const EdgeInsets.all(5),
@@ -41,8 +45,8 @@ class ChatBubble extends StatelessWidget {
                               chatModel.name,
                               style: TextStyle(
                                   color: chatModel.isSender
-                                      ? Colors.white
-                                      : CustomColors().blueLight,
+                                      ? StyleSheet().sendChatBuble2
+                                      : StyleSheet().recieveChatBuble2,
                                   fontWeight: FontWeight.bold),
                             ),
                             Container(
@@ -51,8 +55,8 @@ class ChatBubble extends StatelessWidget {
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(10)),
                                   color: chatModel.isSender
-                                      ? CustomColors().blueLighter
-                                      : CustomColors().blueDark,
+                                      ? StyleSheet().sendChatBuble2
+                                      : StyleSheet().recieveChatBuble2,
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(5),
@@ -66,8 +70,9 @@ class ChatBubble extends StatelessWidget {
                                         chatModel.msg,
                                         style: TextStyle(
                                             color: chatModel.isSender
-                                                ? CustomColors().blueDark
-                                                : Colors.white,
+                                                ? StyleSheet().sendChatBuble1
+                                                : StyleSheet()
+                                                    .recieveChatBuble1,
                                             fontWeight: FontWeight.w500,
                                             fontSize: AppSizes()
                                                 .getBlockSizeHorizontal(5)),
@@ -91,6 +96,5 @@ class ChatModel {
   final String timestamp;
   final bool isSender;
   final String name;
-  final int senderId;
-  ChatModel(this.msg, this.timestamp, this.isSender, this.name, this.senderId);
+  ChatModel(this.msg, this.timestamp, this.isSender, this.name);
 }
