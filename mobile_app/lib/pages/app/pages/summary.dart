@@ -152,7 +152,7 @@ class _SummaryState extends State<Summary> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Text(
-                  "Latest Report",
+                  "Assigned Doctor",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
@@ -166,8 +166,8 @@ class _SummaryState extends State<Summary> {
                   color: StyleSheet().uiBackground,
                   data: List.of([
                     ListItem1Data(
-                        title: "Generatl Report",
-                        icon: IconlyLight.document,
+                        title: "Dr.ABCD",
+                        icon: IconlyLight.heart,
                         onPressed: () {}),
                   ])))
         ],
