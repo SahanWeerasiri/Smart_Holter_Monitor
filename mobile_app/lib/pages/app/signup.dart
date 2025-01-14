@@ -1,7 +1,7 @@
-import 'package:health_care/components/buttons/custom_button_1/custom_button.dart';
+import 'package:health_care/components/buttons/custom_text_button/custom_text_button.dart';
 import 'package:health_care/components/dialogues/simple_dialogue.dart';
 import 'package:health_care/components/text_input/text_input_with_leading_icon.dart';
-import 'package:health_care/components/top_app_bar/top_app_bar.dart';
+import 'package:health_care/components/top_app_bar/top_app_bar2.dart';
 import 'package:health_care/constants/consts.dart';
 import 'package:health_care/controllers/textController.dart';
 import 'package:flutter/material.dart';
@@ -72,75 +72,79 @@ class _SignupState extends State<Signup> {
 
   @override
   Widget build(BuildContext context) {
-    AppSizes().initSizes(context);
+    AppSizes appSizes = AppSizes();
+    appSizes.initSizes(context);
     return Scaffold(
-      appBar: MallikaAppBar5(
+      appBar: CustomTopAppBar2(
         title: "Sign up",
         backButton: true,
         backOnPressed: () {
           credentialController.clear();
           Navigator.pop(context);
         },
-        titleColor: Colors.white,
-        backgroundColor: CustomColors().blue,
+        titleColor: StyleSheet().topbarText,
+        backgroundColor: StyleSheet().topbarBackground,
       ),
       body: SingleChildScrollView(
         child: Container(
           height: AppSizes().getScreenHeight(),
-          color: Colors.white,
+          color: StyleSheet().uiBackground,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(5),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      "User Name",
+                      "Email",
                       style: textStyleTextInputTopic,
                     )
                   ],
                 ),
-                const SizedBox(
-                  height: 5,
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(1),
                 ),
                 InputFieldFb3(
                     inputController: credentialController,
-                    hint: "User name",
-                    icon: Icons.person,
-                    hintColor: CustomColors().greyHint,
-                    textColor: CustomColors().blueDark,
-                    shadowColor: CustomColors().blueLighter,
-                    enableBorderColor: CustomColors().blueLight,
-                    borderColor: CustomColors().blueDark,
-                    focusedBorderColor: CustomColors().blueDark,
+                    hint: "Email",
+                    icon: Icons.email,
+                    hintColor: StyleSheet().greyHint,
+                    textColor: StyleSheet().text,
+                    shadowColor: StyleSheet().textBackground,
+                    enableBorderColor: StyleSheet().disabledBorder,
+                    borderColor: StyleSheet().greyHint,
+                    focusedBorderColor: StyleSheet().enableBorder,
                     typeKey: CustomTextInputTypes().username),
-                const SizedBox(
-                  height: 10,
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(3),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [Text("Password", style: textStyleTextInputTopic)],
                 ),
-                const SizedBox(
-                  height: 5,
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(1),
                 ),
                 InputFieldFb3(
                     inputController: CredentialController(),
                     hint: "Password",
                     icon: Icons.key,
-                    hintColor: CustomColors().greyHint,
-                    textColor: CustomColors().blueDark,
-                    shadowColor: CustomColors().blueLighter,
-                    enableBorderColor: CustomColors().blueLight,
-                    borderColor: CustomColors().blueDark,
-                    focusedBorderColor: CustomColors().blueDark,
+                    hintColor: StyleSheet().greyHint,
+                    textColor: StyleSheet().text,
+                    shadowColor: StyleSheet().textBackground,
+                    enableBorderColor: StyleSheet().disabledBorder,
+                    borderColor: StyleSheet().greyHint,
+                    focusedBorderColor: StyleSheet().enableBorder,
                     isPassword: true,
                     typeKey: CustomTextInputTypes().password),
-                const SizedBox(
-                  height: 10,
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(3),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -148,86 +152,71 @@ class _SignupState extends State<Signup> {
                     Text("Confirm Password", style: textStyleTextInputTopic)
                   ],
                 ),
-                const SizedBox(
-                  height: 5,
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(1),
                 ),
                 InputFieldFb3(
                     inputController: CredentialController(),
                     hint: "Confirm Password",
                     icon: Icons.key,
-                    hintColor: CustomColors().greyHint,
-                    textColor: CustomColors().blueDark,
-                    shadowColor: CustomColors().blueLighter,
-                    enableBorderColor: CustomColors().blueLight,
-                    borderColor: CustomColors().blueDark,
-                    focusedBorderColor: CustomColors().blueDark,
+                    hintColor: StyleSheet().greyHint,
+                    textColor: StyleSheet().text,
+                    shadowColor: StyleSheet().textBackground,
+                    enableBorderColor: StyleSheet().disabledBorder,
+                    borderColor: StyleSheet().greyHint,
+                    focusedBorderColor: StyleSheet().enableBorder,
                     isPassword: true,
                     typeKey: CustomTextInputTypes().confirmPassword),
-                const SizedBox(
-                  height: 10,
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(5),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    CustomButton(
-                        label: "Sign up",
-                        backgroundColor: CustomColors().blue,
-                        textColor: Colors.white,
-                        icon: Icons.create,
-                        onPressed: () {
-                          if (checkCredentials()) {
-                            navigateToHome();
-                          } else {
-                            signUpError();
-                          }
-                        }),
-                  ],
+                CustomTextButton(
+                  label: "Sign Up",
+                  onPressed: () {
+                    if (checkCredentials()) {
+                      navigateToHome();
+                    } else {
+                      signUpError();
+                    }
+                  },
+                  backgroundColor: StyleSheet().btnBackground,
+                  textColor: StyleSheet().btnText,
+                  icon: Icons.login,
                 ),
-                const SizedBox(
-                  height: 10,
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(4),
                 ),
                 Divider(
-                  color: CustomColors().greyHint,
+                  color: StyleSheet().divider,
                   endIndent: 5,
                   thickness: 2,
                 ),
-                const SizedBox(
-                  height: 10,
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(4),
                 ),
                 const Text("Sign up with,"),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    CustomButton(
-                        label: "Google",
-                        backgroundColor: CustomColors().blue,
-                        textColor: Colors.white,
-                        icon: Icons.g_mobiledata_rounded,
-                        onPressed: () {
-                          if (checkGoogleCredentials()) {
-                            navigateToHome();
-                          } else {
-                            signUpError();
-                          }
-                        }),
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    CustomButton(
-                        label: "Facebook",
-                        backgroundColor: CustomColors().blue,
-                        textColor: Colors.white,
-                        icon: Icons.facebook,
-                        onPressed: () {
-                          if (checkFacebookCredentials()) {
-                            navigateToHome();
-                          } else {
-                            signUpError();
-                          }
-                        }),
-                  ],
-                )
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(1),
+                ),
+                CustomTextButton(
+                  label: "Sign in with Google",
+                  borderRadius: 5,
+                  onPressed: () {},
+                  img: 'assetes/icons/google.png',
+                  textColor: StyleSheet().elebtnText,
+                  backgroundColor: StyleSheet().elebtnBackground,
+                ),
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(2),
+                ),
+                CustomTextButton(
+                  borderRadius: 5,
+                  label: "Sign in with Facebook",
+                  onPressed: () {},
+                  img: 'assetes/icons/facebook.png',
+                  textColor: StyleSheet().elebtnText,
+                  backgroundColor: StyleSheet().elebtnBackground,
+                ),
               ],
             ),
           ),
