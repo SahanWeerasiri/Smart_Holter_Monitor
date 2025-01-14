@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:health_care/components/top_app_bar/top_app_bar2.dart';
 import 'package:health_care/pages/app/pages/chat_screen.dart';
+import 'package:health_care/pages/app/pages/profile.dart';
 import 'package:health_care/pages/app/pages/report_list.dart';
 import 'package:health_care/pages/app/pages/summary.dart';
 import '../../constants/consts.dart';
@@ -22,7 +23,7 @@ class _HomeState extends State<Home> {
     const Center(child: Summary()),
     const Center(child: ReportList()),
     const Center(child: ChatScreen()),
-    const Center(child: Text("Profile")),
+    const Center(child: Profile(uid: 1)),
   ];
   late final CustomMenuController menuController;
 

@@ -5,6 +5,7 @@ class CustomTextInputTypes {
   final String password = "PASSWORD";
   final String confirmPassword = "CONFIRM_PASSWORD";
   final String text = "TEXT";
+  final String name = "NAME";
 }
 
 class CustomColors {
@@ -71,6 +72,9 @@ class StyleSheet {
   final Color sendChatBuble2 = const Color.fromARGB(255, 235, 242, 255);
   final Color recieveChatBuble1 = const Color.fromARGB(255, 235, 242, 255);
   final Color recieveChatBuble2 = const Color.fromARGB(255, 64, 124, 226);
+
+  final Color profileBase = const Color.fromARGB(255, 180, 216, 255);
+  final Color profiletext = const Color.fromARGB(255, 0, 0, 0);
 }
 
 class AppSizes {
