@@ -85,9 +85,12 @@ class _LoginState extends State<Login> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(5),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -97,8 +100,8 @@ class _LoginState extends State<Login> {
                     )
                   ],
                 ),
-                const SizedBox(
-                  height: 5,
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(1),
                 ),
                 InputFieldFb3(
                     inputController: credentialController,
@@ -111,15 +114,15 @@ class _LoginState extends State<Login> {
                     borderColor: StyleSheet().greyHint,
                     focusedBorderColor: StyleSheet().enableBorder,
                     typeKey: CustomTextInputTypes().username),
-                const SizedBox(
-                  height: 10,
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(3),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [Text("Password", style: textStyleTextInputTopic)],
                 ),
-                const SizedBox(
-                  height: 5,
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(1),
                 ),
                 InputFieldFb3(
                     inputController: CredentialController(),
@@ -133,8 +136,8 @@ class _LoginState extends State<Login> {
                     focusedBorderColor: StyleSheet().enableBorder,
                     isPassword: true,
                     typeKey: CustomTextInputTypes().password),
-                const SizedBox(
-                  height: 10,
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(5),
                 ),
                 CustomButton(
                   width: AppSizes.blockSizeHorizontal * 310,
@@ -167,8 +170,8 @@ class _LoginState extends State<Login> {
                         }),
                   ],
                 ),
-                const SizedBox(
-                  height: 10,
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(5),
                 ),
                 Divider(
                   color: StyleSheet().divider,
@@ -176,8 +179,8 @@ class _LoginState extends State<Login> {
                   height: 2,
                   thickness: 2,
                 ),
-                const SizedBox(
-                  height: 10,
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(5),
                 ),
                 CustomButton(
                   label: "Sign in with Google",
