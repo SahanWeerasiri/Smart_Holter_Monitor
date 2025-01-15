@@ -37,6 +37,7 @@ dependencies:
   iconly: ^1.0.1
   flame: ^1.23.0
   flame_splash_screen: ^0.3.1
+  firebase_auth: ^5.4.0
 
 dev_dependencies:
   flutter_test:
