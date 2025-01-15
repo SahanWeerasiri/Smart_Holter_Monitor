@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:health_care/components/buttons/custom_text_button/custom_text_button.dart';
 import 'package:health_care/components/dialogues/simple_dialogue.dart';
 import 'package:health_care/components/text_input/text_input_with_leading_icon.dart';
@@ -5,6 +6,7 @@ import 'package:health_care/components/top_app_bar/top_app_bar2.dart';
 import 'package:health_care/constants/consts.dart';
 import 'package:health_care/controllers/textController.dart';
 import 'package:flutter/material.dart';
+import 'package:health_care/pages/app/services/auth_service.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -33,7 +35,20 @@ class _LoginState extends State<Login> {
         fontWeight: FontWeight.bold);
   }
 
-  bool checkCredentials() {
+  @override
+  void dispose() {
+    super.dispose();
+    credentialController.username = "";
+    credentialController.password = "";
+  }
+
+  Future<bool> checkCredentials() async {
+    AuthService auth = AuthService();
+    User? user = await auth.loginUserWithEmailAndPassword(
+        credentialController.username, credentialController.password);
+    if (user == null) {
+      return false;
+    }
     return true;
   }
 
@@ -143,8 +158,8 @@ class _LoginState extends State<Login> {
                 ),
                 CustomTextButton(
                   label: "Sign In",
-                  onPressed: () {
-                    if (checkCredentials()) {
+                  onPressed: () async {
+                    if (await checkCredentials()) {
                       navigateToHome();
                     } else {
                       loginError();
