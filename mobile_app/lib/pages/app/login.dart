@@ -65,6 +65,34 @@ class _LoginState extends State<Login> {
     return true;
   }
 
+  Future<bool> checkGoogleCredentials() async {
+    AuthService auth = AuthService();
+
+    Map<String, dynamic> result = await auth.signUpWithGoogle();
+    if (result["status"] == "error") {
+      setState(() {
+        msg = result["message"];
+      });
+      return false;
+    }
+    setState(() {
+      msg = result["message"];
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(msg),
+          backgroundColor: Colors.green,
+        ),
+      );
+    });
+    return true;
+  }
+
+  // bool checkFacebookCredentials() {
+  //   return true;
+  // }
+
   void navigateToSignUp() {
     credentialController.clear();
     Navigator.pushNamed(context, '/signup');
@@ -209,24 +237,30 @@ class _LoginState extends State<Login> {
                 CustomTextButton(
                   label: "Sign in with Google",
                   borderRadius: 5,
-                  onPressed: () {},
+                  onPressed: () async {
+                    if (await checkGoogleCredentials()) {
+                      navigateToHome();
+                    } else {
+                      loginError();
+                    }
+                  },
                   borderColor: StyleSheet().elebtnBorder,
                   img: 'assetes/icons/google.png',
                   textColor: StyleSheet().elebtnText,
                   backgroundColor: StyleSheet().uiBackground,
                 ),
-                SizedBox(
-                  height: AppSizes().getBlockSizeVertical(2),
-                ),
-                CustomTextButton(
-                  borderRadius: 5,
-                  label: "Sign in with Facebook",
-                  onPressed: () {},
-                  img: 'assetes/icons/facebook.png',
-                  textColor: StyleSheet().elebtnText,
-                  backgroundColor: StyleSheet().uiBackground,
-                  borderColor: StyleSheet().elebtnBorder,
-                ),
+                // SizedBox(
+                //   height: AppSizes().getBlockSizeVertical(2),
+                // ),
+                // CustomTextButton(
+                //   borderRadius: 5,
+                //   label: "Sign in with Facebook",
+                //   onPressed: () {},
+                //   img: 'assetes/icons/facebook.png',
+                //   textColor: StyleSheet().elebtnText,
+                //   backgroundColor: StyleSheet().uiBackground,
+                //   borderColor: StyleSheet().elebtnBorder,
+                // ),
               ],
             ),
           ),

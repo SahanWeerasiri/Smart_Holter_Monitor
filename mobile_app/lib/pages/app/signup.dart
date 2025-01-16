@@ -85,34 +85,6 @@ class _SignupState extends State<Signup> {
     return true;
   }
 
-  Future<bool> checkGoogleCredentials() async {
-    AuthService auth = AuthService();
-
-    Map<String, dynamic> result = await auth.signUpWithGoogle();
-    if (result["status"] == "error") {
-      setState(() {
-        msg = result["message"];
-      });
-      return false;
-    }
-    setState(() {
-      msg = result["message"];
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(msg),
-          backgroundColor: Colors.green,
-        ),
-      );
-    });
-    return true;
-  }
-
-  bool checkFacebookCredentials() {
-    return true;
-  }
-
   void signUpError() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -241,48 +213,6 @@ class _SignupState extends State<Signup> {
                   backgroundColor: StyleSheet().btnBackground,
                   textColor: StyleSheet().btnText,
                   icon: Icons.login,
-                ),
-                SizedBox(
-                  height: AppSizes().getBlockSizeVertical(4),
-                ),
-                Divider(
-                  color: StyleSheet().divider,
-                  endIndent: 5,
-                  thickness: 2,
-                ),
-                SizedBox(
-                  height: AppSizes().getBlockSizeVertical(4),
-                ),
-                const Text("Sign up with,"),
-                SizedBox(
-                  height: AppSizes().getBlockSizeVertical(1),
-                ),
-                CustomTextButton(
-                  label: "Sign in with Google",
-                  borderRadius: 5,
-                  onPressed: () async {
-                    if (await checkGoogleCredentials()) {
-                      navigateToHome();
-                    } else {
-                      signUpError();
-                    }
-                  },
-                  img: 'assetes/icons/google.png',
-                  textColor: StyleSheet().elebtnText,
-                  backgroundColor: StyleSheet().elebtnBackground,
-                  borderColor: StyleSheet().elebtnBorder,
-                ),
-                SizedBox(
-                  height: AppSizes().getBlockSizeVertical(2),
-                ),
-                CustomTextButton(
-                  borderRadius: 5,
-                  label: "Sign in with Facebook",
-                  onPressed: () {},
-                  img: 'assetes/icons/facebook.png',
-                  textColor: StyleSheet().elebtnText,
-                  backgroundColor: StyleSheet().elebtnBackground,
-                  borderColor: StyleSheet().elebtnBorder,
                 ),
               ],
             ),
