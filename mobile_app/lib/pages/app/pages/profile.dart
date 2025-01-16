@@ -17,8 +17,7 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  String name = "Name";
-  String email = "Email";
+  final UserProfile _userProfile = UserProfile(name: "Name", email: "Email");
   late final CredentialController credentialController = CredentialController();
   bool _isLoading = true; // Loading state
 
@@ -36,8 +35,16 @@ class _ProfileState extends State<Profile> {
         await FirestoreDbService().fetchAccount(widget.user!.uid);
     if (res['success']) {
       setState(() {
-        name = res['data']['name'];
-        email = res['data']['email'];
+        _userProfile.name = res['data']['name'];
+        _userProfile.email = res['data']['email'];
+        _userProfile.address = res['data']['address'];
+        _userProfile.color = res['data']['color'];
+        _userProfile.device = res['data']['device'];
+        _userProfile.isDone = res['data']['is_done'];
+        _userProfile.language = res['data']['language'];
+        _userProfile.mobile = res['data']['mobile'];
+        _userProfile.pic = res['data']['pic'];
+        _userProfile.doctorId = res['data']['doctor_id'];
       });
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -87,7 +94,7 @@ class _ProfileState extends State<Profile> {
                 child: Padding(
                   padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
                   child: Text(
-                    name,
+                    _userProfile.name,
                     style: TextStyle(
                       fontSize: AppSizes().getBlockSizeHorizontal(5),
                       color: StyleSheet().profiletext,
@@ -103,7 +110,7 @@ class _ProfileState extends State<Profile> {
                 child: Padding(
                   padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
                   child: Text(
-                    email,
+                    _userProfile.email,
                     style: TextStyle(
                       fontSize: AppSizes().getBlockSizeHorizontal(5),
                       color: StyleSheet().profiletext,
@@ -119,7 +126,7 @@ class _ProfileState extends State<Profile> {
                 child: Padding(
                   padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
                   child: Text(
-                    "Mobile",
+                    _userProfile.mobile,
                     style: TextStyle(
                       fontSize: AppSizes().getBlockSizeHorizontal(5),
                       color: StyleSheet().profiletext,
@@ -135,7 +142,7 @@ class _ProfileState extends State<Profile> {
                 child: Padding(
                   padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
                   child: Text(
-                    "Address",
+                    _userProfile.address,
                     style: TextStyle(
                       fontSize: AppSizes().getBlockSizeHorizontal(5),
                       color: StyleSheet().profiletext,
@@ -151,7 +158,7 @@ class _ProfileState extends State<Profile> {
                 child: Padding(
                   padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
                   child: Text(
-                    "Birthday",
+                    _userProfile.language,
                     style: TextStyle(
                       fontSize: AppSizes().getBlockSizeHorizontal(5),
                       color: StyleSheet().profiletext,
@@ -167,23 +174,7 @@ class _ProfileState extends State<Profile> {
                 child: Padding(
                   padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
                   child: Text(
-                    "Language",
-                    style: TextStyle(
-                      fontSize: AppSizes().getBlockSizeHorizontal(5),
-                      color: StyleSheet().profiletext,
-                    ),
-                  ),
-                )),
-            Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  color: StyleSheet().profileBase,
-                ),
-                width: double.infinity,
-                child: Padding(
-                  padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
-                  child: Text(
-                    "Device",
+                    _userProfile.device,
                     style: TextStyle(
                       fontSize: AppSizes().getBlockSizeHorizontal(5),
                       color: StyleSheet().profiletext,
