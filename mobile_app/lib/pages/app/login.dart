@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:health_care/components/buttons/custom_text_button/custom_text_button.dart';
 import 'package:health_care/components/dialogues/simple_dialogue.dart';
 import 'package:health_care/components/text_input/text_input_with_leading_icon.dart';
@@ -20,6 +19,7 @@ class _LoginState extends State<Login> {
   late final TextStyle textStyleHeading;
   late final TextStyle textStyleTextInputTopic;
   late final TextStyle textStyleInputField;
+  String msg = "";
 
   @override
   void initState() {
@@ -44,11 +44,17 @@ class _LoginState extends State<Login> {
 
   Future<bool> checkCredentials() async {
     AuthService auth = AuthService();
-    User? user = await auth.loginUserWithEmailAndPassword(
+    Map<String, dynamic> result = await auth.loginUserWithEmailAndPassword(
         credentialController.username, credentialController.password);
-    if (user == null) {
+    if (result["status"] == "error") {
+      setState(() {
+        msg = result["message"];
+      });
       return false;
     }
+    setState(() {
+      msg = result["message"];
+    });
     return true;
   }
 
@@ -62,7 +68,7 @@ class _LoginState extends State<Login> {
         context: context,
         builder: (context) => DialogFb2(
               text: "Login Error!",
-              subText: "Try Again",
+              subText: msg,
               icon: Icons.error,
               basicColor: Colors.white,
               fontColor: Colors.red,

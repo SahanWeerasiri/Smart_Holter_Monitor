@@ -5,6 +5,7 @@ import 'package:health_care/components/top_app_bar/top_app_bar2.dart';
 import 'package:health_care/constants/consts.dart';
 import 'package:health_care/controllers/textController.dart';
 import 'package:flutter/material.dart';
+import 'package:health_care/pages/app/services/auth_service.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -18,6 +19,7 @@ class _SignupState extends State<Signup> {
   late final TextStyle textStyleHeading;
   late final TextStyle textStyleTextInputTopic;
   late final TextStyle textStyleInputField;
+  String msg = "";
 
   @override
   void initState() {
@@ -33,7 +35,46 @@ class _SignupState extends State<Signup> {
         fontWeight: FontWeight.bold);
   }
 
-  bool checkCredentials() {
+  Future<bool> checkCredentials() async {
+    if (credentialController.confirmPassword != credentialController.password) {
+      setState(() {
+        msg = "Passwords do not match";
+      });
+      return false;
+    }
+    if (credentialController.username.isEmpty) {
+      setState(() {
+        msg = "Email is required";
+      });
+      return false;
+    }
+
+    if (credentialController.password.isEmpty) {
+      setState(() {
+        msg = "Password is required";
+      });
+      return false;
+    }
+
+    if (credentialController.password.length < 8) {
+      setState(() {
+        msg = "Password required at least 8 characters";
+      });
+      return false;
+    }
+
+    AuthService auth = AuthService();
+    Map<String, dynamic> result = await auth.createUserWithEmailAndPassword(
+        credentialController.username, credentialController.password);
+    if (result["status"] == "error") {
+      setState(() {
+        msg = result["message"];
+      });
+      return false;
+    }
+    setState(() {
+      msg = result["message"];
+    });
     return true;
   }
 
@@ -50,7 +91,7 @@ class _SignupState extends State<Signup> {
         context: context,
         builder: (context) => DialogFb2(
               text: "Signup Error!",
-              subText: "Try Again",
+              subText: msg,
               icon: Icons.error,
               basicColor: Colors.white,
               fontColor: Colors.red,
@@ -67,7 +108,7 @@ class _SignupState extends State<Signup> {
 
   void navigateToHome() {
     credentialController.clear();
-    Navigator.pushNamed(context, '/home');
+    Navigator.pushNamed(context, '/login');
   }
 
   @override
@@ -132,7 +173,7 @@ class _SignupState extends State<Signup> {
                   height: AppSizes().getBlockSizeVertical(1),
                 ),
                 InputFieldFb3(
-                    inputController: CredentialController(),
+                    inputController: credentialController,
                     hint: "Password",
                     icon: Icons.key,
                     hintColor: StyleSheet().greyHint,
@@ -156,7 +197,7 @@ class _SignupState extends State<Signup> {
                   height: AppSizes().getBlockSizeVertical(1),
                 ),
                 InputFieldFb3(
-                    inputController: CredentialController(),
+                    inputController: credentialController,
                     hint: "Confirm Password",
                     icon: Icons.key,
                     hintColor: StyleSheet().greyHint,
@@ -172,8 +213,8 @@ class _SignupState extends State<Signup> {
                 ),
                 CustomTextButton(
                   label: "Sign Up",
-                  onPressed: () {
-                    if (checkCredentials()) {
+                  onPressed: () async {
+                    if (await checkCredentials()) {
                       navigateToHome();
                     } else {
                       signUpError();

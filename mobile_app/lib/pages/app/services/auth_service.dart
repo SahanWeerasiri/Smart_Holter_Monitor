@@ -3,30 +3,42 @@ import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
-  final _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<User?> createUserWithEmailAndPassword(
+  Future<Map<String, dynamic>> createUserWithEmailAndPassword(
       String email, String password) async {
     try {
       final cred = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
-      return cred.user;
+      return {
+        "status": "success",
+        "message": "Account created successfully",
+        "user": cred.user
+      };
     } catch (e) {
-      log("Something went wrong");
+      return {
+        "status": "error",
+        "message": e.toString(),
+      };
     }
-    return null;
   }
 
-  Future<User?> loginUserWithEmailAndPassword(
+  Future<Map<String, dynamic>> loginUserWithEmailAndPassword(
       String email, String password) async {
     try {
       final cred = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
-      return cred.user;
+      return {
+        "status": "success",
+        "message": "Logged in successfully",
+        "user": cred.user
+      };
     } catch (e) {
-      log("Something went wrong");
+      return {
+        "status": "error",
+        "message": e.toString(),
+      };
     }
-    return null;
   }
 
   Future<void> signout() async {
