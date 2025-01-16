@@ -1,5 +1,4 @@
 import 'package:health_care/components/buttons/custom_text_button/custom_text_button.dart';
-import 'package:health_care/components/dialogues/simple_dialogue.dart';
 import 'package:health_care/components/text_input/text_input_with_leading_icon.dart';
 import 'package:health_care/components/top_app_bar/top_app_bar2.dart';
 import 'package:health_care/constants/consts.dart';
@@ -38,8 +37,7 @@ class _LoginState extends State<Login> {
   @override
   void dispose() {
     super.dispose();
-    credentialController.username = "";
-    credentialController.password = "";
+    credentialController.clear();
   }
 
   Future<bool> checkCredentials() async {
@@ -55,6 +53,15 @@ class _LoginState extends State<Login> {
     setState(() {
       msg = result["message"];
     });
+    credentialController.clear();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(msg),
+          backgroundColor: Colors.green,
+        ),
+      );
+    });
     return true;
   }
 
@@ -64,23 +71,14 @@ class _LoginState extends State<Login> {
   }
 
   void loginError() {
-    showDialog(
-        context: context,
-        builder: (context) => DialogFb2(
-              text: "Login Error!",
-              subText: msg,
-              icon: Icons.error,
-              basicColor: Colors.white,
-              fontColor: Colors.red,
-              subTextFontColor: CustomColors().greyHint,
-              backgroundColor: Colors.white,
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              btnText: "Close",
-              btnBackColor: CustomColors().blue,
-              btnTextColor: Colors.white,
-            ));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(msg),
+          backgroundColor: Colors.red,
+        ),
+      );
+    });
   }
 
   void navigateToHome() {
@@ -148,7 +146,7 @@ class _LoginState extends State<Login> {
                   height: AppSizes().getBlockSizeVertical(1),
                 ),
                 InputFieldFb3(
-                    inputController: CredentialController(),
+                    inputController: credentialController,
                     hint: "Password",
                     icon: Icons.key,
                     hintColor: StyleSheet().greyHint,
