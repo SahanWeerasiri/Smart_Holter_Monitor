@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:health_care/components/list/design1/list1.dart';
 import 'package:health_care/components/list/design1/list_item_data.dart';
 import 'package:health_care/constants/consts.dart';
@@ -5,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 
 class ReportList extends StatefulWidget {
-  const ReportList({super.key});
+  final User? user;
+  const ReportList({super.key, required this.user});
 
   @override
   State<ReportList> createState() => _ReportListState();

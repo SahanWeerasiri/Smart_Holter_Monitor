@@ -64,8 +64,9 @@ class StyleSheet {
       const Color.fromARGB(255, 232, 232, 232);
 
   final Color currentHeartBox = const Color.fromARGB(255, 180, 216, 255);
-  final Color avgHeartBox = const Color.fromARGB(255, 168, 255, 212);
-  final Color stateHeartBox = const Color.fromARGB(255, 255, 252, 173);
+  final Color stateHeartBoxGood = const Color.fromARGB(255, 168, 255, 212);
+  final Color stateHeartBoxBad = const Color.fromARGB(255, 255, 168, 168);
+  final Color avgHeartBox = const Color.fromARGB(255, 255, 252, 173);
 
   final Color chatIcon = const Color.fromARGB(255, 64, 124, 226);
   final Color sendChatBuble1 = const Color.fromARGB(255, 64, 124, 226);
@@ -75,6 +76,9 @@ class StyleSheet {
 
   final Color profileBase = const Color.fromARGB(255, 180, 216, 255);
   final Color profiletext = const Color.fromARGB(255, 0, 0, 0);
+
+  final Color doctorDetailsPopPrimary = const Color.fromARGB(255, 64, 124, 226);
+  final Color doctorDetailsPopPSecondary = const Color.fromARGB(255, 0, 0, 0);
 }
 
 class AppSizes {
@@ -138,4 +142,29 @@ class DrawerItems {
       required this.title,
       required this.icon,
       required this.onTap});
+}
+
+class UserProfile {
+  String name;
+  String email;
+  String pic;
+  String address;
+  String mobile;
+  String color;
+  bool isDone;
+  String language;
+  String device;
+  String doctorId;
+  UserProfile({
+    required this.name,
+    required this.email,
+    this.pic = "",
+    this.address = "",
+    this.mobile = "",
+    this.device = "",
+    this.color = "",
+    this.isDone = false,
+    this.language = "",
+    this.doctorId = "",
+  });
 }

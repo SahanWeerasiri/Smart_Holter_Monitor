@@ -22,9 +22,9 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final List<Widget> _pages = [
-    const Center(child: Summary()),
-    const Center(child: ReportList()),
-    const Center(child: ChatScreen()),
+    Center(child: Summary(user: FirebaseAuth.instance.currentUser)),
+    Center(child: ReportList(user: FirebaseAuth.instance.currentUser)),
+    Center(child: ChatScreen(user: FirebaseAuth.instance.currentUser)),
     Center(child: Profile(user: FirebaseAuth.instance.currentUser)),
   ];
   late final CustomMenuController menuController;
