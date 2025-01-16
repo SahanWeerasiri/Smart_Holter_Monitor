@@ -85,8 +85,28 @@ class _SignupState extends State<Signup> {
     return true;
   }
 
-  bool checkGoogleCredentials() {
-    return false;
+  Future<bool> checkGoogleCredentials() async {
+    AuthService auth = AuthService();
+
+    Map<String, dynamic> result = await auth.signUpWithGoogle();
+    if (result["status"] == "error") {
+      setState(() {
+        msg = result["message"];
+      });
+      return false;
+    }
+    setState(() {
+      msg = result["message"];
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(msg),
+          backgroundColor: Colors.green,
+        ),
+      );
+    });
+    return true;
   }
 
   bool checkFacebookCredentials() {
@@ -240,7 +260,13 @@ class _SignupState extends State<Signup> {
                 CustomTextButton(
                   label: "Sign in with Google",
                   borderRadius: 5,
-                  onPressed: () {},
+                  onPressed: () async {
+                    if (await checkGoogleCredentials()) {
+                      navigateToHome();
+                    } else {
+                      signUpError();
+                    }
+                  },
                   img: 'assetes/icons/google.png',
                   textColor: StyleSheet().elebtnText,
                   backgroundColor: StyleSheet().elebtnBackground,
