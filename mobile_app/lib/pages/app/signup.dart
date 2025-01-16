@@ -1,10 +1,10 @@
 import 'package:health_care/components/buttons/custom_text_button/custom_text_button.dart';
-import 'package:health_care/components/dialogues/simple_dialogue.dart';
 import 'package:health_care/components/text_input/text_input_with_leading_icon.dart';
 import 'package:health_care/components/top_app_bar/top_app_bar2.dart';
 import 'package:health_care/constants/consts.dart';
 import 'package:health_care/controllers/textController.dart';
 import 'package:flutter/material.dart';
+import 'package:health_care/pages/app/services/auth_service.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -18,6 +18,7 @@ class _SignupState extends State<Signup> {
   late final TextStyle textStyleHeading;
   late final TextStyle textStyleTextInputTopic;
   late final TextStyle textStyleInputField;
+  String msg = "";
 
   @override
   void initState() {
@@ -33,41 +34,73 @@ class _SignupState extends State<Signup> {
         fontWeight: FontWeight.bold);
   }
 
-  bool checkCredentials() {
-    return true;
-  }
+  Future<bool> checkCredentials() async {
+    if (credentialController.confirmPassword != credentialController.password) {
+      setState(() {
+        msg = "Passwords do not match";
+      });
+      return false;
+    }
+    if (credentialController.username.isEmpty) {
+      setState(() {
+        msg = "Email is required";
+      });
+      return false;
+    }
 
-  bool checkGoogleCredentials() {
-    return false;
-  }
+    if (credentialController.password.isEmpty) {
+      setState(() {
+        msg = "Password is required";
+      });
+      return false;
+    }
 
-  bool checkFacebookCredentials() {
+    if (credentialController.password.length < 8) {
+      setState(() {
+        msg = "Password required at least 8 characters";
+      });
+      return false;
+    }
+
+    AuthService auth = AuthService();
+    Map<String, dynamic> result = await auth.createUserWithEmailAndPassword(
+        credentialController.name,
+        credentialController.username,
+        credentialController.password);
+    if (result["status"] == "error") {
+      setState(() {
+        msg = result["message"];
+      });
+      return false;
+    }
+    setState(() {
+      msg = result["message"];
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(msg),
+          backgroundColor: Colors.green,
+        ),
+      );
+    });
     return true;
   }
 
   void signUpError() {
-    showDialog(
-        context: context,
-        builder: (context) => DialogFb2(
-              text: "Signup Error!",
-              subText: "Try Again",
-              icon: Icons.error,
-              basicColor: Colors.white,
-              fontColor: Colors.red,
-              subTextFontColor: CustomColors().greyHint,
-              backgroundColor: Colors.white,
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              btnText: "Close",
-              btnBackColor: CustomColors().blue,
-              btnTextColor: Colors.white,
-            ));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(msg),
+          backgroundColor: Colors.red,
+        ),
+      );
+    });
   }
 
   void navigateToHome() {
     credentialController.clear();
-    Navigator.pushNamed(context, '/home');
+    Navigator.pushNamed(context, '/login');
   }
 
   @override
@@ -97,6 +130,32 @@ class _SignupState extends State<Signup> {
               children: [
                 SizedBox(
                   height: AppSizes().getBlockSizeVertical(5),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Name",
+                      style: textStyleTextInputTopic,
+                    )
+                  ],
+                ),
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(1),
+                ),
+                InputFieldFb3(
+                    inputController: credentialController,
+                    hint: "Name",
+                    icon: Icons.person,
+                    hintColor: StyleSheet().greyHint,
+                    textColor: StyleSheet().text,
+                    shadowColor: StyleSheet().textBackground,
+                    enableBorderColor: StyleSheet().disabledBorder,
+                    borderColor: StyleSheet().greyHint,
+                    focusedBorderColor: StyleSheet().enableBorder,
+                    typeKey: CustomTextInputTypes().name),
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(3),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -132,7 +191,7 @@ class _SignupState extends State<Signup> {
                   height: AppSizes().getBlockSizeVertical(1),
                 ),
                 InputFieldFb3(
-                    inputController: CredentialController(),
+                    inputController: credentialController,
                     hint: "Password",
                     icon: Icons.key,
                     hintColor: StyleSheet().greyHint,
@@ -156,7 +215,7 @@ class _SignupState extends State<Signup> {
                   height: AppSizes().getBlockSizeVertical(1),
                 ),
                 InputFieldFb3(
-                    inputController: CredentialController(),
+                    inputController: credentialController,
                     hint: "Confirm Password",
                     icon: Icons.key,
                     hintColor: StyleSheet().greyHint,
@@ -172,8 +231,8 @@ class _SignupState extends State<Signup> {
                 ),
                 CustomTextButton(
                   label: "Sign Up",
-                  onPressed: () {
-                    if (checkCredentials()) {
+                  onPressed: () async {
+                    if (await checkCredentials()) {
                       navigateToHome();
                     } else {
                       signUpError();
@@ -182,42 +241,6 @@ class _SignupState extends State<Signup> {
                   backgroundColor: StyleSheet().btnBackground,
                   textColor: StyleSheet().btnText,
                   icon: Icons.login,
-                ),
-                SizedBox(
-                  height: AppSizes().getBlockSizeVertical(4),
-                ),
-                Divider(
-                  color: StyleSheet().divider,
-                  endIndent: 5,
-                  thickness: 2,
-                ),
-                SizedBox(
-                  height: AppSizes().getBlockSizeVertical(4),
-                ),
-                const Text("Sign up with,"),
-                SizedBox(
-                  height: AppSizes().getBlockSizeVertical(1),
-                ),
-                CustomTextButton(
-                  label: "Sign in with Google",
-                  borderRadius: 5,
-                  onPressed: () {},
-                  img: 'assetes/icons/google.png',
-                  textColor: StyleSheet().elebtnText,
-                  backgroundColor: StyleSheet().elebtnBackground,
-                  borderColor: StyleSheet().elebtnBorder,
-                ),
-                SizedBox(
-                  height: AppSizes().getBlockSizeVertical(2),
-                ),
-                CustomTextButton(
-                  borderRadius: 5,
-                  label: "Sign in with Facebook",
-                  onPressed: () {},
-                  img: 'assetes/icons/facebook.png',
-                  textColor: StyleSheet().elebtnText,
-                  backgroundColor: StyleSheet().elebtnBackground,
-                  borderColor: StyleSheet().elebtnBorder,
                 ),
               ],
             ),

@@ -1,9 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care/components/top_app_bar/top_app_bar2.dart';
 import 'package:health_care/pages/app/pages/chat_screen.dart';
 import 'package:health_care/pages/app/pages/profile.dart';
 import 'package:health_care/pages/app/pages/report_list.dart';
 import 'package:health_care/pages/app/pages/summary.dart';
+import 'package:health_care/pages/app/services/auth_service.dart';
 import '../../constants/consts.dart';
 import '../../components/bottom_app_bars/bottom_app_bar_1/bottom_navigation_custom1.dart';
 import '../../components/bottom_app_bars/bottom_app_bar_1/menuController.dart';
@@ -20,10 +22,10 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final List<Widget> _pages = [
-    const Center(child: Summary()),
-    const Center(child: ReportList()),
-    const Center(child: ChatScreen()),
-    const Center(child: Profile(uid: 1)),
+    Center(child: Summary(user: FirebaseAuth.instance.currentUser)),
+    Center(child: ReportList(user: FirebaseAuth.instance.currentUser)),
+    Center(child: ChatScreen(user: FirebaseAuth.instance.currentUser)),
+    Center(child: Profile(user: FirebaseAuth.instance.currentUser)),
   ];
   late final CustomMenuController menuController;
 
@@ -51,7 +53,18 @@ class _HomeState extends State<Home> {
               color: StyleSheet().topbarText,
             ),
             color: StyleSheet().topbarText,
-            onPressed: () {},
+            onPressed: () {
+              AuthService().signout();
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Logout Successfully!"),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              });
+              Navigator.pop(context);
+            },
           )
         ],
       ),

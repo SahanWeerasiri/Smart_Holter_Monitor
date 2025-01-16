@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:health_care/constants/consts.dart';
 import '../../components/buttons/custom_button_1/custom_button.dart';
 
 class DialogFb2 extends StatelessWidget {
@@ -31,6 +32,7 @@ class DialogFb2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppSizes().initSizes(context);
     return Dialog(
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -62,11 +64,19 @@ class DialogFb2 extends StatelessWidget {
             const SizedBox(
               height: 3.5,
             ),
-            Text(subText,
-                style: TextStyle(
-                    color: subTextFontColor,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w300)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
+                  child: Text(subText,
+                      style: TextStyle(
+                        color: subTextFontColor,
+                        fontSize: 15,
+                      )),
+                )
+              ],
+            ),
             const SizedBox(
               height: 15,
             ),

@@ -4,10 +4,12 @@ import 'package:health_care/pages/app/before_login.dart';
 import 'package:health_care/pages/app/home.dart';
 import 'package:health_care/pages/app/login.dart';
 import 'package:health_care/pages/app/signup.dart';
-
+import 'package:firebase_core/firebase_core.dart';
 import 'pages/app/splash.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 

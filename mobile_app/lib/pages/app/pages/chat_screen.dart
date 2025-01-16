@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:health_care/components/text_input/text_input_with_send.dart';
 import 'package:health_care/constants/consts.dart';
 import 'package:health_care/controllers/textController.dart';
@@ -5,7 +6,8 @@ import 'package:health_care/pages/app/additional/chat_bubble.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+  final User? user;
+  const ChatScreen({super.key, required this.user});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
