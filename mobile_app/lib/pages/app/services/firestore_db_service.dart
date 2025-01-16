@@ -26,4 +26,26 @@ class FirestoreDbService {
       return {'success': false, 'error': e.toString()};
     }
   }
+
+  Future<Map<String, dynamic>> fetchAccount(String uid) async {
+    try {
+      // Fetch the document snapshot
+      final DocumentSnapshot<Object?> snapshot =
+          await usersCollection.doc(uid).get();
+
+      // Check if the document exists
+      if (snapshot.exists) {
+        // Extract data from the snapshot
+        final accountData = snapshot.data()!;
+        // Return success with the account data
+        return {'success': true, 'data': accountData};
+      } else {
+        // Document does not exist
+        return {'success': false, 'error': 'Account not found'};
+      }
+    } catch (e) {
+      // Handle errors and return failure
+      return {'success': false, 'error': e.toString()};
+    }
+  }
 }

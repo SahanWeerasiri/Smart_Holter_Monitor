@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care/components/top_app_bar/top_app_bar2.dart';
 import 'package:health_care/pages/app/pages/chat_screen.dart';
@@ -24,7 +25,7 @@ class _HomeState extends State<Home> {
     const Center(child: Summary()),
     const Center(child: ReportList()),
     const Center(child: ChatScreen()),
-    const Center(child: Profile(uid: 1)),
+    Center(child: Profile(user: FirebaseAuth.instance.currentUser)),
   ];
   late final CustomMenuController menuController;
 

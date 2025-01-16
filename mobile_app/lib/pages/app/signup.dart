@@ -64,7 +64,7 @@ class _SignupState extends State<Signup> {
 
     AuthService auth = AuthService();
     Map<String, dynamic> result = await auth.createUserWithEmailAndPassword(
-        credentialController.text,
+        credentialController.name,
         credentialController.username,
         credentialController.password);
     if (result["status"] == "error") {
