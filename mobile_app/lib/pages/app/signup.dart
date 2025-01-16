@@ -64,7 +64,9 @@ class _SignupState extends State<Signup> {
 
     AuthService auth = AuthService();
     Map<String, dynamic> result = await auth.createUserWithEmailAndPassword(
-        credentialController.username, credentialController.password);
+        credentialController.text,
+        credentialController.username,
+        credentialController.password);
     if (result["status"] == "error") {
       setState(() {
         msg = result["message"];
@@ -128,6 +130,32 @@ class _SignupState extends State<Signup> {
               children: [
                 SizedBox(
                   height: AppSizes().getBlockSizeVertical(5),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Name",
+                      style: textStyleTextInputTopic,
+                    )
+                  ],
+                ),
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(1),
+                ),
+                InputFieldFb3(
+                    inputController: credentialController,
+                    hint: "Name",
+                    icon: Icons.person,
+                    hintColor: StyleSheet().greyHint,
+                    textColor: StyleSheet().text,
+                    shadowColor: StyleSheet().textBackground,
+                    enableBorderColor: StyleSheet().disabledBorder,
+                    borderColor: StyleSheet().greyHint,
+                    focusedBorderColor: StyleSheet().enableBorder,
+                    typeKey: CustomTextInputTypes().name),
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(3),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
