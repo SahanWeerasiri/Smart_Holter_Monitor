@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:health_care/pages/app/additional/chat_bubble.dart';
 
 class FirestoreDbService {
   final CollectionReference usersCollection =
@@ -75,6 +76,50 @@ class FirestoreDbService {
         // Document does not exist
         return {'success': false, 'error': 'Doctor not found'};
       }
+    } catch (e) {
+      // Handle errors and return failure
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchChats(String uid) async {
+    try {
+      // Fetch the document snapshot
+      final QuerySnapshot<Object?> snapshot =
+          await usersCollection.doc(uid).collection("chats").get();
+
+      snapshot.docs
+          .sort((a, b) => b.get("timestamp").compareTo(a.get("timestamp")));
+
+      List<ChatModel> chats = [];
+
+      for (final DocumentSnapshot<Object?> doc in snapshot.docs) {
+        // Check if the document exists
+        if (doc.exists) {
+          String sender = doc.get("sender");
+          chats.add(ChatModel(doc.get("msg"), doc.get("timestamp"),
+              sender == "me" ? true : false, sender == "me" ? "Me" : "AI"));
+          // Return success with the account data
+        } else {
+          chats.add(ChatModel("Msg is not found", "", false, "AI"));
+        }
+      }
+      return {'success': true, 'data': chats};
+    } catch (e) {
+      // Handle errors and return failure
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> sendChats(
+      String uid, ChatModel chatModel) async {
+    try {
+      await usersCollection.doc(uid).collection("chats").add({
+        "msg": chatModel.msg,
+        "timestamp": chatModel.timestamp,
+        "sender": chatModel.isSender ? "me" : "ai",
+      });
+      return {'success': true, 'msg': "Msg saved successfully!"};
     } catch (e) {
       // Handle errors and return failure
       return {'success': false, 'error': e.toString()};

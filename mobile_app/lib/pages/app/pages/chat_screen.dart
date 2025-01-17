@@ -4,6 +4,7 @@ import 'package:health_care/constants/consts.dart';
 import 'package:health_care/controllers/textController.dart';
 import 'package:health_care/pages/app/additional/chat_bubble.dart';
 import 'package:flutter/material.dart';
+import 'package:health_care/pages/app/services/firestore_db_service.dart';
 
 class ChatScreen extends StatefulWidget {
   final User? user;
@@ -16,7 +17,11 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final List<ChatBubble> _chatBubbles = [
     ChatBubble(
-        chatModel: ChatModel("msg1", "2024-01-01 11:01:14", false, "AI")),
+        chatModel: ChatModel(
+            "Hi!\nI'm Smart Care AI Agent.\nWhat is your problem?",
+            "2024-01-01 11:01:14",
+            false,
+            "AI")),
   ];
   bool _isLoading = true; // Loading state
   final CredentialController credentialController = CredentialController();
@@ -30,27 +35,73 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  void _initializeData() {
-    // final arguments =
-    //     ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-
-    // if (arguments == null) {
-    //   Navigator.pop(context); // Navigate back if no arguments are passed.
-    //   return;
-    // }
-
+  void _initializeData() async {
+    Map<String, dynamic> res = await FirestoreDbService()
+        .fetchChats(FirebaseAuth.instance.currentUser!.uid);
+    if (res['success']) {
+      setState(() {
+        final tempChatBubbles = res['data'] as List<ChatModel>;
+        for (var element in tempChatBubbles) {
+          _chatBubbles.add(ChatBubble(chatModel: element));
+        }
+      });
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(res['error']),
+            backgroundColor: Colors.red,
+          ),
+        );
+      });
+    }
     setState(() {
       _isLoading = false;
     });
   }
 
-  void onSend() {
+  void sendToAI(ChatModel chatModel) {
+    /*
+    
+    AI API call
+    
+    */
     String d =
         "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}_${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
+    final aiResponse = ChatModel("I got your msg", d, false, "AI");
     setState(() {
-      _chatBubbles.add(ChatBubble(
-          chatModel: ChatModel(credentialController.text, d, true, "Me")));
+      _chatBubbles.add(ChatBubble(chatModel: aiResponse));
     });
+    FirestoreDbService()
+        .sendChats(FirebaseAuth.instance.currentUser!.uid, chatModel);
+  }
+
+  void onSend() async {
+    String d =
+        "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}_${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
+
+    final chatModel = ChatModel(credentialController.text, d, true, "Me");
+
+    Map<String, dynamic> res = await FirestoreDbService()
+        .sendChats(FirebaseAuth.instance.currentUser!.uid, chatModel);
+    if (res['success']) {
+      //
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(res['error']),
+            backgroundColor: Colors.red,
+          ),
+        );
+      });
+    }
+
+    setState(() {
+      _chatBubbles.add(ChatBubble(chatModel: chatModel));
+    });
+
+    sendToAI(chatModel);
   }
 
   @override
