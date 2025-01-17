@@ -3,6 +3,7 @@ import 'package:health_care/components/list/design1/list1.dart';
 import 'package:health_care/components/list/design1/list_item_data.dart';
 import 'package:health_care/constants/consts.dart';
 import 'package:flutter/material.dart';
+import 'package:health_care/pages/app/additional/simple_dialogue_report_viewer.dart';
 import 'package:health_care/pages/app/services/firestore_db_service.dart';
 import 'package:iconly/iconly.dart';
 
@@ -18,6 +19,48 @@ class _ReportListState extends State<ReportList> {
   final List<ReportModel> _oldReportList = [];
   final List<ReportModel> _newReportList = [];
   bool isLoading = true;
+
+  Future<void> showReport(ReportModel report) async {
+    showDialog(
+        context: context,
+        builder: (context) => DialogReport(
+              text: "Report",
+              reportModel: report,
+              basicColor: StyleSheet().uiBackground,
+              fontColor: StyleSheet().doctorDetailsPopPrimary,
+              subTextFontColor: StyleSheet().doctorDetailsPopPSecondary,
+              onPressed: () {
+                FirestoreDbService()
+                    .updateReportSeen(widget.user!.uid, report.reportId);
+                setState(() {
+                  _newReportList.clear();
+                  _oldReportList.clear();
+                });
+                fetchReports();
+                Navigator.pop(context);
+              },
+              btnText: "Mark As Read",
+              btnBackColor: StyleSheet().btnBackground,
+              btnTextColor: StyleSheet().btnText,
+            ));
+  }
+
+  Future<void> showOldReport(ReportModel report) async {
+    showDialog(
+        context: context,
+        builder: (context) => DialogReport(
+              text: "Report",
+              reportModel: report,
+              basicColor: StyleSheet().uiBackground,
+              fontColor: StyleSheet().doctorDetailsPopPrimary,
+              subTextFontColor: StyleSheet().doctorDetailsPopPSecondary,
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              btnBackColor: StyleSheet().btnBackground,
+              btnTextColor: StyleSheet().btnText,
+            ));
+  }
 
   @override
   void initState() {
@@ -53,6 +96,10 @@ class _ReportListState extends State<ReportList> {
     setState(() {
       isLoading = false;
     });
+  }
+
+  String truncateString(String input) {
+    return input.length > 25 ? '${input.substring(0, 25)}...' : input;
   }
 
   @override
@@ -94,16 +141,10 @@ class _ReportListState extends State<ReportList> {
                         color: StyleSheet().uiBackground,
                         data: _newReportList.map((report) {
                           return ListItem1Data(
-                              title: report.timestamp,
+                              title: truncateString(report.brief),
                               icon: IconlyLight.document,
                               onPressed: () {
-                                FirestoreDbService().updateReportSeen(
-                                    widget.user!.uid, report.reportId);
-                                setState(() {
-                                  _newReportList.clear();
-                                  _oldReportList.clear();
-                                });
-                                fetchReports();
+                                showReport(report);
                               });
                         }).toList())),
                 Container(
@@ -127,9 +168,11 @@ class _ReportListState extends State<ReportList> {
                         color: StyleSheet().uiBackground,
                         data: _oldReportList.map((report) {
                           return ListItem1Data(
-                              title: report.timestamp,
+                              title: truncateString(report.brief),
                               icon: IconlyLight.document,
-                              onPressed: () {});
+                              onPressed: () {
+                                showOldReport(report);
+                              });
                         }).toList())),
               ],
             )));

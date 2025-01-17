@@ -172,6 +172,7 @@ class UserProfile {
 class ReportModel {
   final String timestamp;
   final String description;
+  final String brief;
   final String docSuggestions;
   final String aiSuggestions;
   final String avgHeart;
@@ -179,6 +180,7 @@ class ReportModel {
   final String reportId;
   ReportModel(
       {required this.timestamp,
+      required this.brief,
       required this.description,
       required this.aiSuggestions,
       required this.avgHeart,

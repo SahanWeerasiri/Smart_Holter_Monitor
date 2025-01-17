@@ -182,6 +182,7 @@ class FirestoreDbService {
           if (doc.get("is_seen")) {
             reportsOld.add(ReportModel(
                 aiSuggestions: doc.get("ai_suggestions"),
+                brief: doc.get("brief"),
                 avgHeart: doc.get("avg_heart"),
                 timestamp: doc.get("timestamp"),
                 docSuggestions: doc.get("suggestions"),
@@ -190,6 +191,7 @@ class FirestoreDbService {
                 reportId: doc.id));
           } else {
             reportsNew.add(ReportModel(
+                brief: doc.get("brief"),
                 aiSuggestions: doc.get("ai_suggestions"),
                 avgHeart: doc.get("avg_heart"),
                 timestamp: doc.get("timestamp"),
@@ -201,6 +203,7 @@ class FirestoreDbService {
         } else {
           reportsOld.add(ReportModel(
             aiSuggestions: "",
+            brief: "",
             avgHeart: "",
             timestamp: "",
             docSuggestions: "",
