@@ -97,11 +97,21 @@ class FirestoreDbService {
         // Check if the document exists
         if (doc.exists) {
           String sender = doc.get("sender");
-          chats.add(ChatModel(doc.get("msg"), doc.get("timestamp"),
-              sender == "me" ? true : false, sender == "me" ? "Me" : "AI"));
+          chats.add(ChatModel(
+              doc.get("msg"),
+              doc.get("timestamp"),
+              sender == "me" ? true : false,
+              sender == "me" ? "Me" : "AI",
+              doc.id));
           // Return success with the account data
         } else {
-          chats.add(ChatModel("Msg is not found", "", false, "AI"));
+          chats.add(ChatModel(
+            "Msg is not found",
+            "",
+            false,
+            "AI",
+            "0",
+          ));
         }
       }
       return {'success': true, 'data': chats};
@@ -114,12 +124,33 @@ class FirestoreDbService {
   Future<Map<String, dynamic>> sendChats(
       String uid, ChatModel chatModel) async {
     try {
-      await usersCollection.doc(uid).collection("chats").add({
+      DocumentReference<Map<String, dynamic>> res =
+          await usersCollection.doc(uid).collection("chats").add({
         "msg": chatModel.msg,
         "timestamp": chatModel.timestamp,
         "sender": chatModel.isSender ? "me" : "ai",
       });
-      return {'success': true, 'msg': "Msg saved successfully!"};
+      return {'success': true, 'msg': "Msg saved successfully!", "key": res.id};
+    } catch (e) {
+      // Handle errors and return failure
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteChats(
+      String uid, List<ChatBubble> chatBubles) async {
+    try {
+      for (ChatBubble chatBubble in chatBubles) {
+        if (chatBubble.chatModel.chatId == "0") {
+          continue;
+        }
+        usersCollection
+            .doc(uid)
+            .collection("chats")
+            .doc(chatBubble.chatModel.chatId);
+      }
+
+      return {'success': true, 'msg': "Chat deleted successfully!"};
     } catch (e) {
       // Handle errors and return failure
       return {'success': false, 'error': e.toString()};
