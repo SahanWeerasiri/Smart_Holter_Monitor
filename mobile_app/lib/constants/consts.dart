@@ -168,3 +168,21 @@ class UserProfile {
     this.doctorId = "",
   });
 }
+
+class ReportModel {
+  final String timestamp;
+  final String description;
+  final String docSuggestions;
+  final String aiSuggestions;
+  final String avgHeart;
+  final String graph;
+  final String reportId;
+  ReportModel(
+      {required this.timestamp,
+      required this.description,
+      required this.aiSuggestions,
+      required this.avgHeart,
+      required this.docSuggestions,
+      required this.graph,
+      required this.reportId});
+}

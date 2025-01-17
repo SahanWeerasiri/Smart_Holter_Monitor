@@ -37,8 +37,8 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _initializeData() async {
-    Map<String, dynamic> res = await FirestoreDbService()
-        .fetchChats(FirebaseAuth.instance.currentUser!.uid);
+    Map<String, dynamic> res =
+        await FirestoreDbService().fetchChats(widget.user!.uid);
     if (res['success']) {
       setState(() {
         final tempChatBubbles = res['data'] as List<ChatModel>;
@@ -71,8 +71,8 @@ class _ChatScreenState extends State<ChatScreen> {
         "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day} ${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
     final aiResponse = ChatModel("I got your msg", d, false, "AI", "0");
 
-    Map<String, dynamic> res = await FirestoreDbService()
-        .sendChats(FirebaseAuth.instance.currentUser!.uid, aiResponse);
+    Map<String, dynamic> res =
+        await FirestoreDbService().sendChats(widget.user!.uid, aiResponse);
 
     if (res['success']) {
       aiResponse.chatId = res['key'];
@@ -97,8 +97,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
     final chatModel = ChatModel(credentialController.text, d, true, "Me", "0");
 
-    Map<String, dynamic> res = await FirestoreDbService()
-        .sendChats(FirebaseAuth.instance.currentUser!.uid, chatModel);
+    Map<String, dynamic> res =
+        await FirestoreDbService().sendChats(widget.user!.uid, chatModel);
     if (res['success']) {
       chatModel.chatId = res['key'];
       setState(() {
@@ -119,8 +119,8 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void onClear() async {
-    Map<String, dynamic> res = await FirestoreDbService()
-        .deleteChats(FirebaseAuth.instance.currentUser!.uid, _chatBubbles);
+    Map<String, dynamic> res =
+        await FirestoreDbService().deleteChats(widget.user!.uid, _chatBubbles);
     if (res['success']) {
       setState(() {
         _chatBubbles.clear();
@@ -143,7 +143,7 @@ class _ChatScreenState extends State<ChatScreen> {
       return Center(
           child: CircularProgressIndicator(
         backgroundColor: Colors.white,
-        color: CustomColors().blue,
+        color: StyleSheet().btnBackground,
       ));
     }
     return Container(

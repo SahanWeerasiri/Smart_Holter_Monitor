@@ -3,6 +3,7 @@ import 'package:health_care/components/list/design1/list1.dart';
 import 'package:health_care/components/list/design1/list_item_data.dart';
 import 'package:health_care/constants/consts.dart';
 import 'package:flutter/material.dart';
+import 'package:health_care/pages/app/services/firestore_db_service.dart';
 import 'package:iconly/iconly.dart';
 
 class ReportList extends StatefulWidget {
@@ -14,9 +15,58 @@ class ReportList extends StatefulWidget {
 }
 
 class _ReportListState extends State<ReportList> {
+  final List<ReportModel> _oldReportList = [];
+  final List<ReportModel> _newReportList = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchReports();
+  }
+
+  Future<void> fetchReports() async {
+    setState(() {
+      isLoading = true;
+    });
+    Map<String, dynamic> res =
+        await FirestoreDbService().fetchReports(widget.user!.uid);
+    if (res['success']) {
+      setState(() {
+        for (ReportModel reportModel in res['data_new']) {
+          _newReportList.add(reportModel);
+        }
+        for (ReportModel reportModel in res['data_old']) {
+          _oldReportList.add(reportModel);
+        }
+      });
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(res['error']),
+            backgroundColor: Colors.red,
+          ),
+        );
+      });
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     AppSizes().initSizes(context);
+
+    if (isLoading) {
+      return Center(
+          child: CircularProgressIndicator(
+        color: StyleSheet().btnBackground,
+        backgroundColor: StyleSheet().uiBackground,
+      ));
+    }
+
     return Center(
         child: Container(
             color: StyleSheet().uiBackground,
@@ -42,12 +92,20 @@ class _ReportListState extends State<ReportList> {
                 Expanded(
                     child: List1(
                         color: StyleSheet().uiBackground,
-                        data: List.of([
-                          ListItem1Data(
-                              title: "Generatl Report 01",
+                        data: _newReportList.map((report) {
+                          return ListItem1Data(
+                              title: report.timestamp,
                               icon: IconlyLight.document,
-                              onPressed: () {}),
-                        ]))),
+                              onPressed: () {
+                                FirestoreDbService().updateReportSeen(
+                                    widget.user!.uid, report.reportId);
+                                setState(() {
+                                  _newReportList.clear();
+                                  _oldReportList.clear();
+                                });
+                                fetchReports();
+                              });
+                        }).toList())),
                 Container(
                   padding: EdgeInsets.only(
                       left: AppSizes().getBlockSizeHorizontal(3)),
@@ -67,16 +125,12 @@ class _ReportListState extends State<ReportList> {
                 Expanded(
                     child: List1(
                         color: StyleSheet().uiBackground,
-                        data: List.of([
-                          ListItem1Data(
-                              title: "Generatl Report 02",
+                        data: _oldReportList.map((report) {
+                          return ListItem1Data(
+                              title: report.timestamp,
                               icon: IconlyLight.document,
-                              onPressed: () {}),
-                          ListItem1Data(
-                              title: "Generatl Report 03",
-                              icon: IconlyLight.document,
-                              onPressed: () {})
-                        ]))),
+                              onPressed: () {});
+                        }).toList())),
               ],
             )));
   }

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flame/extensions.dart';
+import 'package:health_care/constants/consts.dart';
 import 'package:health_care/pages/app/additional/chat_bubble.dart';
 
 class FirestoreDbService {
@@ -155,6 +156,78 @@ class FirestoreDbService {
       }
 
       return {'success': true, 'msg': "Chat deleted successfully!"};
+    } catch (e) {
+      // Handle errors and return failure
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchReports(String uid) async {
+    try {
+      // Fetch the document snapshot
+      final QuerySnapshot<Object?> snapshot =
+          await usersCollection.doc(uid).collection("reports").get();
+
+      final docs = snapshot.docs;
+
+      docs.sort((a, b) => b.get("timestamp").compareTo(a.get("timestamp")));
+      docs.reverse();
+
+      List<ReportModel> reportsNew = [];
+      List<ReportModel> reportsOld = [];
+
+      for (final DocumentSnapshot<Object?> doc in docs) {
+        // Check if the document exists
+        if (doc.exists) {
+          if (doc.get("is_seen")) {
+            reportsOld.add(ReportModel(
+                aiSuggestions: doc.get("ai_suggestions"),
+                avgHeart: doc.get("avg_heart"),
+                timestamp: doc.get("timestamp"),
+                docSuggestions: doc.get("suggestions"),
+                description: doc.get("description"),
+                graph: doc.get("graph"),
+                reportId: doc.id));
+          } else {
+            reportsNew.add(ReportModel(
+                aiSuggestions: doc.get("ai_suggestions"),
+                avgHeart: doc.get("avg_heart"),
+                timestamp: doc.get("timestamp"),
+                docSuggestions: doc.get("suggestions"),
+                description: doc.get("description"),
+                graph: doc.get("graph"),
+                reportId: doc.id));
+          }
+        } else {
+          reportsOld.add(ReportModel(
+            aiSuggestions: "",
+            avgHeart: "",
+            timestamp: "",
+            docSuggestions: "",
+            description: "",
+            graph: "",
+            reportId: "",
+          ));
+        }
+      }
+      return {'success': true, 'data_new': reportsNew, "data_old": reportsOld};
+    } catch (e) {
+      // Handle errors and return failure
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> updateReportSeen(
+      String uid, String reportId) async {
+    try {
+      // Fetch the document snapshot
+
+      await usersCollection
+          .doc(uid)
+          .collection("reports")
+          .doc(reportId)
+          .update({'is_seen': true});
+      return {'success': true, 'message': "updation successful"};
     } catch (e) {
       // Handle errors and return failure
       return {'success': false, 'error': e.toString()};
