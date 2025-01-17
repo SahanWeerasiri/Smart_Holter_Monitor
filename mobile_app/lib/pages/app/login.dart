@@ -34,12 +34,6 @@ class _LoginState extends State<Login> {
         fontWeight: FontWeight.bold);
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    credentialController.clear();
-  }
-
   Future<bool> checkCredentials() async {
     AuthService auth = AuthService();
     Map<String, dynamic> result = await auth.loginUserWithEmailAndPassword(
@@ -94,7 +88,9 @@ class _LoginState extends State<Login> {
   // }
 
   void navigateToSignUp() {
-    credentialController.clear();
+    setState(() {
+      credentialController.clear();
+    });
     Navigator.pushNamed(context, '/signup');
   }
 
@@ -110,7 +106,9 @@ class _LoginState extends State<Login> {
   }
 
   void navigateToHome() {
-    credentialController.clear();
+    setState(() {
+      credentialController.clear();
+    });
     Navigator.pushNamed(context, '/home');
   }
 
@@ -192,6 +190,9 @@ class _LoginState extends State<Login> {
                   label: "Sign In",
                   onPressed: () async {
                     if (await checkCredentials()) {
+                      setState(() {
+                        credentialController.clear();
+                      });
                       navigateToHome();
                     } else {
                       loginError();
@@ -218,6 +219,9 @@ class _LoginState extends State<Login> {
                               fontWeight: FontWeight.w900),
                         ),
                         onPressed: () {
+                          setState(() {
+                            credentialController.clear();
+                          });
                           navigateToSignUp();
                         }),
                   ],
@@ -239,6 +243,9 @@ class _LoginState extends State<Login> {
                   borderRadius: 5,
                   onPressed: () async {
                     if (await checkGoogleCredentials()) {
+                      setState(() {
+                        credentialController.clear();
+                      });
                       navigateToHome();
                     } else {
                       loginError();
