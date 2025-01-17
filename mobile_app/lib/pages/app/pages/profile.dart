@@ -67,13 +67,57 @@ class _ProfileState extends State<Profile> {
 
   Future<void> onPick() async {}
   Future<void> onSubmit() async {
-    profileController.clear();
-    Navigator.pop(context);
+    Map<String, dynamic> res = await FirestoreDbService().updateProfile(
+        widget.user!.uid,
+        profileController.mobile.text,
+        profileController.language.text,
+        profileController.address.text,
+        profileController.pic.text);
+    if (res['success']) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(res['message']),
+            backgroundColor: Colors.green,
+          ),
+        );
+      });
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(res['error']),
+            backgroundColor: Colors.red,
+          ),
+        );
+      });
+    }
   }
 
   Future<void> onSubmitContact() async {
-    profileController.clear();
-    Navigator.pop(context);
+    Map<String, dynamic> res = await FirestoreDbService().addContact(
+        widget.user!.uid,
+        profileController.name.text,
+        profileController.mobile.text);
+    if (res['success']) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(res['message']),
+            backgroundColor: Colors.green,
+          ),
+        );
+      });
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(res['error']),
+            backgroundColor: Colors.red,
+          ),
+        );
+      });
+    }
   }
 
   @override
@@ -213,7 +257,12 @@ class _ProfileState extends State<Profile> {
                         addressController: profileController.address,
                         languageController: profileController.language,
                         onPickImage: onPick,
-                        onSubmit: onSubmit));
+                        onSubmit: () {
+                          onSubmit();
+                          profileController.clear();
+                          Navigator.pop(context);
+                          fetchProfileData();
+                        }));
               },
               icon: IconlyLight.edit,
               backgroundColor: StyleSheet().btnBackground,
@@ -243,7 +292,12 @@ class _ProfileState extends State<Profile> {
                       builder: (context) => AddContactPopup(
                           mobileController: profileController.mobile,
                           nameController: profileController.name,
-                          onSubmit: onSubmitContact));
+                          onSubmit: () {
+                            onSubmitContact();
+                            profileController.clear();
+                            Navigator.pop(context);
+                            fetchProfileData();
+                          }));
                 }),
             ListItem1(
                 title: "Amma", icon: IconlyLight.profile, onPressed: () {})
