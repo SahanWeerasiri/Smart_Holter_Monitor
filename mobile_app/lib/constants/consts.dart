@@ -6,6 +6,11 @@ class CustomTextInputTypes {
   final String confirmPassword = "CONFIRM_PASSWORD";
   final String text = "TEXT";
   final String name = "NAME";
+  final String mobile = "MOBILE";
+  final String address = "ADDRESS";
+  final String language = "LANGUAGE";
+  final String color = "COLOR";
+  final String pic = "PIC";
 }
 
 class CustomColors {
@@ -166,5 +171,34 @@ class UserProfile {
     this.isDone = false,
     this.language = "",
     this.doctorId = "",
+  });
+}
+
+class ReportModel {
+  final String timestamp;
+  final String description;
+  final String brief;
+  final String docSuggestions;
+  final String aiSuggestions;
+  final String avgHeart;
+  final String graph;
+  final String reportId;
+  ReportModel(
+      {required this.timestamp,
+      required this.brief,
+      required this.description,
+      required this.aiSuggestions,
+      required this.avgHeart,
+      required this.docSuggestions,
+      required this.graph,
+      required this.reportId});
+}
+
+class ContactProfile {
+  String name;
+  String mobile;
+  ContactProfile({
+    required this.name,
+    this.mobile = "",
   });
 }

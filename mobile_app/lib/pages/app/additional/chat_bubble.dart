@@ -96,5 +96,6 @@ class ChatModel {
   final String timestamp;
   final bool isSender;
   final String name;
-  ChatModel(this.msg, this.timestamp, this.isSender, this.name);
+  String chatId = "";
+  ChatModel(this.msg, this.timestamp, this.isSender, this.name, this.chatId);
 }

@@ -4,6 +4,7 @@ import 'package:health_care/constants/consts.dart';
 import 'package:health_care/controllers/textController.dart';
 import 'package:health_care/pages/app/additional/chat_bubble.dart';
 import 'package:flutter/material.dart';
+import 'package:health_care/pages/app/services/firestore_db_service.dart';
 
 class ChatScreen extends StatefulWidget {
   final User? user;
@@ -16,7 +17,12 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final List<ChatBubble> _chatBubbles = [
     ChatBubble(
-        chatModel: ChatModel("msg1", "2024-01-01 11:01:14", false, "AI")),
+        chatModel: ChatModel(
+            "Hi!\nI'm Smart Care AI Agent.\nWhat is your problem?",
+            "2024-01-01 11:01:14",
+            false,
+            "AI",
+            "0")),
   ];
   bool _isLoading = true; // Loading state
   final CredentialController credentialController = CredentialController();
@@ -30,27 +36,105 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  void _initializeData() {
-    // final arguments =
-    //     ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-
-    // if (arguments == null) {
-    //   Navigator.pop(context); // Navigate back if no arguments are passed.
-    //   return;
-    // }
-
+  void _initializeData() async {
+    Map<String, dynamic> res =
+        await FirestoreDbService().fetchChats(widget.user!.uid);
+    if (res['success']) {
+      setState(() {
+        final tempChatBubbles = res['data'] as List<ChatModel>;
+        for (var element in tempChatBubbles) {
+          _chatBubbles.add(ChatBubble(chatModel: element));
+        }
+      });
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(res['error']),
+            backgroundColor: Colors.red,
+          ),
+        );
+      });
+    }
     setState(() {
       _isLoading = false;
     });
   }
 
-  void onSend() {
+  void sendToAI(ChatModel chatModel) async {
+    /*
+    
+    AI API call
+    
+    */
     String d =
-        "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}_${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
-    setState(() {
-      _chatBubbles.add(ChatBubble(
-          chatModel: ChatModel(credentialController.text, d, true, "Me")));
-    });
+        "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day} ${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
+    final aiResponse = ChatModel("I got your msg", d, false, "AI", "0");
+
+    Map<String, dynamic> res =
+        await FirestoreDbService().sendChats(widget.user!.uid, aiResponse);
+
+    if (res['success']) {
+      aiResponse.chatId = res['key'];
+      setState(() {
+        _chatBubbles.add(ChatBubble(chatModel: aiResponse));
+      });
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(res['error']),
+            backgroundColor: Colors.red,
+          ),
+        );
+      });
+    }
+  }
+
+  void onSend() async {
+    String d =
+        "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day} ${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
+
+    final chatModel = ChatModel(credentialController.text, d, true, "Me", "0");
+
+    Map<String, dynamic> res =
+        await FirestoreDbService().sendChats(widget.user!.uid, chatModel);
+    if (res['success']) {
+      chatModel.chatId = res['key'];
+      setState(() {
+        _chatBubbles.add(ChatBubble(chatModel: chatModel));
+      });
+
+      sendToAI(chatModel);
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(res['error']),
+            backgroundColor: Colors.red,
+          ),
+        );
+      });
+    }
+  }
+
+  void onClear() async {
+    Map<String, dynamic> res =
+        await FirestoreDbService().deleteChats(widget.user!.uid, _chatBubbles);
+    if (res['success']) {
+      setState(() {
+        _chatBubbles.clear();
+      });
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(res['error']),
+            backgroundColor: Colors.red,
+          ),
+        );
+      });
+    }
   }
 
   @override
@@ -59,7 +143,7 @@ class _ChatScreenState extends State<ChatScreen> {
       return Center(
           child: CircularProgressIndicator(
         backgroundColor: Colors.white,
-        color: CustomColors().blue,
+        color: StyleSheet().btnBackground,
       ));
     }
     return Container(
@@ -77,18 +161,20 @@ class _ChatScreenState extends State<ChatScreen> {
           Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextInputWithSend(
-                  inputController: credentialController,
-                  hint: "Message",
-                  hintColor: StyleSheet().greyHint,
-                  textColor: StyleSheet().text,
-                  iconColor: StyleSheet().chatIcon,
-                  fontSize: AppSizes().getBlockSizeHorizontal(5),
-                  shadowColor: StyleSheet().textBackground,
-                  enableBorderColor: StyleSheet().disabledBorder,
-                  focusedBorderColor: StyleSheet().enableBorder,
-                  icon: Icons.message,
-                  typeKey: CustomTextInputTypes().text,
-                  onSend: onSend)),
+                inputController: credentialController,
+                hint: "Message",
+                hintColor: StyleSheet().greyHint,
+                textColor: StyleSheet().text,
+                iconColor: StyleSheet().chatIcon,
+                fontSize: AppSizes().getBlockSizeHorizontal(5),
+                shadowColor: StyleSheet().textBackground,
+                enableBorderColor: StyleSheet().disabledBorder,
+                focusedBorderColor: StyleSheet().enableBorder,
+                icon: Icons.message,
+                typeKey: CustomTextInputTypes().text,
+                onSend: onSend,
+                onClear: onClear,
+              )),
         ],
       ),
     );
