@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:health_care/components/buttons/custom_text_button/custom_text_button.dart';
 import 'package:health_care/components/list/design1/list_item1.dart';
 import 'package:health_care/constants/consts.dart';
+import 'package:health_care/controllers/profileController.dart';
 import 'package:health_care/controllers/textController.dart';
+import 'package:health_care/pages/app/additional/edit_profile_popup.dart';
 import 'package:health_care/pages/app/services/firestore_db_service.dart';
 import 'package:iconly/iconly.dart';
 
@@ -19,6 +21,7 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   final UserProfile _userProfile = UserProfile(name: "Name", email: "Email");
   late final CredentialController credentialController = CredentialController();
+  late final ProfileController profileController = ProfileController();
   bool _isLoading = true; // Loading state
 
   @override
@@ -59,6 +62,12 @@ class _ProfileState extends State<Profile> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Future<void> onPick() async {}
+  Future<void> onSubmit() async {
+    profileController.clear();
+    Navigator.pop(context);
   }
 
   @override
@@ -186,7 +195,20 @@ class _ProfileState extends State<Profile> {
                 )),
             CustomTextButton(
               label: "Edit Profile",
-              onPressed: () {},
+              onPressed: () {
+                profileController.mobile.text = _userProfile.mobile;
+                profileController.address.text = _userProfile.address;
+                profileController.language.text = _userProfile.language;
+                profileController.pic.text = _userProfile.pic;
+                showDialog(
+                    context: context,
+                    builder: (context) => EditProfilePopup(
+                        mobileController: profileController.mobile,
+                        addressController: profileController.address,
+                        languageController: profileController.language,
+                        onPickImage: onPick,
+                        onSubmit: onSubmit));
+              },
               icon: IconlyLight.edit,
               backgroundColor: StyleSheet().btnBackground,
               textColor: StyleSheet().btnText,
