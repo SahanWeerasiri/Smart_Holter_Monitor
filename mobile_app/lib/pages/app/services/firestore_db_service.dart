@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flame/extensions.dart';
 import 'package:health_care/pages/app/additional/chat_bubble.dart';
 
 class FirestoreDbService {
@@ -88,12 +89,14 @@ class FirestoreDbService {
       final QuerySnapshot<Object?> snapshot =
           await usersCollection.doc(uid).collection("chats").get();
 
-      snapshot.docs
-          .sort((a, b) => b.get("timestamp").compareTo(a.get("timestamp")));
+      final docs = snapshot.docs;
+
+      docs.sort((a, b) => b.get("timestamp").compareTo(a.get("timestamp")));
+      docs.reverse();
 
       List<ChatModel> chats = [];
 
-      for (final DocumentSnapshot<Object?> doc in snapshot.docs) {
+      for (final DocumentSnapshot<Object?> doc in docs) {
         // Check if the document exists
         if (doc.exists) {
           String sender = doc.get("sender");
@@ -147,7 +150,8 @@ class FirestoreDbService {
         usersCollection
             .doc(uid)
             .collection("chats")
-            .doc(chatBubble.chatModel.chatId);
+            .doc(chatBubble.chatModel.chatId)
+            .delete();
       }
 
       return {'success': true, 'msg': "Chat deleted successfully!"};

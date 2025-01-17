@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import '../../constants/consts.dart';
 import '../../controllers/textController.dart';
 
@@ -19,6 +20,7 @@ class TextInputWithSend extends StatefulWidget {
   final double fontSize;
   final Color textColor;
   final VoidCallback onSend;
+  final VoidCallback onClear;
 
   const TextInputWithSend(
       {super.key,
@@ -27,6 +29,7 @@ class TextInputWithSend extends StatefulWidget {
       required this.icon,
       required this.typeKey,
       required this.onSend,
+      required this.onClear,
       this.borderColor = Colors.lightBlue,
       this.focusedBorderColor = Colors.blue,
       this.erroBorderColor = Colors.red,
@@ -53,6 +56,16 @@ class _TextInputWithSendState extends State<TextInputWithSend> {
     AppSizes().initSizes(context);
     return Row(
       children: [
+        IconButton(
+          padding: EdgeInsets.all(0),
+          onPressed: () {
+            widget.onClear();
+          },
+          icon: Icon(
+            IconlyLight.delete,
+            color: Colors.red,
+          ),
+        ),
         Expanded(
           child: Container(
             height: 50,

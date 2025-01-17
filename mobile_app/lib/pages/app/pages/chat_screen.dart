@@ -68,7 +68,7 @@ class _ChatScreenState extends State<ChatScreen> {
     
     */
     String d =
-        "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}_${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
+        "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day} ${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
     final aiResponse = ChatModel("I got your msg", d, false, "AI", "0");
 
     Map<String, dynamic> res = await FirestoreDbService()
@@ -93,7 +93,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void onSend() async {
     String d =
-        "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}_${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
+        "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day} ${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
 
     final chatModel = ChatModel(credentialController.text, d, true, "Me", "0");
 
@@ -106,6 +106,25 @@ class _ChatScreenState extends State<ChatScreen> {
       });
 
       sendToAI(chatModel);
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(res['error']),
+            backgroundColor: Colors.red,
+          ),
+        );
+      });
+    }
+  }
+
+  void onClear() async {
+    Map<String, dynamic> res = await FirestoreDbService()
+        .deleteChats(FirebaseAuth.instance.currentUser!.uid, _chatBubbles);
+    if (res['success']) {
+      setState(() {
+        _chatBubbles.clear();
+      });
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -142,18 +161,20 @@ class _ChatScreenState extends State<ChatScreen> {
           Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextInputWithSend(
-                  inputController: credentialController,
-                  hint: "Message",
-                  hintColor: StyleSheet().greyHint,
-                  textColor: StyleSheet().text,
-                  iconColor: StyleSheet().chatIcon,
-                  fontSize: AppSizes().getBlockSizeHorizontal(5),
-                  shadowColor: StyleSheet().textBackground,
-                  enableBorderColor: StyleSheet().disabledBorder,
-                  focusedBorderColor: StyleSheet().enableBorder,
-                  icon: Icons.message,
-                  typeKey: CustomTextInputTypes().text,
-                  onSend: onSend)),
+                inputController: credentialController,
+                hint: "Message",
+                hintColor: StyleSheet().greyHint,
+                textColor: StyleSheet().text,
+                iconColor: StyleSheet().chatIcon,
+                fontSize: AppSizes().getBlockSizeHorizontal(5),
+                shadowColor: StyleSheet().textBackground,
+                enableBorderColor: StyleSheet().disabledBorder,
+                focusedBorderColor: StyleSheet().enableBorder,
+                icon: Icons.message,
+                typeKey: CustomTextInputTypes().text,
+                onSend: onSend,
+                onClear: onClear,
+              )),
         ],
       ),
     );
