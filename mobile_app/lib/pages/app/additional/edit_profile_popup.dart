@@ -77,7 +77,12 @@ class EditProfilePopup extends StatelessWidget {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            mobileController.clear();
+            addressController.clear();
+            languageController.clear();
+            Navigator.pop(context);
+          },
           child: Text(
             "Cancel",
             style: TextStyle(

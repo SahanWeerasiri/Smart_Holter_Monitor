@@ -236,4 +236,38 @@ class FirestoreDbService {
       return {'success': false, 'error': e.toString()};
     }
   }
+
+  Future<Map<String, dynamic>> updateProfile(String uid, String mobile,
+      String language, String address, String pic) async {
+    try {
+      // Fetch the document snapshot
+
+      await usersCollection.doc(uid).update({
+        'mobile': mobile,
+        'address': address,
+        'language': language,
+        'pic': pic,
+      });
+      return {'success': true, 'message': "updation successful"};
+    } catch (e) {
+      // Handle errors and return failure
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> addContact(
+      String uid, String name, String mobile) async {
+    try {
+      // Fetch the document snapshot
+
+      await usersCollection.doc(uid).collection("emergency").add({
+        "name": name,
+        "mobile": mobile,
+      });
+      return {'success': true, 'message': "Add contact successfully!"};
+    } catch (e) {
+      // Handle errors and return failure
+      return {'success': false, 'error': e.toString()};
+    }
+  }
 }

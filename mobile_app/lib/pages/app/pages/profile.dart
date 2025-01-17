@@ -5,6 +5,7 @@ import 'package:health_care/components/list/design1/list_item1.dart';
 import 'package:health_care/constants/consts.dart';
 import 'package:health_care/controllers/profileController.dart';
 import 'package:health_care/controllers/textController.dart';
+import 'package:health_care/pages/app/additional/add_contact_popup.dart';
 import 'package:health_care/pages/app/additional/edit_profile_popup.dart';
 import 'package:health_care/pages/app/services/firestore_db_service.dart';
 import 'package:iconly/iconly.dart';
@@ -66,6 +67,11 @@ class _ProfileState extends State<Profile> {
 
   Future<void> onPick() async {}
   Future<void> onSubmit() async {
+    profileController.clear();
+    Navigator.pop(context);
+  }
+
+  Future<void> onSubmitContact() async {
     profileController.clear();
     Navigator.pop(context);
   }
@@ -231,7 +237,14 @@ class _ProfileState extends State<Profile> {
                 icon: IconlyLight.add_user,
                 backgroundColor: StyleSheet().btnBackground,
                 textColor: StyleSheet().btnText,
-                onPressed: () {}),
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) => AddContactPopup(
+                          mobileController: profileController.mobile,
+                          nameController: profileController.name,
+                          onSubmit: onSubmitContact));
+                }),
             ListItem1(
                 title: "Amma", icon: IconlyLight.profile, onPressed: () {})
           ],

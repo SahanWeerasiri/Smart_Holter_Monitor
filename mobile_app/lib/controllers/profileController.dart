@@ -6,6 +6,7 @@ class ProfileController {
   TextEditingController pic = TextEditingController();
   TextEditingController language = TextEditingController();
   TextEditingController color = TextEditingController();
+  TextEditingController name = TextEditingController();
 
   void clear() {
     pic.clear();
@@ -13,5 +14,6 @@ class ProfileController {
     address.clear();
     language.clear();
     color.clear();
+    name.clear();
   }
 }
