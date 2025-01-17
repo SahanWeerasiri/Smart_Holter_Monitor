@@ -25,12 +25,12 @@ class _ProfileState extends State<Profile> {
   void initState() {
     super.initState();
     fetchProfileData();
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   Future<void> fetchProfileData() async {
+    setState(() {
+      _isLoading = true;
+    });
     Map<String, dynamic> res =
         await FirestoreDbService().fetchAccount(widget.user!.uid);
     if (res['success']) {
@@ -56,6 +56,9 @@ class _ProfileState extends State<Profile> {
         );
       });
     }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -64,8 +67,8 @@ class _ProfileState extends State<Profile> {
     if (_isLoading) {
       return Center(
           child: CircularProgressIndicator(
-        backgroundColor: Colors.white,
-        color: CustomColors().blue,
+        backgroundColor: StyleSheet().uiBackground,
+        color: StyleSheet().btnBackground,
       ));
     }
     return SingleChildScrollView(

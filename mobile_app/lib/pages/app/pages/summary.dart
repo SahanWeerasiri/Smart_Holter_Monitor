@@ -19,6 +19,7 @@ class Summary extends StatefulWidget {
 class _SummaryState extends State<Summary> {
   final UserProfile _userProfile = UserProfile(name: "Name", email: "Email");
   final UserProfile doctorProfile = UserProfile(name: "Name", email: "Email");
+  bool isLoading = true;
   int currentHeartRate = 0;
   num avgHeartRate = 0.0;
   Color stateBoxColor = StyleSheet().stateHeartBoxBad;
@@ -29,6 +30,9 @@ class _SummaryState extends State<Summary> {
   }
 
   Future<void> fetchProfileData() async {
+    setState(() {
+      isLoading = true;
+    });
     Map<String, dynamic> res =
         await FirestoreDbService().fetchAccount(widget.user!.uid);
     if (res['success']) {
@@ -80,6 +84,9 @@ class _SummaryState extends State<Summary> {
         );
       });
     }
+    setState(() {
+      isLoading = false;
+    });
   }
 
   Future<void> fetchDeviceData(String device) async {
@@ -152,6 +159,15 @@ class _SummaryState extends State<Summary> {
   @override
   Widget build(BuildContext context) {
     AppSizes().initSizes(context);
+
+    if (isLoading) {
+      return Center(
+          child: CircularProgressIndicator(
+        color: StyleSheet().btnBackground,
+        backgroundColor: StyleSheet().uiBackground,
+      ));
+    }
+
     return Padding(
       padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(8)),
       child: Column(
