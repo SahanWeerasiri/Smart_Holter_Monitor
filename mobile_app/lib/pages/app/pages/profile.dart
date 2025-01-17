@@ -70,7 +70,6 @@ class _ProfileState extends State<Profile> {
     });
   }
 
-  Future<void> onPick() async {}
   Future<void> onSubmit() async {
     Map<String, dynamic> res = await FirestoreDbService().updateProfile(
         widget.user!.uid,
@@ -172,17 +171,18 @@ class _ProfileState extends State<Profile> {
         child: Column(
           spacing: AppSizes().getBlockSizeVertical(1),
           children: [
-            CircleAvatar(
-              radius: 60,
-              backgroundColor:
-                  Colors.blue, // Replace with your StyleSheet().btnBackground
+            Container(
+              clipBehavior: Clip.hardEdge,
+              width: AppSizes().getBlockSizeHorizontal(50),
+              height: AppSizes().getBlockSizeHorizontal(50),
+              decoration: BoxDecoration(
+                  color: StyleSheet().btnBackground,
+                  borderRadius: BorderRadius.circular(60)),
               child: _userProfile.pic.isNotEmpty
-                  ? ClipOval(
-                      child: Image.memory(
-                        base64Decode(_userProfile.pic),
-                        fit: BoxFit
-                            .cover, // Ensures the image fills the CircleAvatar nicely
-                      ),
+                  ? Image.memory(
+                      base64Decode(_userProfile.pic),
+                      fit: BoxFit
+                          .cover, // Ensures the image fills the CircleAvatar nicely
                     )
                   : const Icon(
                       Icons.person,
@@ -299,7 +299,7 @@ class _ProfileState extends State<Profile> {
                         mobileController: profileController.mobile,
                         addressController: profileController.address,
                         languageController: profileController.language,
-                        onPickImage: onPick,
+                        picController: profileController.pic,
                         onSubmit: () {
                           onSubmit();
                           profileController.clear();
