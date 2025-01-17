@@ -270,4 +270,35 @@ class FirestoreDbService {
       return {'success': false, 'error': e.toString()};
     }
   }
+
+  Future<Map<String, dynamic>> fetchEmergency(String uid) async {
+    try {
+      // Fetch the document snapshot
+      final QuerySnapshot<Object?> snapshot =
+          await usersCollection.doc(uid).collection("emergency").get();
+
+      final docs = snapshot.docs;
+
+      List<Map<String, dynamic>> people = [];
+
+      for (final DocumentSnapshot<Object?> doc in docs) {
+        // Check if the document exists
+        if (doc.exists) {
+          people.add({
+            'name': doc.get("name"),
+            'mobile': doc.get("mobile"),
+          });
+        } else {
+          people.add({
+            'name': "",
+            'mobile': "",
+          });
+        }
+      }
+      return {'success': true, 'data': people};
+    } catch (e) {
+      // Handle errors and return failure
+      return {'success': false, 'error': e.toString()};
+    }
+  }
 }

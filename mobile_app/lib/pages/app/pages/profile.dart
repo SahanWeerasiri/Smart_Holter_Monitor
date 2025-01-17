@@ -7,6 +7,7 @@ import 'package:health_care/controllers/profileController.dart';
 import 'package:health_care/controllers/textController.dart';
 import 'package:health_care/pages/app/additional/add_contact_popup.dart';
 import 'package:health_care/pages/app/additional/edit_profile_popup.dart';
+import 'package:health_care/pages/app/additional/show_contact_popup.dart';
 import 'package:health_care/pages/app/services/firestore_db_service.dart';
 import 'package:iconly/iconly.dart';
 
@@ -21,6 +22,7 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   final UserProfile _userProfile = UserProfile(name: "Name", email: "Email");
+  final List<ContactProfile> _people = [];
   late final CredentialController credentialController = CredentialController();
   late final ProfileController profileController = ProfileController();
   bool _isLoading = true; // Loading state
@@ -29,6 +31,7 @@ class _ProfileState extends State<Profile> {
   void initState() {
     super.initState();
     fetchProfileData();
+    fetchEmergency();
   }
 
   Future<void> fetchProfileData() async {
@@ -118,6 +121,35 @@ class _ProfileState extends State<Profile> {
         );
       });
     }
+  }
+
+  Future<void> fetchEmergency() async {
+    setState(() {
+      _isLoading = true;
+    });
+    Map<String, dynamic> res =
+        await FirestoreDbService().fetchEmergency(widget.user!.uid);
+    if (res['success']) {
+      setState(() {
+        final people = res['data'] as List<Map<String, dynamic>>;
+        for (var person in people) {
+          _people.add(
+              ContactProfile(name: person['name'], mobile: person['mobile']));
+        }
+      });
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(res['error']),
+            backgroundColor: Colors.red,
+          ),
+        );
+      });
+    }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -296,11 +328,21 @@ class _ProfileState extends State<Profile> {
                             onSubmitContact();
                             profileController.clear();
                             Navigator.pop(context);
-                            fetchProfileData();
+                            fetchEmergency();
                           }));
                 }),
-            ListItem1(
-                title: "Amma", icon: IconlyLight.profile, onPressed: () {})
+            Column(
+                children: _people.map((person) {
+              return ListItem1(
+                  title: person.name,
+                  icon: IconlyLight.profile,
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) =>
+                            ShowContactPopup(profile: person));
+                  });
+            }).toList())
           ],
         ),
       ),
