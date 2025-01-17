@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care/components/buttons/custom_text_button/custom_text_button.dart';
@@ -172,12 +174,21 @@ class _ProfileState extends State<Profile> {
           children: [
             CircleAvatar(
               radius: 60,
-              backgroundColor: StyleSheet().btnBackground,
-              child: const Icon(
-                Icons.person,
-                size: 60,
-                color: Colors.white,
-              ),
+              backgroundColor:
+                  Colors.blue, // Replace with your StyleSheet().btnBackground
+              child: _userProfile.pic.isNotEmpty
+                  ? ClipOval(
+                      child: Image.memory(
+                        base64Decode(_userProfile.pic),
+                        fit: BoxFit
+                            .cover, // Ensures the image fills the CircleAvatar nicely
+                      ),
+                    )
+                  : const Icon(
+                      Icons.person,
+                      size: 40, // Optional: Adjust size as needed
+                      color: Colors.white, // Optional: Adjust icon color
+                    ),
             ),
             Container(
                 decoration: BoxDecoration(
