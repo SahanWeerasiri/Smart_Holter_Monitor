@@ -1,19 +1,18 @@
 import 'package:health_care_web/components/buttons/custom_text_button/custom_text_button.dart';
 import 'package:health_care_web/components/text_input/text_input_with_leading_icon.dart';
-import 'package:health_care_web/components/top_app_bar/top_app_bar2.dart';
 import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/controllers/textController.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care_web/pages/app/services/auth_service.dart';
 
-class Signup extends StatefulWidget {
-  const Signup({super.key});
+class SignupCard extends StatefulWidget {
+  const SignupCard({super.key});
 
   @override
-  State<Signup> createState() => _SignupState();
+  State<SignupCard> createState() => _SignupCardState();
 }
 
-class _SignupState extends State<Signup> {
+class _SignupCardState extends State<SignupCard> {
   late final CredentialController credentialController;
   late final TextStyle textStyleHeading;
   late final TextStyle textStyleTextInputTopic;
@@ -107,21 +106,19 @@ class _SignupState extends State<Signup> {
   Widget build(BuildContext context) {
     AppSizes appSizes = AppSizes();
     appSizes.initSizes(context);
-    return Scaffold(
-      appBar: CustomTopAppBar2(
-        title: "Sign up",
-        backButton: true,
-        backOnPressed: () {
-          credentialController.clear();
-          Navigator.pop(context);
-        },
-        titleColor: StyleSheet().topbarText,
-        backgroundColor: StyleSheet().topbarBackground,
-      ),
-      body: SingleChildScrollView(
+    return SizedBox(
+        width: 350,
+        height: AppSizes().getBlockSizeVertical(80),
         child: Container(
-          height: AppSizes().getScreenHeight(),
-          color: StyleSheet().uiBackground,
+          decoration: BoxDecoration(
+              color: StyleSheet().uiBackground,
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+              boxShadow: List.of([
+                BoxShadow(
+                  color: Colors.black,
+                  blurRadius: 20,
+                )
+              ])),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
             child: Column(
@@ -245,9 +242,6 @@ class _SignupState extends State<Signup> {
               ],
             ),
           ),
-        ),
-      ),
-      bottomNavigationBar: null,
-    );
+        ));
   }
 }

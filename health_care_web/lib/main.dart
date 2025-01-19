@@ -3,7 +3,7 @@ import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/pages/app/before_login_page.dart';
 import 'package:health_care_web/pages/app/home.dart';
 import 'package:health_care_web/pages/app/login_page.dart';
-import 'package:health_care_web/pages/app/signup.dart';
+import 'package:health_care_web/pages/app/signup_page.dart';
 // import 'package:health_care_web/pages/app/splash.dart';
 
 void main() {
@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
       routes: {
         // Sample routes
         '/login': (context) => const LoginPage(),
-        '/signup': (context) => const Signup(),
+        '/signup': (context) => const SignupPage(),
         '/before_login': (context) => const BeforeLoginPage(),
         '/home': (context) => const Home(),
       },
