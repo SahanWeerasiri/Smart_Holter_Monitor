@@ -58,7 +58,7 @@ class _SummaryState extends State<Summary> {
       }
       if (res['data']['doctor_id'] != "") {
         Map<String, dynamic> resDoc =
-            await FirestoreDbService().fetchDoctor(res['data']['doctor_id']);
+            await FirestoreDbService().fetchPatient(res['data']['doctor_id']);
         if (resDoc['success']) {
           setState(() {
             doctorProfile.name = resDoc['data']['name'];

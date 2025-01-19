@@ -1,0 +1,7 @@
+html, body {
+    overflow: auto; /* Disable scrolling */
+    min-width: 1500; /* Ensure the body width doesn't exceed the viewport */
+    min-height: 800; /* Ensure the body height doesn't exceed the viewport */
+    margin: 0;
+    resize: none;
+  }
