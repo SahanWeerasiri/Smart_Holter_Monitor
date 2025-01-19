@@ -1,16 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:health_care_web/components/top_app_bar/top_app_bar2.dart';
-import 'package:health_care_web/pages/app/pages/profile.dart';
-import 'package:health_care_web/pages/app/pages/report_list.dart';
-import 'package:health_care_web/pages/app/pages/summary.dart';
+import 'package:health_care_web/components/drawer/simple_drawer/drawer_index_controller.dart';
+import 'package:health_care_web/components/drawer/simple_drawer/simple_drawer.dart';
+import 'package:health_care_web/components/top_app_bar/top_app_bar3.dart';
 import 'package:health_care_web/pages/app/services/auth_service.dart';
 import '../../constants/consts.dart';
-import '../../components/bottom_app_bars/bottom_app_bar_1/bottom_navigation_custom1.dart';
-import '../../components/bottom_app_bars/bottom_app_bar_1/menuController.dart';
-import '../../components/bottom_app_bars/bottom_app_bar_1/bottom_nav_button_1.dart';
 import 'package:iconly/iconly.dart';
-import '../../components/bottom_app_bars/bottom_app_bar_1/constants1.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -20,30 +14,68 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final List<Widget> _pages = [
-    Center(child: Summary(user: FirebaseAuth.instance.currentUser)),
-    Center(child: ReportList(user: FirebaseAuth.instance.currentUser)),
-    Center(child: Profile(user: FirebaseAuth.instance.currentUser)),
+  final DrawerIndexController drawerIndexController = DrawerIndexController();
+  final List<Widget> pages = [
+    const Text('Test Drawer 1'),
+    const Text('Test Drawer 2'),
+    const Text('Test Drawer 3'),
+    const Text('Test Drawer 4'),
+    const Text('Test Drawer 5'),
+    const Text('Test Drawer 6'),
+    const Text('Test Drawer 7'),
   ];
-  late final CustomMenuController menuController;
-
-  @override
-  void initState() {
-    super.initState();
-    menuController = CustomMenuController(0, _pages);
-  }
-
   @override
   Widget build(BuildContext context) {
     AppSizes appSizes = AppSizes();
     appSizes.initSizes(context);
     return Scaffold(
       backgroundColor: StyleSheet().uiBackground,
-      appBar: CustomTopAppBar2(
-        title: "Smart Care",
+      drawer: DrawerFb1(
+          title: "Dashboard",
+          items: [
+            DrawerItems(
+                index: 0,
+                title: 'Item 1',
+                icon: Icons.home,
+                onTap: () {
+                  setState(() {
+                    drawerIndexController.setSelectedIndex(0);
+                  });
+                }),
+            DrawerItems(
+                index: 1,
+                title: 'Item 2',
+                icon: Icons.search,
+                onTap: () {
+                  setState(() {
+                    drawerIndexController.setSelectedIndex(1);
+                  });
+                }),
+          ],
+          backgroundColor: StyleSheet().uiBackground,
+          textColor: StyleSheet().uiBackground,
+          titleColor: StyleSheet().btnBackground,
+          selectedTextColor: StyleSheet().btnBackground,
+          dividerColor: StyleSheet().divider,
+          drawerWidth: 350,
+          drawerRadius: 10,
+          drawerIndexController: drawerIndexController),
+      appBar: CustomTopAppBar3(
+        title: "Smart Care - Doctor",
         backOnPressed: () {},
         backgroundColor: StyleSheet().topbarBackground,
         titleColor: StyleSheet().topbarText,
+        leadingIcon: Builder(
+          builder: (context) => IconButton(
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+            icon: Icon(
+              Icons.menu,
+              color: StyleSheet().topbarText,
+            ),
+          ),
+        ),
         actions: [
           IconButton(
             icon: Icon(
@@ -67,65 +99,7 @@ class _HomeState extends State<Home> {
         ],
       ),
       body: Center(
-        child: _pages[menuController.getCurrentIndex()],
-      ),
-      bottomNavigationBar: BottomNavigationCustom1(
-        backgroundColor: StyleSheet().bottomNavigationBackground,
-        baseColor: StyleSheet().bottomNavigationBase,
-        gradient: StyleSheet().gradientForBottomAppBar,
-        animatedPositionedLeftValue:
-            animatedPositionedLeftValueTest(menuController.getCurrentIndex()),
-        menuController: menuController,
-        navBtnList: [
-          BottomNavBtn(
-            icon: IconlyLight.home,
-            currentIndex: menuController.getCurrentIndex(),
-            index: 0,
-            iconColor: StyleSheet().bottomNavigationIcon,
-            shadowColor: StyleSheet().bottomNavigationShadow,
-            onPressed: (val) {
-              setState(() {
-                menuController.setCurrentIndex(val);
-              });
-            },
-          ),
-          BottomNavBtn(
-            icon: IconlyLight.document,
-            iconColor: StyleSheet().bottomNavigationIcon,
-            shadowColor: StyleSheet().bottomNavigationShadow,
-            currentIndex: menuController.getCurrentIndex(),
-            index: 1,
-            onPressed: (val) {
-              setState(() {
-                menuController.setCurrentIndex(val);
-              });
-            },
-          ),
-          BottomNavBtn(
-            icon: IconlyLight.chat,
-            iconColor: StyleSheet().bottomNavigationIcon,
-            shadowColor: StyleSheet().bottomNavigationShadow,
-            currentIndex: menuController.getCurrentIndex(),
-            index: 2,
-            onPressed: (val) {
-              setState(() {
-                menuController.setCurrentIndex(val);
-              });
-            },
-          ),
-          BottomNavBtn(
-            icon: IconlyLight.profile,
-            iconColor: StyleSheet().bottomNavigationIcon,
-            shadowColor: StyleSheet().bottomNavigationShadow,
-            currentIndex: menuController.getCurrentIndex(),
-            index: 3,
-            onPressed: (val) {
-              setState(() {
-                menuController.setCurrentIndex(val);
-              });
-            },
-          ),
-        ],
+        child: pages[drawerIndexController.getSelectedIndex()],
       ),
     );
   }

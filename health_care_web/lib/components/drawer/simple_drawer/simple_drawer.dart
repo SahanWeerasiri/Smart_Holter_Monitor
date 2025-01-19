@@ -12,6 +12,7 @@ class DrawerFb1 extends StatefulWidget {
   final Color dividerColor;
   final double drawerWidth;
   final double drawerRadius;
+  final Color titleColor;
   final DrawerIndexController drawerIndexController;
   const DrawerFb1(
       {super.key,
@@ -19,6 +20,7 @@ class DrawerFb1 extends StatefulWidget {
       required this.items,
       required this.backgroundColor,
       required this.textColor,
+      required this.titleColor,
       required this.selectedTextColor,
       required this.dividerColor,
       required this.drawerWidth,
@@ -39,43 +41,52 @@ class _DrawerFb1State extends State<DrawerFb1> {
       ),
       child: Material(
         color: widget.backgroundColor,
-        child: ListView(
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                children: [
-                  const SizedBox(height: 12),
-                  Text(
-                    widget.title,
-                    style: TextStyle(
-                        color: widget.textColor,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold),
+        child: Builder(
+          builder: (drawerContext) {
+            // Use `drawerContext` for Navigator.pop() or Scaffold.of()
+            return ListView(
+              children: <Widget>[
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  child: Column(
+                    spacing: 1,
+                    children: [
+                      const SizedBox(height: 5),
+                      Text(
+                        widget.title,
+                        style: TextStyle(
+                          color: widget.titleColor,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      ...widget.items.map((item) => Column(
+                            spacing: 1,
+                            children: [
+                              item.title != ''
+                                  ? MenuItem(
+                                      text: item.title,
+                                      icon: item.icon,
+                                      isSelected: item.index ==
+                                          widget.drawerIndexController
+                                              .getSelectedIndex(),
+                                      onClicked: () => selectedItem(
+                                          drawerContext, item.index),
+                                      textColor: widget.textColor,
+                                      selectedTextColor:
+                                          widget.selectedTextColor,
+                                    )
+                                  : Divider(color: widget.dividerColor),
+                              const SizedBox(height: 5),
+                            ],
+                          )),
+                    ],
                   ),
-                  const SizedBox(height: 12),
-                  ...widget.items.map((item) => Column(
-                        children: [
-                          item.title != ''
-                              ? MenuItem(
-                                  text: item.title,
-                                  icon: item.icon,
-                                  isSelected: item.index ==
-                                      widget.drawerIndexController
-                                          .getSelectedIndex(),
-                                  onClicked: () =>
-                                      selectedItem(context, item.index),
-                                  textColor: widget.textColor,
-                                  selectedTextColor: widget.selectedTextColor,
-                                )
-                              : Divider(color: widget.dividerColor),
-                          const SizedBox(height: 5),
-                        ],
-                      )),
-                ],
-              ),
-            ),
-          ],
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -109,12 +120,13 @@ class MenuItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return isSelected
+    return !isSelected
         ? ListItem1(
             color: textColor,
             textColor: selectedTextColor,
             title: text,
             icon: icon,
+            padding: 1,
             onPressed: onClicked ?? () {},
             shadowBlurRadius: 20,
             needArrow: false,
@@ -123,6 +135,7 @@ class MenuItem extends StatelessWidget {
             color: selectedTextColor,
             textColor: textColor,
             title: text,
+            padding: 1,
             icon: icon,
             onPressed: onClicked ?? () {},
             shadowBlurRadius: 20,
