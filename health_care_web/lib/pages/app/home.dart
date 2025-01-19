@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care_web/components/top_app_bar/top_app_bar2.dart';
-import 'package:health_care_web/pages/app/pages/chat_screen.dart';
 import 'package:health_care_web/pages/app/pages/profile.dart';
 import 'package:health_care_web/pages/app/pages/report_list.dart';
 import 'package:health_care_web/pages/app/pages/summary.dart';
@@ -24,7 +23,6 @@ class _HomeState extends State<Home> {
   final List<Widget> _pages = [
     Center(child: Summary(user: FirebaseAuth.instance.currentUser)),
     Center(child: ReportList(user: FirebaseAuth.instance.currentUser)),
-    Center(child: ChatScreen(user: FirebaseAuth.instance.currentUser)),
     Center(child: Profile(user: FirebaseAuth.instance.currentUser)),
   ];
   late final CustomMenuController menuController;

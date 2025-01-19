@@ -116,7 +116,7 @@ class _LoginCardState extends State<LoginCard> {
     AppSizes().initSizes(context);
     return SizedBox(
         width: 350,
-        height: AppSizes().getBlockSizeVertical(80),
+        height: AppSizes().getBlockSizeVertical(70),
         child: Container(
           decoration: BoxDecoration(
               color: StyleSheet().uiBackground,
@@ -200,30 +200,30 @@ class _LoginCardState extends State<LoginCard> {
                   textColor: StyleSheet().btnText,
                   icon: Icons.login,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Text("Don't you have an account?",
-                        style: TextStyle(
-                          fontSize: 15,
-                        )),
-                    TextButton(
-                        child: Text(
-                          "Sign up",
-                          style: TextStyle(
-                              fontSize: 15,
-                              color: StyleSheet().btnBackground,
-                              fontWeight: FontWeight.w900),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            credentialController.clear();
-                          });
-                          navigateToSignUp();
-                        }),
-                  ],
-                ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.center,
+                //   crossAxisAlignment: CrossAxisAlignment.center,
+                //   children: [
+                //     const Text("Don't you have an account?",
+                //         style: TextStyle(
+                //           fontSize: 15,
+                //         )),
+                //     TextButton(
+                //         child: Text(
+                //           "Sign up",
+                //           style: TextStyle(
+                //               fontSize: 15,
+                //               color: StyleSheet().btnBackground,
+                //               fontWeight: FontWeight.w900),
+                //         ),
+                //         onPressed: () {
+                //           setState(() {
+                //             credentialController.clear();
+                //           });
+                //           navigateToSignUp();
+                //         }),
+                //   ],
+                // ),
                 SizedBox(
                   height: AppSizes().getBlockSizeVertical(5),
                 ),

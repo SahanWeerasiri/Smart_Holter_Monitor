@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flame/extensions.dart';
 import 'package:health_care_web/constants/consts.dart';
-import 'package:health_care_web/pages/app/additional/chat_bubble.dart';
 
 class FirestoreDbService {
   final CollectionReference usersCollection =
@@ -21,16 +20,13 @@ class FirestoreDbService {
         'name': name,
         'address': "Address",
         'mobile': "Mobile",
-        'is_done': false,
         'language': 'Language',
-        'device': 'Device',
         'color': 'Color',
         'pic': '',
-        'doctor_id': ''
       };
 
       // Store data in the database
-      await usersCollection.doc(_auth.currentUser!.uid).set(accountData);
+      await doctorCollection.doc(_auth.currentUser!.uid).set(accountData);
 
       // Return the account data
       return {'success': true, 'data': accountData};
@@ -44,7 +40,7 @@ class FirestoreDbService {
     try {
       // Fetch the document snapshot
       final DocumentSnapshot<Object?> snapshot =
-          await usersCollection.doc(uid).get();
+          await doctorCollection.doc(uid).get();
 
       // Check if the document exists
       if (snapshot.exists) {
@@ -62,21 +58,41 @@ class FirestoreDbService {
     }
   }
 
-  Future<Map<String, dynamic>> fetchDoctor(String uid) async {
+  Future<Map<String, dynamic>> fetchPatient(String uid) async {
     try {
       // Fetch the document snapshot
-      final DocumentSnapshot<Object?> snapshot =
-          await doctorCollection.doc(uid).get();
+      final QuerySnapshot<Object?> snapshot = await usersCollection.get();
 
-      // Check if the document exists
-      if (snapshot.exists) {
-        // Extract data from the snapshot
-        final accountData = snapshot.data()!;
-        // Return success with the account data
-        return {'success': true, 'data': accountData};
+      const List<UserProfile> profiles = [];
+
+      // Iterate through all documents in the snapshot
+      for (DocumentSnapshot doc in snapshot.docs) {
+        final patientData = doc.data() as Map<String, dynamic>;
+        // Check if the 'doctor_id' matches the provided UID
+        if (patientData['doctor_id'] == uid) {
+          // Add the user profile to the list
+          profiles.add(
+            UserProfile(
+              name: patientData['name'],
+              email: patientData['email'],
+              pic: patientData['pic'],
+              address: patientData['address'],
+              mobile: patientData['mobile'],
+              device: patientData['device'],
+              isDone: patientData['is_done'],
+            ),
+          );
+        }
+      }
+
+      // Check if any profiles were found
+      if (profiles.isNotEmpty) {
+        return {'success': true, 'data': profiles};
       } else {
-        // Document does not exist
-        return {'success': false, 'error': 'Doctor not found'};
+        return {
+          'success': false,
+          'error': 'No patients found for the given doctor'
+        };
       }
     } catch (e) {
       // Handle errors and return failure
@@ -84,78 +100,29 @@ class FirestoreDbService {
     }
   }
 
-  Future<Map<String, dynamic>> fetchChats(String uid) async {
+  Future<Map<String, dynamic>> isDoctor(String email) async {
     try {
       // Fetch the document snapshot
-      final QuerySnapshot<Object?> snapshot =
-          await usersCollection.doc(uid).collection("chats").get();
+      final QuerySnapshot<Object?> snapshot = await doctorCollection.get();
 
-      final docs = snapshot.docs;
+      // Iterate through all documents in the snapshot
+      bool isDoctor = false;
 
-      docs.sort((a, b) => b.get("timestamp").compareTo(a.get("timestamp")));
-      docs.reverse();
-
-      List<ChatModel> chats = [];
-
-      for (final DocumentSnapshot<Object?> doc in docs) {
-        // Check if the document exists
-        if (doc.exists) {
-          String sender = doc.get("sender");
-          chats.add(ChatModel(
-              doc.get("msg"),
-              doc.get("timestamp"),
-              sender == "me" ? true : false,
-              sender == "me" ? "Me" : "AI",
-              doc.id));
-          // Return success with the account data
-        } else {
-          chats.add(ChatModel(
-            "Msg is not found",
-            "",
-            false,
-            "AI",
-            "0",
-          ));
+      for (DocumentSnapshot doc in snapshot.docs) {
+        final docData = doc.data() as Map<String, dynamic>;
+        // Check if the 'doctor_id' matches the provided UID
+        if (docData['email'] == email) {
+          isDoctor = true;
+          break;
         }
       }
-      return {'success': true, 'data': chats};
-    } catch (e) {
-      // Handle errors and return failure
-      return {'success': false, 'error': e.toString()};
-    }
-  }
 
-  Future<Map<String, dynamic>> sendChats(
-      String uid, ChatModel chatModel) async {
-    try {
-      DocumentReference<Map<String, dynamic>> res =
-          await usersCollection.doc(uid).collection("chats").add({
-        "msg": chatModel.msg,
-        "timestamp": chatModel.timestamp,
-        "sender": chatModel.isSender ? "me" : "ai",
-      });
-      return {'success': true, 'msg': "Msg saved successfully!", "key": res.id};
-    } catch (e) {
-      // Handle errors and return failure
-      return {'success': false, 'error': e.toString()};
-    }
-  }
-
-  Future<Map<String, dynamic>> deleteChats(
-      String uid, List<ChatBubble> chatBubles) async {
-    try {
-      for (ChatBubble chatBubble in chatBubles) {
-        if (chatBubble.chatModel.chatId == "0") {
-          continue;
-        }
-        usersCollection
-            .doc(uid)
-            .collection("chats")
-            .doc(chatBubble.chatModel.chatId)
-            .delete();
+      // Check if any profiles were found
+      if (isDoctor) {
+        return {'success': true, 'message': "This is a doctor"};
+      } else {
+        return {'success': false, 'error': 'You are not a doctor'};
       }
-
-      return {'success': true, 'msg': "Chat deleted successfully!"};
     } catch (e) {
       // Handle errors and return failure
       return {'success': false, 'error': e.toString()};

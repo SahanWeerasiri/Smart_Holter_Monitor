@@ -35,6 +35,16 @@ class AuthService {
     try {
       final cred = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
+
+      final Map<String, dynamic> res =
+          await FirestoreDbService().isDoctor(email);
+      if (!res['success']) {
+        await signout();
+        return {
+          "status": "error",
+          "message": res['error'],
+        };
+      }
       return {
         "status": "success",
         "message": "Logged in successfully",
@@ -64,6 +74,17 @@ class AuthService {
       final credential = GoogleAuthProvider.credential(
           accessToken: googleAuth?.accessToken, idToken: googleAuth?.idToken);
       final userCredential = await _auth.signInWithCredential(credential);
+
+      final Map<String, dynamic> res =
+          await FirestoreDbService().isDoctor(userCredential.user!.email!);
+      if (!res['success']) {
+        await signout();
+        return {
+          "status": "error",
+          "message": res['error'],
+        };
+      }
+
       return {
         "status": "success",
         "message": "Logged in successfully",

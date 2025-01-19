@@ -68,18 +68,18 @@ class BeforeLoginCard extends StatelessWidget {
                   backgroundColor: StyleSheet().btnBackground,
                   textColor: StyleSheet().btnText,
                 ),
-                SizedBox(
-                  height: AppSizes().getBlockSizeVertical(1),
-                ),
-                CustomTextButton(
-                  label: "Sign Up",
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/signup');
-                  },
-                  backgroundColor: StyleSheet().uiBackground,
-                  borderColor: StyleSheet().btnBackground,
-                  textColor: StyleSheet().btnBackground,
-                )
+                // SizedBox(
+                //   height: AppSizes().getBlockSizeVertical(1),
+                // ),
+                // CustomTextButton(
+                //   label: "Sign Up",
+                //   onPressed: () {
+                //     Navigator.pushNamed(context, '/signup');
+                //   },
+                //   backgroundColor: StyleSheet().uiBackground,
+                //   borderColor: StyleSheet().btnBackground,
+                //   textColor: StyleSheet().btnBackground,
+                // )
               ],
             ),
           ),
