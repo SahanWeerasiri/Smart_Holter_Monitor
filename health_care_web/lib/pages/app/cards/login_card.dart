@@ -1,19 +1,18 @@
 import 'package:health_care_web/components/buttons/custom_text_button/custom_text_button.dart';
 import 'package:health_care_web/components/text_input/text_input_with_leading_icon.dart';
-import 'package:health_care_web/components/top_app_bar/top_app_bar2.dart';
 import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/controllers/textController.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care_web/pages/app/services/auth_service.dart';
 
-class Login extends StatefulWidget {
-  const Login({super.key});
+class LoginCard extends StatefulWidget {
+  const LoginCard({super.key});
 
   @override
-  State<Login> createState() => _LoginState();
+  State<LoginCard> createState() => _LoginCardState();
 }
 
-class _LoginState extends State<Login> {
+class _LoginCardState extends State<LoginCard> {
   late final CredentialController credentialController;
   late final TextStyle textStyleHeading;
   late final TextStyle textStyleTextInputTopic;
@@ -115,20 +114,19 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     AppSizes().initSizes(context);
-    return Scaffold(
-      appBar: CustomTopAppBar2(
-        title: "Sign In",
-        backButton: true,
-        backgroundColor: StyleSheet().topbarBackground,
-        titleColor: StyleSheet().topbarText,
-        backOnPressed: () {
-          Navigator.pop(context);
-        },
-      ),
-      body: SingleChildScrollView(
+    return SizedBox(
+        width: 350,
+        height: AppSizes().getBlockSizeVertical(80),
         child: Container(
-          height: AppSizes().getScreenHeight(),
-          color: StyleSheet().uiBackground,
+          decoration: BoxDecoration(
+              color: StyleSheet().uiBackground,
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+              boxShadow: List.of([
+                BoxShadow(
+                  color: Colors.black,
+                  blurRadius: 20,
+                )
+              ])),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
             child: Column(
@@ -256,24 +254,9 @@ class _LoginState extends State<Login> {
                   textColor: StyleSheet().elebtnText,
                   backgroundColor: StyleSheet().uiBackground,
                 ),
-                // SizedBox(
-                //   height: AppSizes().getBlockSizeVertical(2),
-                // ),
-                // CustomTextButton(
-                //   borderRadius: 5,
-                //   label: "Sign in with Facebook",
-                //   onPressed: () {},
-                //   img: 'assetes/icons/facebook.png',
-                //   textColor: StyleSheet().elebtnText,
-                //   backgroundColor: StyleSheet().uiBackground,
-                //   borderColor: StyleSheet().elebtnBorder,
-                // ),
               ],
             ),
           ),
-        ),
-      ),
-      bottomNavigationBar: null,
-    );
+        ));
   }
 }
