@@ -97,9 +97,9 @@ class _SignupCardState extends State<SignupCard> {
     });
   }
 
-  void navigateToHome() {
+  void navigateToHome() async {
     credentialController.clear();
-    Navigator.pushNamed(context, '/login');
+    Navigator.pop(context);
   }
 
   @override
@@ -230,6 +230,8 @@ class _SignupCardState extends State<SignupCard> {
                   label: "Sign Up",
                   onPressed: () async {
                     if (await checkCredentials()) {
+                      AuthService auth = AuthService();
+                      await auth.signout();
                       navigateToHome();
                     } else {
                       signUpError();

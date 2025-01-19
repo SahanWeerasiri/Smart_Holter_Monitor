@@ -1,4 +1,5 @@
 import 'package:health_care_web/components/buttons/custom_text_button/custom_text_button.dart';
+import 'package:health_care_web/components/dropdown/CustomDropDown.dart';
 import 'package:health_care_web/components/text_input/text_input_with_leading_icon.dart';
 import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/controllers/textController.dart';
@@ -17,6 +18,7 @@ class _LoginCardState extends State<LoginCard> {
   late final TextStyle textStyleHeading;
   late final TextStyle textStyleTextInputTopic;
   late final TextStyle textStyleInputField;
+  String role = "";
   String msg = "";
 
   @override
@@ -36,7 +38,7 @@ class _LoginCardState extends State<LoginCard> {
   Future<bool> checkCredentials() async {
     AuthService auth = AuthService();
     Map<String, dynamic> result = await auth.loginUserWithEmailAndPassword(
-        credentialController.username, credentialController.password);
+        credentialController.username, credentialController.password, role);
     if (result["status"] == "error") {
       setState(() {
         msg = result["message"];
@@ -58,40 +60,33 @@ class _LoginCardState extends State<LoginCard> {
     return true;
   }
 
-  Future<bool> checkGoogleCredentials() async {
-    AuthService auth = AuthService();
+  // Future<bool> checkGoogleCredentials() async {
+  //   AuthService auth = AuthService();
 
-    Map<String, dynamic> result = await auth.signUpWithGoogle();
-    if (result["status"] == "error") {
-      setState(() {
-        msg = result["message"];
-      });
-      return false;
-    }
-    setState(() {
-      msg = result["message"];
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(msg),
-          backgroundColor: Colors.green,
-        ),
-      );
-    });
-    return true;
-  }
+  //   Map<String, dynamic> result = await auth.signWithGoogle();
+  //   if (result["status"] == "error") {
+  //     setState(() {
+  //       msg = result["message"];
+  //     });
+  //     return false;
+  //   }
+  //   setState(() {
+  //     msg = result["message"];
+  //   });
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text(msg),
+  //         backgroundColor: Colors.green,
+  //       ),
+  //     );
+  //   });
+  //   return true;
+  // }
 
   // bool checkFacebookCredentials() {
   //   return true;
   // }
-
-  void navigateToSignUp() {
-    setState(() {
-      credentialController.clear();
-    });
-    Navigator.pushNamed(context, '/signup');
-  }
 
   void loginError() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -109,6 +104,19 @@ class _LoginCardState extends State<LoginCard> {
       credentialController.clear();
     });
     Navigator.pushNamed(context, '/home');
+  }
+
+  void navigateToSignup() {
+    setState(() {
+      credentialController.clear();
+    });
+    Navigator.pushNamed(context, '/signup');
+  }
+
+  void onDropDownSelected(value) {
+    setState(() {
+      role = value;
+    });
   }
 
   @override
@@ -191,7 +199,11 @@ class _LoginCardState extends State<LoginCard> {
                       setState(() {
                         credentialController.clear();
                       });
-                      navigateToHome();
+                      if (role == "Admin") {
+                        navigateToSignup();
+                      } else {
+                        navigateToHome();
+                      }
                     } else {
                       loginError();
                     }
@@ -227,33 +239,37 @@ class _LoginCardState extends State<LoginCard> {
                 SizedBox(
                   height: AppSizes().getBlockSizeVertical(5),
                 ),
-                Divider(
-                  color: StyleSheet().divider,
-                  endIndent: 5,
-                  height: 2,
-                  thickness: 2,
-                ),
-                SizedBox(
-                  height: AppSizes().getBlockSizeVertical(5),
-                ),
-                CustomTextButton(
-                  label: "Sign in with Google",
-                  borderRadius: 5,
-                  onPressed: () async {
-                    if (await checkGoogleCredentials()) {
-                      setState(() {
-                        credentialController.clear();
-                      });
-                      navigateToHome();
-                    } else {
-                      loginError();
-                    }
-                  },
-                  borderColor: StyleSheet().elebtnBorder,
-                  img: 'assetes/icons/google.png',
-                  textColor: StyleSheet().elebtnText,
-                  backgroundColor: StyleSheet().uiBackground,
-                ),
+                // Divider(
+                //   color: StyleSheet().divider,
+                //   endIndent: 5,
+                //   height: 2,
+                //   thickness: 2,
+                // ),
+                // SizedBox(
+                //   height: AppSizes().getBlockSizeVertical(5),
+                // ),
+                // CustomTextButton(
+                //   label: "Sign in with Google",
+                //   borderRadius: 5,
+                //   onPressed: () async {
+                //     if (await checkGoogleCredentials()) {
+                //       setState(() {
+                //         credentialController.clear();
+                //       });
+                //       navigateToHome();
+                //     } else {
+                //       loginError();
+                //     }
+                //   },
+                //   borderColor: StyleSheet().elebtnBorder,
+                //   img: 'assetes/icons/google.png',
+                //   textColor: StyleSheet().elebtnText,
+                //   backgroundColor: StyleSheet().uiBackground,
+                // ),
+                CustomDropdown(
+                    label: 'Role',
+                    options: ['Doctor', 'Admin'],
+                    onChanged: onDropDownSelected)
               ],
             ),
           ),
