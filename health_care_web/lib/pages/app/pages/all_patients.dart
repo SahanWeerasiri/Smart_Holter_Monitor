@@ -21,6 +21,38 @@ class _AllPatientsState extends State<AllPatients> {
     fetchPatients();
   }
 
+  Future<void> removePatients(id) async {
+    Map<String, dynamic> res = await FirestoreDbService().removePatiet(id);
+    if (res['success']) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Patient removed successfully')));
+      refresh();
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Failed to remove patient')));
+    }
+  }
+
+  Future<void> addPatients(id, docId) async {
+    Map<String, dynamic> res = await FirestoreDbService().addPatiet(id, docId);
+    if (res['success']) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Patient added successfully')));
+      refresh();
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Failed to add patient')));
+    }
+  }
+
+  void refresh() {
+    setState(() {
+      profiles = [];
+      isLoading = false;
+    });
+    fetchPatients();
+  }
+
   Future<void> fetchPatients() async {
     setState(() => isLoading = true);
 
@@ -103,6 +135,7 @@ class _AllPatientsState extends State<AllPatients> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: profiles.map((p) {
                     return ExpandableProfileCardUpdated(
+                      id: p.id,
                       name: p.name,
                       profilePic: p.pic,
                       email: p.email,
@@ -111,6 +144,9 @@ class _AllPatientsState extends State<AllPatients> {
                       device: p.device,
                       docId: p.doctorId,
                       myId: FirebaseAuth.instance.currentUser!.uid,
+                      onRemove: () => removePatients(p.id),
+                      onAdd: () => addPatients(
+                          p.id, FirebaseAuth.instance.currentUser!.uid),
                     );
                   }).toList(),
                 ),

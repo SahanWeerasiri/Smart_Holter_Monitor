@@ -83,11 +83,7 @@ class FirestoreDbService {
       }
 
       // Check if any profiles were found
-      if (profiles.isNotEmpty) {
-        return {'success': true, 'data': profiles};
-      } else {
-        return {'success': false, 'error': 'No patients found'};
-      }
+      return {'success': true, 'data': profiles};
     } catch (e) {
       // Handle errors and return failure
       return {'success': false, 'error': e.toString()};
@@ -126,7 +122,7 @@ class FirestoreDbService {
   Future<Map<String, dynamic>> removePatiet(String uid) async {
     try {
       // Fetch the document snapshot
-      await usersCollection.doc(uid).set({
+      await usersCollection.doc(uid).update({
         'doctor_id': "",
       });
 
@@ -140,7 +136,7 @@ class FirestoreDbService {
   Future<Map<String, dynamic>> addPatiet(String uid, String docId) async {
     try {
       // Fetch the document snapshot
-      await usersCollection.doc(uid).set({
+      await usersCollection.doc(uid).update({
         'doctor_id': docId,
       });
 
@@ -180,14 +176,7 @@ class FirestoreDbService {
       }
 
       // Check if any profiles were found
-      if (profiles.isNotEmpty) {
-        return {'success': true, 'data': profiles};
-      } else {
-        return {
-          'success': false,
-          'error': 'No patients with holt monitors found for the given doctor'
-        };
-      }
+      return {'success': true, 'data': profiles};
     } catch (e) {
       // Handle errors and return failure
       return {'success': false, 'error': e.toString()};

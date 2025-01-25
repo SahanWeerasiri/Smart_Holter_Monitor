@@ -12,9 +12,13 @@ class ExpandableProfileCardUpdated extends StatefulWidget {
   final String device;
   final String docId;
   final String myId;
+  final String id;
+  final VoidCallback onRemove;
+  final VoidCallback onAdd;
 
   const ExpandableProfileCardUpdated({
     super.key,
+    required this.id,
     required this.name,
     required this.profilePic,
     required this.email,
@@ -23,6 +27,8 @@ class ExpandableProfileCardUpdated extends StatefulWidget {
     required this.device,
     required this.docId,
     required this.myId,
+    required this.onRemove,
+    required this.onAdd,
   });
 
   @override
@@ -38,9 +44,6 @@ class _ExpandableProfileCardUpdatedState
     StyleSheet().stateHeartBoxGood,
     StyleSheet().avgHeartBox
   ];
-
-  Future<void> removePatients() async {}
-  Future<void> addPatients() async {}
 
   @override
   Widget build(BuildContext context) {
@@ -105,13 +108,13 @@ class _ExpandableProfileCardUpdatedState
                                 icon: IconlyLight.delete,
                                 textColor: StyleSheet().uiBackground,
                                 backgroundColor: StyleSheet().patientsDelete,
-                                onPressed: () => {removePatients()})
+                                onPressed: () => {widget.onRemove()})
                             : CustomButton(
                                 label: "Add",
                                 textColor: StyleSheet().uiBackground,
                                 icon: IconlyLight.add_user,
                                 backgroundColor: StyleSheet().patientsAdd,
-                                onPressed: () => {addPatients()})
+                                onPressed: () => {widget.onAdd()})
                       ],
                     ),
                     widget.profilePic.isNotEmpty
