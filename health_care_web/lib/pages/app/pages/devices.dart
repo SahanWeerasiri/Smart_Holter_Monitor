@@ -101,6 +101,46 @@ class _DevicesState extends State<Devices> {
     }
   }
 
+  Future<void> fetchSearchDevices(value) async {
+    setState(() {
+      profiles = [];
+    });
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception("User is not logged in.");
+      }
+
+      Map<String, dynamic> res = await RealDbService()
+          .fetchSearchDevices(value.toString().toLowerCase());
+
+      if (res['success']) {
+        setState(() {
+          profiles = res['data'] as List<DeviceProfile>;
+        });
+      } else {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('An error occurred: ${res["error"]}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occurred: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
   // Future<void> fetchSearch(String name) async {
   //   setState(() {
   //     profiles = [];
@@ -150,8 +190,8 @@ class _DevicesState extends State<Devices> {
         spacing: 10,
         children: [
           SearchBar(
-            // onSubmitted: (value) =>
-            //     value.isNotEmpty ? fetchSearch(value) : fetchPatients(),
+            onSubmitted: (value) =>
+                value.isNotEmpty ? fetchSearchDevices(value) : fetcheDevices(),
             leading: Icon(IconlyLight.search),
             hintText: "Search...",
             controller: controller,
