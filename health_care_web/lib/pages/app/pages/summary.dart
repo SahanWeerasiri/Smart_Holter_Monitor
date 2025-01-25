@@ -1,9 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care_web/constants/consts.dart';
+import 'package:health_care_web/pages/app/additional/connect_device_popup.dart';
 import 'package:health_care_web/pages/app/cards/expandable_profile_card.dart';
 import 'package:health_care_web/pages/app/cards/mobile_home_popup.dart';
 import 'package:health_care_web/pages/app/services/firestore_db_service.dart';
+import 'package:health_care_web/pages/app/services/real_db_service.dart';
 import 'package:iconly/iconly.dart';
 
 class Summary extends StatefulWidget {
@@ -70,7 +72,29 @@ class _SummaryState extends State<Summary> {
   }
 
   Future<void> createReport() async {}
-  Future<void> addDevice() async {}
+  Future<void> addDevice() async {
+    Map<String, dynamic> res = await RealDbService().fetchDevices();
+    if (res['success']) {
+      List<DeviceProfile> devices = res['data'];
+      List<String> codes = [];
+      for (DeviceProfile deviceProfile in devices) {
+        if (!deviceProfile.state) {
+          codes.add(deviceProfile.code);
+        }
+      }
+      showDialog(
+          context: context,
+          builder: (context) =>
+              ConnectDevicePopup(id: "", devices: codes, onSubmit: () {}));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(res['error'] ?? 'Unknown error occurred'),
+            backgroundColor: Colors.red),
+      );
+    }
+  }
+
   Future<void> removeDevice(String uid, String deviceId) async {
     setState(() {
       isLoading = true;
