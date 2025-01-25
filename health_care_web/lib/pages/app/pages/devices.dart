@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
 import 'package:health_care_web/constants/consts.dart';
+import 'package:health_care_web/pages/app/additional/add_device_popup.dart';
 import 'package:health_care_web/pages/app/cards/expandable_profile_card_updated.dart';
 import 'package:health_care_web/pages/app/services/firestore_db_service.dart';
 import 'package:iconly/iconly.dart';
@@ -16,6 +18,7 @@ class _DevicesState extends State<Devices> {
   final TextEditingController controller = TextEditingController();
   List<UserProfile> profiles = [];
   bool isLoading = false;
+  bool isOpen = false;
 
   @override
   void initState() {
@@ -152,19 +155,24 @@ class _DevicesState extends State<Devices> {
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
+            spacing: 10,
             children: [
-              Container(
-                width: 150,
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(12),
-                    ),
-                    color: StyleSheet().myPatients),
-                child: Row(
-                  spacing: 3,
-                  children: [Icon(Icons.people), Text("My Patients")],
-                ),
+              CustomButton(
+                label: "Add Device",
+                icon: Icons.add,
+                textColor: StyleSheet().uiBackground,
+                backgroundColor: StyleSheet().btnBackground,
+                onPressed: () {
+                  setState(() {
+                    isOpen = true;
+                    showDialog(
+                        context: context,
+                        builder: (context) => AddDevicePopup(
+                            deviceCode: TextEditingController(),
+                            otherDetails: TextEditingController(),
+                            onSubmit: () {}));
+                  });
+                },
               ),
             ],
           ),
