@@ -52,15 +52,7 @@ class RealDbService {
       for (final child in dataSnapshot.children) {
         final device = child.key;
         final other = child.child('other').value as String;
-        bool state = false;
-        try {
-          final data = child.child('data').value as Map<dynamic, dynamic>;
-          if (data.isNotEmpty) {
-            state = true;
-          }
-        } catch (e) {
-          state = false;
-        }
+        final state = child.child('assigned').value as bool;
         devices.add(DeviceProfile(
             code: device.toString(), detail: other.toString(), state: state));
       }
@@ -88,16 +80,8 @@ class RealDbService {
       for (final child in dataSnapshot.children) {
         final device = child.key.toString();
         final other = child.child('other').value as String;
+        final state = child.child('assigned').value as bool;
         if (device.toLowerCase().contains(name)) {
-          bool state = false;
-          try {
-            final data = child.child('data').value as Map<dynamic, dynamic>;
-            if (data.isNotEmpty) {
-              state = true;
-            }
-          } catch (e) {
-            state = false;
-          }
           devices.add(DeviceProfile(
               code: device.toString(), detail: other.toString(), state: state));
         }
@@ -126,7 +110,10 @@ class RealDbService {
         return {'success': false, 'message': 'Device already exists.'};
       } else {
         // If the device does not exist, add the data
-        await ref.set({'other': other});
+        await ref.set({
+          'other': other,
+          'assigned': false,
+        });
         return {'success': true, 'message': 'Device added successfully.'};
       }
     } catch (e) {
@@ -167,8 +154,19 @@ class RealDbService {
     try {
       // Check if the ref already exists
       await ref.remove();
-
+      await _database.ref('devices').child(code).update({'assigned': false});
       return {'success': true, 'data': 'Data removed from the device.'};
+    } catch (e) {
+      // Handle any errors during the operation
+      return {'success': false, 'message': 'An error occurred: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> connectDeviceData(String code) async {
+    try {
+      // Check if the ref already exists
+      await _database.ref('devices').child(code).update({'assigned': true});
+      return {'success': true, 'data': 'Device is connected successfully'};
     } catch (e) {
       // Handle any errors during the operation
       return {'success': false, 'message': 'An error occurred: $e'};

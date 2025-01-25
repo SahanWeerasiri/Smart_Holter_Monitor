@@ -317,7 +317,13 @@ class FirestoreDbService {
       await usersCollection.doc(uid).update({
         'device': device,
       });
-      return {'success': true, 'message': "Device added successfully"};
+      Map<String, dynamic> res =
+          await RealDbService().connectDeviceData(device);
+      if (res['success']) {
+        return {'success': true, 'message': res['message']};
+      } else {
+        return {'success': false, 'error': res['error']};
+      }
     } catch (e) {
       // Handle errors and return failure
       return {'success': false, 'error': e.toString()};

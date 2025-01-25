@@ -72,7 +72,35 @@ class _SummaryState extends State<Summary> {
   }
 
   Future<void> createReport() async {}
-  Future<void> addDevice() async {
+  Future<void> connectDevice(String uid, String device) async {
+    setState(() {
+      isLoading = true;
+    });
+    Map<String, dynamic> res =
+        await FirestoreDbService().addDeviceToPatient(uid, device);
+    if (res['success']) {
+      refresh();
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(res['message']),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(res['error'] ?? 'Unknown error occurred'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  Future<void> addDevice(uid) async {
     Map<String, dynamic> res = await RealDbService().fetchDevices();
     if (res['success']) {
       List<DeviceProfile> devices = res['data'];
@@ -84,8 +112,12 @@ class _SummaryState extends State<Summary> {
       }
       showDialog(
           context: context,
-          builder: (context) =>
-              ConnectDevicePopup(id: "", devices: codes, onSubmit: () {}));
+          builder: (context) => ConnectDevicePopup(
+              id: uid,
+              devices: codes,
+              onSubmit: (value) {
+                connectDevice(uid, value);
+              }));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -229,7 +261,9 @@ class _SummaryState extends State<Summary> {
                           mobile: p.mobile,
                           device: p.device,
                           isDone: p.isDone,
-                          onAddDevice: addDevice,
+                          onAddDevice: () {
+                            addDevice(p.id);
+                          },
                           onCreateReport: createReport,
                           onPending: () {
                             pendingData(p.device);

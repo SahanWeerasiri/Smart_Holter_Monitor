@@ -3,10 +3,12 @@ import 'package:health_care_web/components/buttons/custom_button_1/custom_button
 import 'package:health_care_web/components/dropdown/CustomDropDown.dart';
 import 'package:health_care_web/constants/consts.dart';
 
+typedef DeviceSubmitCallback = void Function(String code);
+
 class ConnectDevicePopup extends StatefulWidget {
   final String id;
   final List<String> devices;
-  final VoidCallback onSubmit;
+  final DeviceSubmitCallback onSubmit;
 
   const ConnectDevicePopup({
     super.key,
@@ -42,7 +44,11 @@ class _StateConnectDevicePopup extends State<ConnectDevicePopup> {
             CustomDropdown(
                 label: "Select a device",
                 options: widget.devices,
-                onChanged: (value) {})
+                onChanged: (value) {
+                  setState(() {
+                    device = value;
+                  });
+                })
           ],
         ),
       ),
@@ -62,7 +68,7 @@ class _StateConnectDevicePopup extends State<ConnectDevicePopup> {
         ),
         CustomButton(
           label: "Add",
-          onPressed: () => widget.onSubmit(),
+          onPressed: () => widget.onSubmit(device),
           backgroundColor: StyleSheet().btnBackground,
           textColor: StyleSheet().btnText,
           icon: Icons.add,
