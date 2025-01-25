@@ -92,6 +92,11 @@ class StyleSheet {
 
   final Color availableDevices = const Color.fromARGB(255, 171, 202, 255);
   final Color unavailableDevices = const Color.fromARGB(255, 255, 168, 168);
+
+  final Color step1 = const Color.fromARGB(255, 255, 168, 168);
+  final Color step2 = const Color.fromARGB(255, 255, 252, 173);
+  final Color step3 = const Color.fromARGB(255, 168, 255, 212);
+  final Color step4 = const Color.fromARGB(255, 180, 216, 255);
 }
 
 class AppSizes {

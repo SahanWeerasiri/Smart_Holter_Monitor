@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/pages/app/cards/expandable_profile_card.dart';
+import 'package:health_care_web/pages/app/cards/mobile_home_popup.dart';
 import 'package:health_care_web/pages/app/services/firestore_db_service.dart';
 import 'package:iconly/iconly.dart';
 
@@ -60,10 +61,49 @@ class _SummaryState extends State<Summary> {
     }
   }
 
+  void refresh() {
+    setState(() {
+      currentProfiles = [];
+      isLoading = false;
+    });
+    fetchCurrentPatients();
+  }
+
   Future<void> createReport() async {}
   Future<void> addDevice() async {}
-  Future<void> removeDevice() async {}
-  Future<void> pendingData() async {}
+  Future<void> removeDevice(String uid, String deviceId) async {
+    setState(() {
+      isLoading = true;
+    });
+    Map<String, dynamic> res =
+        await FirestoreDbService().removeDeviceFromPatient(uid, deviceId);
+    if (res['success']) {
+      refresh();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('done'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(res['error'] ?? 'Unknown error occurred'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  Future<void> pendingData(String device) async {
+    showDialog(
+        context: context,
+        builder: (context) => MobileHomePopup(device: device));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +137,22 @@ class _SummaryState extends State<Summary> {
                               borderRadius: BorderRadius.all(
                                 Radius.circular(12),
                               ),
-                              color: StyleSheet().stateHeartBoxGood),
+                              color: StyleSheet().step4),
+                          child: Row(
+                            spacing: 3,
+                            children: [
+                              Icon(IconlyLight.document),
+                              Text("Report creation")
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(12),
+                              ),
+                              color: StyleSheet().step3),
                           child: Row(
                             spacing: 3,
                             children: [
@@ -112,7 +167,7 @@ class _SummaryState extends State<Summary> {
                               borderRadius: BorderRadius.all(
                                 Radius.circular(12),
                               ),
-                              color: StyleSheet().avgHeartBox),
+                              color: StyleSheet().step2),
                           child: Row(
                             spacing: 3,
                             children: [
@@ -127,7 +182,7 @@ class _SummaryState extends State<Summary> {
                               borderRadius: BorderRadius.all(
                                 Radius.circular(12),
                               ),
-                              color: StyleSheet().stateHeartBoxBad),
+                              color: StyleSheet().step1),
                           child: Row(
                             spacing: 3,
                             children: [
@@ -152,8 +207,12 @@ class _SummaryState extends State<Summary> {
                           isDone: p.isDone,
                           onAddDevice: addDevice,
                           onCreateReport: createReport,
-                          onPending: pendingData,
-                          onRemoveDevice: removeDevice,
+                          onPending: () {
+                            pendingData(p.device);
+                          },
+                          onRemoveDevice: () {
+                            removeDevice(p.id, p.device);
+                          },
                         );
                       }).toList(),
                     ),

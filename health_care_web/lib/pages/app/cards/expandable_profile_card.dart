@@ -38,9 +38,10 @@ class _ExpandableProfileCardState extends State<ExpandableProfileCard> {
   bool _isExpanded = false;
   double _cardHeight = 70;
   final List<Color> _stateColors = [
-    StyleSheet().stateHeartBoxGood,
-    StyleSheet().avgHeartBox,
-    StyleSheet().stateHeartBoxBad,
+    StyleSheet().step1,
+    StyleSheet().step2,
+    StyleSheet().step3,
+    StyleSheet().step4,
   ];
 
   @override
@@ -50,9 +51,17 @@ class _ExpandableProfileCardState extends State<ExpandableProfileCard> {
       height: _cardHeight,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(10)),
-        color: widget.isDone
-            ? _stateColors[0]
-            : (widget.device == "Device" ? _stateColors[2] : _stateColors[1]),
+        color: (widget.isDone &&
+                widget.device == "Device") //wait for report(4 step)
+            ? _stateColors[3]
+            : (widget.isDone &&
+                    widget.device !=
+                        "Device") // device is still there. but the work is done(3 step)
+                ? _stateColors[2]
+                : (!widget.isDone &&
+                        widget.device == "Device") //No device assigned.(1 step)
+                    ? _stateColors[0]
+                    : _stateColors[1], //Device is assigned. pending... (2 step)
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,44 +129,62 @@ class _ExpandableProfileCardState extends State<ExpandableProfileCard> {
                             scale: 5,
                           ),
                     Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        spacing: 10,
-                        children: widget.isDone
-                            ? [
-                                CustomButton(
-                                    label: "Create the report",
-                                    icon: Icons.create,
-                                    backgroundColor: StyleSheet().btnBackground,
-                                    textColor: StyleSheet().btnText,
-                                    onPressed: () => widget.onCreateReport),
-                                CustomButton(
-                                    label: "Remove the device",
-                                    icon: Icons.remove_circle,
-                                    backgroundColor:
-                                        StyleSheet().patientsDelete,
-                                    textColor: StyleSheet().btnText,
-                                    onPressed: () => widget.onRemoveDevice),
-                              ]
-                            : (widget.device == "Device"
-                                ? [
-                                    CustomButton(
-                                        label: "Add a device",
-                                        icon: Icons.add,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      spacing: 10,
+                      children: (widget.isDone &&
+                              widget.device ==
+                                  "Device") //wait for report(4 step)
+                          ? [
+                              CustomButton(
+                                  label: "Create the report",
+                                  icon: Icons.create,
+                                  backgroundColor: StyleSheet().btnBackground,
+                                  textColor: StyleSheet().btnText,
+                                  onPressed: () {
+                                    widget.onCreateReport();
+                                  })
+                            ]
+                          : (widget.isDone &&
+                                  widget.device !=
+                                      "Device") // device is still there. but the work is done(3 step)
+                              ? [
+                                  CustomButton(
+                                      label: "Remove the device",
+                                      icon: Icons.remove_circle,
+                                      backgroundColor:
+                                          StyleSheet().patientsDelete,
+                                      textColor: StyleSheet().btnText,
+                                      onPressed: () {
+                                        widget.onRemoveDevice();
+                                      })
+                                ]
+                              : (!widget.isDone &&
+                                      widget.device ==
+                                          "Device") //No device assigned.(1 step)
+                                  ? [
+                                      CustomButton(
+                                          label: "Add a device",
+                                          icon: Icons.add,
+                                          backgroundColor:
+                                              StyleSheet().btnBackground,
+                                          textColor: StyleSheet().btnText,
+                                          onPressed: () {
+                                            widget.onAddDevice();
+                                          })
+                                    ]
+                                  : [
+                                      CustomButton(
+                                        label: "Pending...",
+                                        icon: Icons.pending_actions,
                                         backgroundColor:
                                             StyleSheet().btnBackground,
                                         textColor: StyleSheet().btnText,
-                                        onPressed: () => widget.onAddDevice),
-                                  ]
-                                : [
-                                    CustomButton(
-                                      label: "Pending...",
-                                      icon: Icons.pending_actions,
-                                      backgroundColor:
-                                          StyleSheet().btnBackground,
-                                      textColor: StyleSheet().btnText,
-                                      onPressed: () => widget.onPending,
-                                    ),
-                                  ])),
+                                        onPressed: () {
+                                          widget.onPending();
+                                        },
+                                      )
+                                    ], //Device is assigned. pending... (2 step)
+                    ),
                   ],
                 )),
         ],

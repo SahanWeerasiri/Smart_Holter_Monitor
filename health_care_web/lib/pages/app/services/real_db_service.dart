@@ -134,4 +134,44 @@ class RealDbService {
       return {'success': false, 'message': 'An error occurred: $e'};
     }
   }
+
+  Future<Map<String, dynamic>> transferDeviceData(String code) async {
+    final DatabaseReference ref =
+        _database.ref('devices').child(code).child('data');
+    try {
+      // Check if the ref already exists
+      final DataSnapshot snapshot = await ref.get();
+
+      if (snapshot.exists) {
+        // If the device already exists, return an error
+        return {
+          'success': true,
+          'data': snapshot.value as Map<dynamic, dynamic>
+        };
+      } else {
+        // If the device does not exist, add the data
+        return {
+          'success': false,
+          'message': 'Device data are not retrieved successfully.'
+        };
+      }
+    } catch (e) {
+      // Handle any errors during the operation
+      return {'success': false, 'message': 'An error occurred: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteDeviceData(String code) async {
+    final DatabaseReference ref =
+        _database.ref('devices').child(code).child('data');
+    try {
+      // Check if the ref already exists
+      await ref.remove();
+
+      return {'success': true, 'data': 'Data removed from the device.'};
+    } catch (e) {
+      // Handle any errors during the operation
+      return {'success': false, 'message': 'An error occurred: $e'};
+    }
+  }
 }

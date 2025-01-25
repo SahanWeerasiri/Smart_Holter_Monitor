@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flame/extensions.dart';
 import 'package:health_care_web/constants/consts.dart';
+import 'package:health_care_web/pages/app/services/real_db_service.dart';
 
 class FirestoreDbService {
   final CollectionReference usersCollection =
@@ -302,6 +303,54 @@ class FirestoreDbService {
         'pic': pic,
       });
       return {'success': true, 'message': "updation successful"};
+    } catch (e) {
+      // Handle errors and return failure
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> addDeviceToPatient(
+      String uid, String device) async {
+    try {
+      // Fetch the document snapshot
+
+      await usersCollection.doc(uid).update({
+        'device': device,
+      });
+      return {'success': true, 'message': "Device added successfully"};
+    } catch (e) {
+      // Handle errors and return failure
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> removeDeviceFromPatient(
+      String uid, String device) async {
+    try {
+      // Fetch the document snapshot
+      Map<String, dynamic> res =
+          await RealDbService().transferDeviceData(device);
+      if (res['success']) {
+        await usersCollection.doc(uid).collection("data").add({
+          'device': device,
+          'timestamp': DateTime.now(),
+          'data': res['data'],
+        });
+
+        Map<String, dynamic> res2 =
+            await RealDbService().deleteDeviceData(device);
+        if (res2['success']) {
+          await usersCollection.doc(uid).update({
+            'device': "Device",
+            // "is_done":false, keep it as it is until the report is done
+          });
+          return {'success': true, 'message': res2['message']};
+        } else {
+          return {'success': false, 'message': res2['message']};
+        }
+      } else {
+        return {'success': false, 'message': res['message']};
+      }
     } catch (e) {
       // Handle errors and return failure
       return {'success': false, 'error': e.toString()};
