@@ -5,6 +5,7 @@ import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/pages/app/additional/add_device_popup.dart';
 import 'package:health_care_web/pages/app/cards/expandable_profile_card_updated.dart';
 import 'package:health_care_web/pages/app/services/firestore_db_service.dart';
+import 'package:health_care_web/pages/app/services/real_db_service.dart';
 import 'package:iconly/iconly.dart';
 
 class Devices extends StatefulWidget {
@@ -16,6 +17,8 @@ class Devices extends StatefulWidget {
 
 class _DevicesState extends State<Devices> {
   final TextEditingController controller = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
   List<UserProfile> profiles = [];
   bool isLoading = false;
   bool isOpen = false;
@@ -38,15 +41,15 @@ class _DevicesState extends State<Devices> {
     }
   }
 
-  Future<void> addPatients(id, docId) async {
-    Map<String, dynamic> res = await FirestoreDbService().addPatiet(id, docId);
+  Future<void> addDevices(code, detail) async {
+    Map<String, dynamic> res = await RealDbService().addDevice(code, detail);
     if (res['success']) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Patient added successfully')));
+          .showSnackBar(SnackBar(content: Text('Device added successfully')));
       refresh();
     } else {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Failed to add patient')));
+          .showSnackBar(SnackBar(content: Text('Failed to add device')));
     }
   }
 
@@ -170,7 +173,10 @@ class _DevicesState extends State<Devices> {
                         builder: (context) => AddDevicePopup(
                             deviceCode: TextEditingController(),
                             otherDetails: TextEditingController(),
-                            onSubmit: () {}));
+                            onSubmit: (code, detail) {
+                              addDevices(code, detail);
+                              Navigator.pop(context);
+                            }));
                   });
                 },
               ),
@@ -198,8 +204,7 @@ class _DevicesState extends State<Devices> {
                       docId: p.doctorId,
                       myId: FirebaseAuth.instance.currentUser!.uid,
                       onRemove: () => removePatients(p.id),
-                      onAdd: () => addPatients(
-                          p.id, FirebaseAuth.instance.currentUser!.uid),
+                      onAdd: () {},
                     );
                   }).toList(),
                 ),

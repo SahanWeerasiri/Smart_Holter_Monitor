@@ -39,4 +39,24 @@ class RealDbService {
       'timestamp': key,
     };
   }
+
+  Future<Map<String, dynamic>> addDevice(String code, String other) async {
+    final DatabaseReference ref = _database.ref('devices').child(code);
+    try {
+      // Check if the ref already exists
+      final DataSnapshot snapshot = await ref.get();
+
+      if (snapshot.exists) {
+        // If the device already exists, return an error
+        return {'success': false, 'message': 'Device already exists.'};
+      } else {
+        // If the device does not exist, add the data
+        await ref.set({'other': other});
+        return {'success': true, 'message': 'Device added successfully.'};
+      }
+    } catch (e) {
+      // Handle any errors during the operation
+      return {'success': false, 'message': 'An error occurred: $e'};
+    }
+  }
 }

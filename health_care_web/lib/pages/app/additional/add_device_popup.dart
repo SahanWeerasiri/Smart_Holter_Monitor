@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
 import 'package:health_care_web/constants/consts.dart';
 
+typedef DeviceSubmitCallback = void Function(String code, String details);
+
 class AddDevicePopup extends StatefulWidget {
   final TextEditingController deviceCode;
   final TextEditingController otherDetails;
-  final VoidCallback onSubmit;
+  final DeviceSubmitCallback onSubmit;
 
   const AddDevicePopup({
     super.key,
@@ -18,6 +20,9 @@ class AddDevicePopup extends StatefulWidget {
 }
 
 class _StateAddDevicePopup extends State<AddDevicePopup> {
+  String code = "";
+  String details = "";
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -37,6 +42,9 @@ class _StateAddDevicePopup extends State<AddDevicePopup> {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
+              onChanged: (value) => setState(() {
+                code = widget.deviceCode.text;
+              }),
               style: TextStyle(
                 backgroundColor: StyleSheet().uiBackground,
                 fontSize: 20,
@@ -46,6 +54,9 @@ class _StateAddDevicePopup extends State<AddDevicePopup> {
               decoration: const InputDecoration(labelText: "Device Code"),
             ),
             TextField(
+              onChanged: (value) => setState(() {
+                details = widget.otherDetails.text;
+              }),
               style: TextStyle(
                 backgroundColor: StyleSheet().uiBackground,
                 fontSize: 20,
@@ -74,11 +85,11 @@ class _StateAddDevicePopup extends State<AddDevicePopup> {
           ),
         ),
         CustomButton(
-          label: "Update",
-          onPressed: widget.onSubmit,
+          label: "Add",
+          onPressed: () => widget.onSubmit(code, details),
           backgroundColor: StyleSheet().btnBackground,
           textColor: StyleSheet().btnText,
-          icon: Icons.update,
+          icon: Icons.add,
         ),
       ],
     );
