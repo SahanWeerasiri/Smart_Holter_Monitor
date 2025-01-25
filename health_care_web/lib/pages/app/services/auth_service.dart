@@ -6,12 +6,12 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<Map<String, dynamic>> createUserWithEmailAndPassword(
-      String name, String email, String password, List<String> tags) async {
+      String name, String email, String password) async {
     try {
       final cred = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       Map<String, dynamic> res =
-          await FirestoreDbService().createAccount(name, email, tags);
+          await FirestoreDbService().createAccount(name, email);
       if (res['success']) {
         return {
           "status": "success",
