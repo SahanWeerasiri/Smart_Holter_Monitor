@@ -123,6 +123,34 @@ class FirestoreDbService {
     }
   }
 
+  Future<Map<String, dynamic>> removePatiet(String uid) async {
+    try {
+      // Fetch the document snapshot
+      await usersCollection.doc(uid).set({
+        'doctor_id': "",
+      });
+
+      return {'success': true, 'message': "Patient is removed succesfully"};
+    } catch (e) {
+      // Handle errors and return failure
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> addPatiet(String uid, String docId) async {
+    try {
+      // Fetch the document snapshot
+      await usersCollection.doc(uid).set({
+        'doctor_id': docId,
+      });
+
+      return {'success': true, 'message': "Patient is added succesfully"};
+    } catch (e) {
+      // Handle errors and return failure
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
   Future<Map<String, dynamic>> fetchCurrentPatient(String uid) async {
     try {
       // Fetch the document snapshot
