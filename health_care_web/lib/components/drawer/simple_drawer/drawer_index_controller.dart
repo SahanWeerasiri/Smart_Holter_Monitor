@@ -1,5 +1,5 @@
 class DrawerIndexController {
-  int selectedIndex = 4;
+  int selectedIndex = 2;
   void setSelectedIndex(int index) {
     selectedIndex = index;
   }

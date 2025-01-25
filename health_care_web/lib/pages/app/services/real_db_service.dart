@@ -52,8 +52,17 @@ class RealDbService {
       for (final child in dataSnapshot.children) {
         final device = child.key;
         final other = child.child('other').value as String;
-        devices.add(
-            DeviceProfile(code: device.toString(), detail: other.toString()));
+        bool state = false;
+        try {
+          final data = child.child('data').value as Map<dynamic, dynamic>;
+          if (data.isNotEmpty) {
+            state = true;
+          }
+        } catch (e) {
+          state = false;
+        }
+        devices.add(DeviceProfile(
+            code: device.toString(), detail: other.toString(), state: state));
       }
 
       return {
@@ -80,8 +89,17 @@ class RealDbService {
         final device = child.key.toString();
         final other = child.child('other').value as String;
         if (device.toLowerCase().contains(name)) {
-          devices.add(
-              DeviceProfile(code: device.toString(), detail: other.toString()));
+          bool state = false;
+          try {
+            final data = child.child('data').value as Map<dynamic, dynamic>;
+            if (data.isNotEmpty) {
+              state = true;
+            }
+          } catch (e) {
+            state = false;
+          }
+          devices.add(DeviceProfile(
+              code: device.toString(), detail: other.toString(), state: state));
         }
       }
 

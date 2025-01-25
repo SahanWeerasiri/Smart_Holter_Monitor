@@ -4,6 +4,7 @@ import 'package:health_care_web/constants/consts.dart';
 class ExpandableProfileCardUpdatedDevices extends StatefulWidget {
   final String code;
   final String detail;
+  final bool state;
   final VoidCallback onRemove;
 
   const ExpandableProfileCardUpdatedDevices({
@@ -11,6 +12,7 @@ class ExpandableProfileCardUpdatedDevices extends StatefulWidget {
     required this.code,
     required this.detail,
     required this.onRemove,
+    this.state = false,
   });
 
   @override
@@ -23,8 +25,8 @@ class _ExpandableProfileCardUpdatedDevicesState
   bool _isExpanded = false;
   double _cardHeight = 70;
   final List<Color> _stateColors = [
-    StyleSheet().myPatients,
-    StyleSheet().avgHeartBox
+    StyleSheet().availableDevices,
+    StyleSheet().unavailableDevices,
   ];
 
   @override
@@ -34,7 +36,7 @@ class _ExpandableProfileCardUpdatedDevicesState
       height: _cardHeight,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(10)),
-        color: _stateColors[1],
+        color: widget.state ? _stateColors[1] : _stateColors[0],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

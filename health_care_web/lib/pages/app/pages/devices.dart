@@ -222,6 +222,41 @@ class _DevicesState extends State<Devices> {
               ),
             ],
           ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            spacing: 10,
+            children: [
+              Container(
+                width: 180,
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(12),
+                    ),
+                    color: StyleSheet().availableDevices),
+                child: Row(
+                  spacing: 3,
+                  children: [Icon(Icons.devices), Text("Available Devices")],
+                ),
+              ),
+              Container(
+                width: 180,
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(12),
+                    ),
+                    color: StyleSheet().unavailableDevices),
+                child: Row(
+                  spacing: 3,
+                  children: [
+                    Icon(Icons.device_unknown_sharp),
+                    Text("Unavailable Devices")
+                  ],
+                ),
+              ),
+            ],
+          ),
           profiles.isEmpty
               ? const Center(
                   child: Text(
@@ -238,6 +273,7 @@ class _DevicesState extends State<Devices> {
                       code: p.code,
                       detail: p.detail,
                       onRemove: () {},
+                      state: p.state,
                     );
                   }).toList(),
                 ),

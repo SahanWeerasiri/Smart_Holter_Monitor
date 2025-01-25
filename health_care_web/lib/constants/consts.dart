@@ -89,6 +89,9 @@ class StyleSheet {
   final Color patientsAdd = const Color.fromARGB(255, 64, 124, 226);
 
   final Color myPatients = const Color.fromARGB(255, 171, 202, 255);
+
+  final Color availableDevices = const Color.fromARGB(255, 171, 202, 255);
+  final Color unavailableDevices = const Color.fromARGB(255, 255, 168, 168);
 }
 
 class AppSizes {
@@ -213,8 +216,10 @@ class ContactProfile {
 class DeviceProfile {
   String code;
   String detail;
+  bool state;
   DeviceProfile({
     required this.code,
     this.detail = "",
+    this.state = false,
   });
 }
