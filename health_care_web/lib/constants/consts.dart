@@ -174,6 +174,7 @@ class UserProfile {
   String language;
   String device;
   String doctorId;
+  List<ContactProfile> contacts;
   UserProfile({
     required this.id,
     required this.name,
@@ -186,6 +187,7 @@ class UserProfile {
     this.isDone = false,
     this.language = "",
     this.doctorId = "",
+    this.contacts = const [],
   });
 }
 

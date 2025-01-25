@@ -70,6 +70,14 @@ class FirestoreDbService {
       for (DocumentSnapshot doc in snapshot.docs) {
         final patientData = doc.data() as Map<String, dynamic>;
         // Add the user profile to the list
+        // final QuerySnapshot<Object?> snapshotContacts =
+        //     await usersCollection.doc(doc.id).collection("emergency").get();
+        // List<ContactProfile> contacts = [];
+        // for (DocumentSnapshot docContacts in snapshotContacts.docs) {
+        //   final contactData = docContacts.data() as Map<String, dynamic>;
+        //   contacts.add(ContactProfile(
+        //       name: contactData['name'], mobile: contactData['mobile']));
+        // }
         profiles.add(UserProfile(
           id: doc.id,
           name: patientData['name'],
@@ -80,6 +88,7 @@ class FirestoreDbService {
           mobile: patientData['mobile'],
           device: patientData['device'],
           isDone: patientData['is_done'],
+          // contacts: contacts,
         ));
       }
 
@@ -194,17 +203,25 @@ class FirestoreDbService {
         final patientData = doc.data() as Map<String, dynamic>;
         // Check if the 'doctor_id' matches the provided UID
         if (patientData['doctor_id'] == uid) {
+          final QuerySnapshot<Object?> snapshotContacts =
+              await usersCollection.doc(doc.id).collection("emergency").get();
+          List<ContactProfile> contacts = [];
+          for (DocumentSnapshot docContacts in snapshotContacts.docs) {
+            final contactData = docContacts.data() as Map<String, dynamic>;
+            contacts.add(ContactProfile(
+                name: contactData['name'], mobile: contactData['mobile']));
+          }
           // Add the user profile to the list
           profiles.add(UserProfile(
-            id: doc.id,
-            name: patientData['name'],
-            email: patientData['email'],
-            pic: patientData['pic'],
-            address: patientData['address'],
-            mobile: patientData['mobile'],
-            device: patientData['device'],
-            isDone: patientData['is_done'],
-          ));
+              id: doc.id,
+              name: patientData['name'],
+              email: patientData['email'],
+              pic: patientData['pic'],
+              address: patientData['address'],
+              mobile: patientData['mobile'],
+              device: patientData['device'],
+              isDone: patientData['is_done'],
+              contacts: contacts));
         }
       }
 

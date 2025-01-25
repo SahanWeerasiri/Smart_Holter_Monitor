@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
 import 'package:health_care_web/constants/consts.dart';
+import 'package:health_care_web/pages/app/additional/contacts_popup.dart';
 
 class ExpandableProfileCard extends StatefulWidget {
   final String name;
@@ -10,6 +11,7 @@ class ExpandableProfileCard extends StatefulWidget {
   final String mobile;
   final String device;
   final bool isDone;
+  final List<ContactProfile> contactProfiles;
   final VoidCallback onCreateReport;
   final VoidCallback onRemoveDevice;
   final VoidCallback onAddDevice;
@@ -28,6 +30,7 @@ class ExpandableProfileCard extends StatefulWidget {
     required this.onRemoveDevice,
     required this.onAddDevice,
     required this.onPending,
+    required this.contactProfiles,
   });
 
   @override
@@ -43,6 +46,12 @@ class _ExpandableProfileCardState extends State<ExpandableProfileCard> {
     StyleSheet().step3,
     StyleSheet().step4,
   ];
+
+  void showContacts() {
+    showDialog(
+        context: context,
+        builder: (context) => ContactsPopup(contacts: widget.contactProfiles));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +93,7 @@ class _ExpandableProfileCardState extends State<ExpandableProfileCard> {
                   setState(() {
                     _isExpanded = !_isExpanded;
                     if (_isExpanded) {
-                      _cardHeight = 200;
+                      _cardHeight = 240;
                     } else {
                       _cardHeight = 70;
                     }
@@ -110,6 +119,15 @@ class _ExpandableProfileCardState extends State<ExpandableProfileCard> {
                         Text("Mobile: ${widget.mobile}"),
                         const SizedBox(height: 4),
                         Text("Device: ${widget.device}"),
+                        const SizedBox(height: 4),
+                        CustomButton(
+                            label: "View Contacts",
+                            icon: Icons.contact_emergency,
+                            backgroundColor: StyleSheet().btnBackground,
+                            textColor: StyleSheet().btnText,
+                            onPressed: () {
+                              showContacts();
+                            })
                       ],
                     ),
                     widget.profilePic.isNotEmpty

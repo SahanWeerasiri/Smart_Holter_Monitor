@@ -261,6 +261,7 @@ class _SummaryState extends State<Summary> {
                           mobile: p.mobile,
                           device: p.device,
                           isDone: p.isDone,
+                          contactProfiles: p.contacts,
                           onAddDevice: () {
                             addDevice(p.id);
                           },
