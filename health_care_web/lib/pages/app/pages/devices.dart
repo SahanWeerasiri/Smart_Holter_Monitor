@@ -5,14 +5,14 @@ import 'package:health_care_web/pages/app/cards/expandable_profile_card_updated.
 import 'package:health_care_web/pages/app/services/firestore_db_service.dart';
 import 'package:iconly/iconly.dart';
 
-class AllPatients extends StatefulWidget {
-  const AllPatients({super.key});
+class Devices extends StatefulWidget {
+  const Devices({super.key});
 
   @override
-  State<AllPatients> createState() => _AllPatientsState();
+  State<Devices> createState() => _DevicesState();
 }
 
-class _AllPatientsState extends State<AllPatients> {
+class _DevicesState extends State<Devices> {
   final TextEditingController controller = TextEditingController();
   List<UserProfile> profiles = [];
   bool isLoading = false;
@@ -20,7 +20,7 @@ class _AllPatientsState extends State<AllPatients> {
   @override
   void initState() {
     super.initState();
-    fetchPatients();
+    // fetchPatients();
   }
 
   Future<void> removePatients(id) async {
@@ -52,7 +52,7 @@ class _AllPatientsState extends State<AllPatients> {
       profiles = [];
       isLoading = false;
     });
-    fetchPatients();
+    // fetchPatients();
   }
 
   Future<void> fetchPatients() async {
