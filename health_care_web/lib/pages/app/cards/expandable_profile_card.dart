@@ -74,20 +74,41 @@ class _ExpandableProfileCardState extends State<ExpandableProfileCard> {
           ),
           if (_isExpanded)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Email: ${widget.email}"),
-                  const SizedBox(height: 4),
-                  Text("Address: ${widget.address}"),
-                  const SizedBox(height: 4),
-                  Text("Mobile: ${widget.mobile}"),
-                  const SizedBox(height: 4),
-                  Text("Device: ${widget.device}"),
-                ],
-              ),
-            ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Email: ${widget.email}"),
+                        const SizedBox(height: 4),
+                        Text("Address: ${widget.address}"),
+                        const SizedBox(height: 4),
+                        Text("Mobile: ${widget.mobile}"),
+                        const SizedBox(height: 4),
+                        Text("Device: ${widget.device}"),
+                      ],
+                    ),
+                    widget.profilePic.isNotEmpty
+                        ? Image.network(
+                            widget.profilePic,
+                            scale: 5,
+                            errorBuilder: (context, error, stackTrace) {
+                              // Fallback to a placeholder if the image fails to load
+                              return Image.asset(
+                                "assetes/icons/logo.png",
+                                scale: 5,
+                              );
+                            },
+                          )
+                        : Image.asset(
+                            "assetes/icons/logo.png",
+                            scale: 5,
+                          ),
+                  ],
+                )),
         ],
       ),
     );
