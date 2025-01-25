@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care_web/constants/consts.dart';
-import 'package:health_care_web/pages/app/cards/expandable_profile_card.dart';
+import 'package:health_care_web/pages/app/cards/expandable_profile_card_updated.dart';
 import 'package:health_care_web/pages/app/services/firestore_db_service.dart';
 
 class AllPatients extends StatefulWidget {
@@ -12,18 +12,7 @@ class AllPatients extends StatefulWidget {
 }
 
 class _AllPatientsState extends State<AllPatients> {
-  List<UserProfile> currentProfiles = [];
-  UserProfile selectedProfile = UserProfile(
-    id: "",
-    name: "",
-    email: "",
-    pic: "",
-    address: "",
-    mobile: "",
-    device: "",
-    isDone: false,
-  );
-
+  List<UserProfile> profiles = [];
   bool isLoading = false;
 
   @override
@@ -41,18 +30,17 @@ class _AllPatientsState extends State<AllPatients> {
         throw Exception("User is not logged in.");
       }
 
-      Map<String, dynamic> res =
-          await FirestoreDbService().fetchPatient(user.uid);
+      Map<String, dynamic> res = await FirestoreDbService().fetchPatient();
 
       if (res['success']) {
         setState(() {
-          currentProfiles = res['data'] as List<UserProfile>;
+          profiles = res['data'] as List<UserProfile>;
         });
       } else {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(res['error'] ?? 'Unknown error occurred'),
+              content: Text('An error occurred: ${res["error"]}'),
               backgroundColor: Colors.red,
             ),
           );
@@ -78,7 +66,7 @@ class _AllPatientsState extends State<AllPatients> {
       );
     }
     AppSizes().initSizes(context);
-    return currentProfiles.isEmpty
+    return profiles.isEmpty
         ? Padding(
             padding: const EdgeInsets.all(16.0),
             child: const Center(
@@ -90,20 +78,43 @@ class _AllPatientsState extends State<AllPatients> {
         : SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: currentProfiles.map((p) {
-                return ExpandableProfileCard(
-                  name: p.name,
-                  profilePic: p.pic,
-                  email: p.email,
-                  address: p.address,
-                  mobile: p.mobile,
-                  device: p.device,
-                  isDone: p.isDone,
-                );
-              }).toList(),
-            ),
-          );
+              spacing: 10,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 150,
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(12),
+                          ),
+                          color: StyleSheet().stateHeartBoxGood),
+                      child: Row(
+                        spacing: 3,
+                        children: [Icon(Icons.people), Text("My Patients")],
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: profiles.map((p) {
+                    return ExpandableProfileCardUpdated(
+                      name: p.name,
+                      profilePic: p.pic,
+                      email: p.email,
+                      address: p.address,
+                      mobile: p.mobile,
+                      device: p.device,
+                      docId: p.doctorId,
+                      myId: FirebaseAuth.instance.currentUser!.uid,
+                    );
+                  }).toList(),
+                ),
+              ],
+            ));
   }
 }

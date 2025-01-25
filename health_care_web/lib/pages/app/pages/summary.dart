@@ -14,17 +14,6 @@ class Summary extends StatefulWidget {
 
 class _SummaryState extends State<Summary> {
   List<UserProfile> currentProfiles = [];
-  UserProfile selectedProfile = UserProfile(
-    id: "",
-    name: "",
-    email: "",
-    pic: "",
-    address: "",
-    mobile: "",
-    device: "",
-    isDone: false,
-  );
-
   bool isLoading = false;
 
   @override
