@@ -192,9 +192,7 @@ class FirestoreDbService {
       for (DocumentSnapshot doc in snapshot.docs) {
         final patientData = doc.data() as Map<String, dynamic>;
         // Check if the 'doctor_id' matches the provided UID
-        if (patientData['doctor_id'] == uid &&
-            patientData["device"] != "" &&
-            !(patientData["is_done"] as bool)) {
+        if (patientData['doctor_id'] == uid) {
           // Add the user profile to the list
           profiles.add(UserProfile(
             id: doc.id,

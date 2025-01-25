@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
 import 'package:health_care_web/constants/consts.dart';
 
 class ExpandableProfileCard extends StatefulWidget {
@@ -9,6 +10,10 @@ class ExpandableProfileCard extends StatefulWidget {
   final String mobile;
   final String device;
   final bool isDone;
+  final VoidCallback onCreateReport;
+  final VoidCallback onRemoveDevice;
+  final VoidCallback onAddDevice;
+  final VoidCallback onPending;
 
   const ExpandableProfileCard({
     super.key,
@@ -19,6 +24,10 @@ class ExpandableProfileCard extends StatefulWidget {
     required this.mobile,
     required this.device,
     required this.isDone,
+    required this.onCreateReport,
+    required this.onRemoveDevice,
+    required this.onAddDevice,
+    required this.onPending,
   });
 
   @override
@@ -110,6 +119,45 @@ class _ExpandableProfileCardState extends State<ExpandableProfileCard> {
                             "assetes/icons/logo.png",
                             scale: 5,
                           ),
+                    Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        spacing: 10,
+                        children: widget.isDone
+                            ? [
+                                CustomButton(
+                                    label: "Create the report",
+                                    icon: Icons.create,
+                                    backgroundColor: StyleSheet().btnBackground,
+                                    textColor: StyleSheet().btnText,
+                                    onPressed: () => widget.onCreateReport),
+                                CustomButton(
+                                    label: "Remove the device",
+                                    icon: Icons.remove_circle,
+                                    backgroundColor:
+                                        StyleSheet().patientsDelete,
+                                    textColor: StyleSheet().btnText,
+                                    onPressed: () => widget.onRemoveDevice),
+                              ]
+                            : (widget.device == "Device"
+                                ? [
+                                    CustomButton(
+                                        label: "Add a device",
+                                        icon: Icons.add,
+                                        backgroundColor:
+                                            StyleSheet().btnBackground,
+                                        textColor: StyleSheet().btnText,
+                                        onPressed: () => widget.onAddDevice),
+                                  ]
+                                : [
+                                    CustomButton(
+                                      label: "Pending...",
+                                      icon: Icons.pending_actions,
+                                      backgroundColor:
+                                          StyleSheet().btnBackground,
+                                      textColor: StyleSheet().btnText,
+                                      onPressed: () => widget.onPending,
+                                    ),
+                                  ])),
                   ],
                 )),
         ],

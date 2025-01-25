@@ -60,6 +60,11 @@ class _SummaryState extends State<Summary> {
     }
   }
 
+  Future<void> createReport() async {}
+  Future<void> addDevice() async {}
+  Future<void> removeDevice() async {}
+  Future<void> pendingData() async {}
+
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
@@ -145,6 +150,10 @@ class _SummaryState extends State<Summary> {
                           mobile: p.mobile,
                           device: p.device,
                           isDone: p.isDone,
+                          onAddDevice: addDevice,
+                          onCreateReport: createReport,
+                          onPending: pendingData,
+                          onRemoveDevice: removeDevice,
                         );
                       }).toList(),
                     ),
