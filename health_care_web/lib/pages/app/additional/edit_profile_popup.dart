@@ -63,8 +63,8 @@ class _StateEditProfile extends State<EditProfilePopup> {
           children: [
             Container(
               clipBehavior: Clip.hardEdge,
-              width: AppSizes().getBlockSizeHorizontal(50),
-              height: AppSizes().getBlockSizeHorizontal(50),
+              width: 200,
+              height: 200,
               decoration: BoxDecoration(
                   color: StyleSheet().btnBackground,
                   borderRadius: BorderRadius.circular(60)),

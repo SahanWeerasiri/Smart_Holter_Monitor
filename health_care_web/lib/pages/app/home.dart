@@ -4,6 +4,7 @@ import 'package:health_care_web/components/drawer/simple_drawer/simple_drawer.da
 import 'package:health_care_web/components/top_app_bar/top_app_bar3.dart';
 import 'package:health_care_web/pages/app/pages/all_patients.dart';
 import 'package:health_care_web/pages/app/pages/devices.dart';
+import 'package:health_care_web/pages/app/pages/profile.dart';
 import 'package:health_care_web/pages/app/pages/summary.dart';
 import 'package:health_care_web/pages/app/services/auth_service.dart';
 import '../../constants/consts.dart';
@@ -23,9 +24,7 @@ class _HomeState extends State<Home> {
     const AllPatients(),
     const Devices(),
     const Text('Test Drawer 4'),
-    const Text('Test Drawer 5'),
-    const Text('Test Drawer 6'),
-    const Text('Test Drawer 7'),
+    const Profile(user: null),
   ];
   @override
   Widget build(BuildContext context) {
