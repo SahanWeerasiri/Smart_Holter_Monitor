@@ -77,62 +77,79 @@ class _SummaryState extends State<Summary> {
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ))
-        : SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              spacing: 10,
-              children: [
-                Row(
-                  spacing: 20,
+        : Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+            SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  spacing: 10,
                   children: [
-                    Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(12),
+                    Row(
+                      spacing: 20,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(12),
+                              ),
+                              color: StyleSheet().stateHeartBoxGood),
+                          child: Row(
+                            spacing: 3,
+                            children: [
+                              Icon(Icons.done),
+                              Text("Monitoring is done")
+                            ],
                           ),
-                          color: StyleSheet().stateHeartBoxGood),
-                      child: Row(
-                        spacing: 3,
-                        children: [
-                          Icon(Icons.done),
-                          Text("Monitoring is done")
-                        ],
-                      ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(12),
+                              ),
+                              color: StyleSheet().avgHeartBox),
+                          child: Row(
+                            spacing: 3,
+                            children: [
+                              Icon(IconlyLight.time_square),
+                              Text("Pending"),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(12),
+                              ),
+                              color: StyleSheet().stateHeartBoxBad),
+                          child: Row(
+                            spacing: 3,
+                            children: [
+                              Icon(Icons.device_unknown),
+                              Text("Device is not connected"),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(12),
-                          ),
-                          color: StyleSheet().avgHeartBox),
-                      child: Row(
-                        spacing: 3,
-                        children: [
-                          Icon(IconlyLight.time_square),
-                          Text("Pending"),
-                        ],
-                      ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: currentProfiles.map((p) {
+                        return ExpandableProfileCard(
+                          name: p.name,
+                          profilePic: p.pic,
+                          email: p.email,
+                          address: p.address,
+                          mobile: p.mobile,
+                          device: p.device,
+                          isDone: p.isDone,
+                        );
+                      }).toList(),
                     ),
                   ],
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: currentProfiles.map((p) {
-                    return ExpandableProfileCard(
-                      name: p.name,
-                      profilePic: p.pic,
-                      email: p.email,
-                      address: p.address,
-                      mobile: p.mobile,
-                      device: p.device,
-                      isDone: p.isDone,
-                    );
-                  }).toList(),
-                ),
-              ],
-            ));
+                )),
+          ]);
   }
 }

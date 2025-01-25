@@ -30,7 +30,8 @@ class _ExpandableProfileCardState extends State<ExpandableProfileCard> {
   double _cardHeight = 70;
   final List<Color> _stateColors = [
     StyleSheet().stateHeartBoxGood,
-    StyleSheet().avgHeartBox
+    StyleSheet().avgHeartBox,
+    StyleSheet().stateHeartBoxBad,
   ];
 
   @override
@@ -40,7 +41,9 @@ class _ExpandableProfileCardState extends State<ExpandableProfileCard> {
       height: _cardHeight,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(10)),
-        color: widget.isDone ? _stateColors[0] : _stateColors[1],
+        color: widget.isDone
+            ? _stateColors[0]
+            : (widget.device == "Device" ? _stateColors[2] : _stateColors[1]),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
