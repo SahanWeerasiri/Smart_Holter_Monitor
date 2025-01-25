@@ -84,6 +84,9 @@ class StyleSheet {
 
   final Color doctorDetailsPopPrimary = const Color.fromARGB(255, 64, 124, 226);
   final Color doctorDetailsPopPSecondary = const Color.fromARGB(255, 0, 0, 0);
+
+  final Color patientsDelete = const Color.fromARGB(255, 208, 0, 0);
+  final Color patientsAdd = const Color.fromARGB(255, 64, 124, 226);
 }
 
 class AppSizes {

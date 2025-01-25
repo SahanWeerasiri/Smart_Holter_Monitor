@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
 import 'package:health_care_web/constants/consts.dart';
+import 'package:iconly/iconly.dart';
 
 class ExpandableProfileCardUpdated extends StatefulWidget {
   final String name;
@@ -37,6 +39,9 @@ class _ExpandableProfileCardUpdatedState
     StyleSheet().avgHeartBox
   ];
 
+  Future<void> removePatients() async {}
+  Future<void> addPatients() async {}
+
   @override
   Widget build(BuildContext context) {
     AppSizes().initSizes(context);
@@ -67,7 +72,7 @@ class _ExpandableProfileCardUpdatedState
                   setState(() {
                     _isExpanded = !_isExpanded;
                     if (_isExpanded) {
-                      _cardHeight = 200;
+                      _cardHeight = 230;
                     } else {
                       _cardHeight = 70;
                     }
@@ -93,6 +98,20 @@ class _ExpandableProfileCardUpdatedState
                         Text("Mobile: ${widget.mobile}"),
                         const SizedBox(height: 4),
                         Text("Device: ${widget.device}"),
+                        const SizedBox(height: 4),
+                        widget.myId == widget.docId
+                            ? CustomButton(
+                                label: "Remove",
+                                icon: IconlyLight.delete,
+                                textColor: StyleSheet().uiBackground,
+                                backgroundColor: StyleSheet().patientsDelete,
+                                onPressed: () => {removePatients()})
+                            : CustomButton(
+                                label: "Add",
+                                textColor: StyleSheet().uiBackground,
+                                icon: IconlyLight.add_user,
+                                backgroundColor: StyleSheet().patientsAdd,
+                                onPressed: () => {addPatients()})
                       ],
                     ),
                     widget.profilePic.isNotEmpty
