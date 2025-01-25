@@ -92,11 +92,10 @@ class FirestoreDbService {
     }
   }
 
-  Future<Map<String, dynamic>> fetchSearch(name) async {
+  Future<Map<String, dynamic>> fetchSearch(String name) async {
     try {
       // Fetch the document snapshot
-      final QuerySnapshot<Object?> snapshot =
-          await usersCollection.where('tags', arrayContains: name).get();
+      final QuerySnapshot<Object?> snapshot = await usersCollection.get();
 
       List<UserProfile> profiles = [];
 
@@ -104,17 +103,19 @@ class FirestoreDbService {
       for (DocumentSnapshot doc in snapshot.docs) {
         final patientData = doc.data() as Map<String, dynamic>;
         // Add the user profile to the list
-        profiles.add(UserProfile(
-          id: doc.id,
-          name: patientData['name'],
-          email: patientData['email'],
-          pic: patientData['pic'],
-          doctorId: patientData['doctor_id'],
-          address: patientData['address'],
-          mobile: patientData['mobile'],
-          device: patientData['device'],
-          isDone: patientData['is_done'],
-        ));
+        if (patientData['name'].toString().toLowerCase().contains(name)) {
+          profiles.add(UserProfile(
+            id: doc.id,
+            name: patientData['name'],
+            email: patientData['email'],
+            pic: patientData['pic'],
+            doctorId: patientData['doctor_id'],
+            address: patientData['address'],
+            mobile: patientData['mobile'],
+            device: patientData['device'],
+            isDone: patientData['is_done'],
+          ));
+        }
       }
 
       // Check if any profiles were found
