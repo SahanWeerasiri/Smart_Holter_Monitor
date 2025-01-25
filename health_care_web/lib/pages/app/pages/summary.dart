@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/pages/app/cards/expandable_profile_card.dart';
 import 'package:health_care_web/pages/app/services/firestore_db_service.dart';
+import 'package:iconly/iconly.dart';
 
 class Summary extends StatefulWidget {
   const Summary({super.key});
@@ -90,20 +91,59 @@ class _SummaryState extends State<Summary> {
         : SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: currentProfiles.map((p) {
-                return ExpandableProfileCard(
-                  name: p.name,
-                  profilePic: p.pic,
-                  email: p.email,
-                  address: p.address,
-                  mobile: p.mobile,
-                  device: p.device,
-                  isDone: p.isDone,
-                );
-              }).toList(),
-            ),
-          );
+              spacing: 10,
+              children: [
+                Row(
+                  spacing: 20,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(12),
+                          ),
+                          color: StyleSheet().stateHeartBoxGood),
+                      child: Row(
+                        spacing: 3,
+                        children: [
+                          Icon(Icons.done),
+                          Text("Monitoring is done")
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(12),
+                          ),
+                          color: StyleSheet().avgHeartBox),
+                      child: Row(
+                        spacing: 3,
+                        children: [
+                          Icon(IconlyLight.time_square),
+                          Text("Pending"),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: currentProfiles.map((p) {
+                    return ExpandableProfileCard(
+                      name: p.name,
+                      profilePic: p.pic,
+                      email: p.email,
+                      address: p.address,
+                      mobile: p.mobile,
+                      device: p.device,
+                      isDone: p.isDone,
+                    );
+                  }).toList(),
+                ),
+              ],
+            ));
   }
 }
