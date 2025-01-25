@@ -73,6 +73,7 @@ class FirestoreDbService {
           // Add the user profile to the list
           profiles.add(
             UserProfile(
+              id: doc.id,
               name: patientData['name'],
               email: patientData['email'],
               pic: patientData['pic'],
@@ -122,6 +123,49 @@ class FirestoreDbService {
         return {'success': true, 'message': "This is a doctor"};
       } else {
         return {'success': false, 'error': 'You are not a doctor'};
+      }
+    } catch (e) {
+      // Handle errors and return failure
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchCurrentPatient(String uid) async {
+    try {
+      // Fetch the document snapshot
+      final QuerySnapshot<Object?> snapshot = await usersCollection.get();
+
+      List<UserProfile> profiles = [];
+
+      // Iterate through all documents in the snapshot
+      for (DocumentSnapshot doc in snapshot.docs) {
+        final patientData = doc.data() as Map<String, dynamic>;
+        // Check if the 'doctor_id' matches the provided UID
+        if (patientData['doctor_id'] == uid &&
+            patientData["device"] != "" &&
+            !(patientData["is_done"] as bool)) {
+          // Add the user profile to the list
+          profiles.add(UserProfile(
+            id: doc.id,
+            name: patientData['name'],
+            email: patientData['email'],
+            pic: patientData['pic'],
+            address: patientData['address'],
+            mobile: patientData['mobile'],
+            device: patientData['device'],
+            isDone: patientData['is_done'],
+          ));
+        }
+      }
+
+      // Check if any profiles were found
+      if (profiles.isNotEmpty) {
+        return {'success': true, 'data': profiles};
+      } else {
+        return {
+          'success': false,
+          'error': 'No patients with holt monitors found for the given doctor'
+        };
       }
     } catch (e) {
       // Handle errors and return failure

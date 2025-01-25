@@ -150,6 +150,7 @@ class DrawerItems {
 }
 
 class UserProfile {
+  String id;
   String name;
   String email;
   String pic;
@@ -161,6 +162,7 @@ class UserProfile {
   String device;
   String doctorId;
   UserProfile({
+    required this.id,
     required this.name,
     required this.email,
     this.pic = "",

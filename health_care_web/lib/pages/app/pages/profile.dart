@@ -23,7 +23,8 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  final UserProfile _userProfile = UserProfile(name: "Name", email: "Email");
+  final UserProfile _userProfile =
+      UserProfile(id: "", name: "Name", email: "Email");
   final List<ContactProfile> _people = [];
   late final CredentialController credentialController = CredentialController();
   late final ProfileController profileController = ProfileController();

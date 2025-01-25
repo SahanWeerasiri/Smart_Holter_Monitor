@@ -73,8 +73,7 @@ class _InputFieldFb3State extends State<InputFieldFb3> {
           hintText: widget.hint,
           fillColor: widget.shadowColor,
           hintStyle: TextStyle(color: widget.hintColor.withOpacity(.75)),
-          contentPadding: EdgeInsets.symmetric(
-              vertical: 0.0, horizontal: AppSizes.blockSizeHorizontal * 10),
+          contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 0.0),
           border: OutlineInputBorder(
             borderSide: BorderSide(color: widget.borderColor, width: 2.0),
             borderRadius: const BorderRadius.all(Radius.circular(10.0)),
