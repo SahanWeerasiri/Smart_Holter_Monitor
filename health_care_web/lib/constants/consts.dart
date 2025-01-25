@@ -209,3 +209,12 @@ class ContactProfile {
     this.mobile = "",
   });
 }
+
+class DeviceProfile {
+  String code;
+  String detail;
+  DeviceProfile({
+    required this.code,
+    this.detail = "",
+  });
+}

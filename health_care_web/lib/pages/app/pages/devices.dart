@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
 import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/pages/app/additional/add_device_popup.dart';
-import 'package:health_care_web/pages/app/cards/expandable_profile_card_updated.dart';
+import 'package:health_care_web/pages/app/cards/expandable_profile_card_updated_devices.dart';
 import 'package:health_care_web/pages/app/services/firestore_db_service.dart';
 import 'package:health_care_web/pages/app/services/real_db_service.dart';
 import 'package:iconly/iconly.dart';
@@ -19,14 +19,14 @@ class _DevicesState extends State<Devices> {
   final TextEditingController controller = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
-  List<UserProfile> profiles = [];
+  List<DeviceProfile> profiles = [];
   bool isLoading = false;
   bool isOpen = false;
 
   @override
   void initState() {
     super.initState();
-    // fetchPatients();
+    fetcheDevices();
   }
 
   Future<void> removePatients(id) async {
@@ -58,10 +58,10 @@ class _DevicesState extends State<Devices> {
       profiles = [];
       isLoading = false;
     });
-    // fetchPatients();
+    fetcheDevices();
   }
 
-  Future<void> fetchPatients() async {
+  Future<void> fetcheDevices() async {
     setState(() {
       isLoading = true;
       profiles = [];
@@ -73,11 +73,11 @@ class _DevicesState extends State<Devices> {
         throw Exception("User is not logged in.");
       }
 
-      Map<String, dynamic> res = await FirestoreDbService().fetchPatient();
+      Map<String, dynamic> res = await RealDbService().fetchDevices();
 
       if (res['success']) {
         setState(() {
-          profiles = res['data'] as List<UserProfile>;
+          profiles = res['data'] as List<DeviceProfile>;
         });
       } else {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -101,40 +101,40 @@ class _DevicesState extends State<Devices> {
     }
   }
 
-  Future<void> fetchSearch(String name) async {
-    setState(() {
-      profiles = [];
-      isLoading = true;
-    });
-    try {
-      Map<String, dynamic> res =
-          await FirestoreDbService().fetchSearch(name.toLowerCase());
+  // Future<void> fetchSearch(String name) async {
+  //   setState(() {
+  //     profiles = [];
+  //     isLoading = true;
+  //   });
+  //   try {
+  //     Map<String, dynamic> res =
+  //         await FirestoreDbService().fetchSearch(name.toLowerCase());
 
-      if (res['success']) {
-        setState(() {
-          profiles = res['data'] as List<UserProfile>;
-        });
-      } else {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('An error occurred: ${res["error"]}'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        });
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('An error occurred: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
+  //     if (res['success']) {
+  //       setState(() {
+  //         profiles = res['data'] as List<UserProfile>;
+  //       });
+  //     } else {
+  //       WidgetsBinding.instance.addPostFrameCallback((_) {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(
+  //             content: Text('An error occurred: ${res["error"]}'),
+  //             backgroundColor: Colors.red,
+  //           ),
+  //         );
+  //       });
+  //     }
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('An error occurred: $e'),
+  //         backgroundColor: Colors.red,
+  //       ),
+  //     );
+  //   } finally {
+  //     setState(() => isLoading = false);
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -150,8 +150,8 @@ class _DevicesState extends State<Devices> {
         spacing: 10,
         children: [
           SearchBar(
-            onSubmitted: (value) =>
-                value.isNotEmpty ? fetchSearch(value) : fetchPatients(),
+            // onSubmitted: (value) =>
+            //     value.isNotEmpty ? fetchSearch(value) : fetchPatients(),
             leading: Icon(IconlyLight.search),
             hintText: "Search...",
             controller: controller,
@@ -192,19 +192,12 @@ class _DevicesState extends State<Devices> {
               : Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 10,
                   children: profiles.map((p) {
-                    return ExpandableProfileCardUpdated(
-                      id: p.id,
-                      name: p.name,
-                      profilePic: p.pic,
-                      email: p.email,
-                      address: p.address,
-                      mobile: p.mobile,
-                      device: p.device,
-                      docId: p.doctorId,
-                      myId: FirebaseAuth.instance.currentUser!.uid,
-                      onRemove: () => removePatients(p.id),
-                      onAdd: () {},
+                    return ExpandableProfileCardUpdatedDevices(
+                      code: p.code,
+                      detail: p.detail,
+                      onRemove: () {},
                     );
                   }).toList(),
                 ),

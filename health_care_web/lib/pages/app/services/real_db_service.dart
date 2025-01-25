@@ -1,4 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:health_care_web/constants/consts.dart';
 
 class RealDbService {
   final FirebaseDatabase _database = FirebaseDatabase.instance;
@@ -38,6 +39,33 @@ class RealDbService {
       'data': value,
       'timestamp': key,
     };
+  }
+
+  Future<Map<String, dynamic>> fetchDevices() async {
+    // Reference to the device's data
+    try {
+      final ref = _database.ref('devices');
+      final DataSnapshot dataSnapshot = await ref.get();
+
+      List<DeviceProfile> devices = [];
+
+      for (final child in dataSnapshot.children) {
+        final device = child.key;
+        final other = child.child('other').value as String;
+        devices.add(
+            DeviceProfile(code: device.toString(), detail: other.toString()));
+      }
+
+      return {
+        'success': true,
+        'data': devices,
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'data': 'Error fetching devices $e',
+      };
+    }
   }
 
   Future<Map<String, dynamic>> addDevice(String code, String other) async {
