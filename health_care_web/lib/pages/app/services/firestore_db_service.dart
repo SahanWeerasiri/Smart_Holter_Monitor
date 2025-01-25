@@ -11,7 +11,8 @@ class FirestoreDbService {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<Map<String, dynamic>> createAccount(String name, String email) async {
+  Future<Map<String, dynamic>> createAccount(
+      String name, String email, List<String> tags) async {
     try {
       // Example data for the account
       final accountData = {
@@ -23,6 +24,7 @@ class FirestoreDbService {
         'language': 'Language',
         'color': 'Color',
         'pic': '',
+        'tags': tags,
       };
 
       // Store data in the database
@@ -62,6 +64,39 @@ class FirestoreDbService {
     try {
       // Fetch the document snapshot
       final QuerySnapshot<Object?> snapshot = await usersCollection.get();
+
+      List<UserProfile> profiles = [];
+
+      // Iterate through all documents in the snapshot
+      for (DocumentSnapshot doc in snapshot.docs) {
+        final patientData = doc.data() as Map<String, dynamic>;
+        // Add the user profile to the list
+        profiles.add(UserProfile(
+          id: doc.id,
+          name: patientData['name'],
+          email: patientData['email'],
+          pic: patientData['pic'],
+          doctorId: patientData['doctor_id'],
+          address: patientData['address'],
+          mobile: patientData['mobile'],
+          device: patientData['device'],
+          isDone: patientData['is_done'],
+        ));
+      }
+
+      // Check if any profiles were found
+      return {'success': true, 'data': profiles};
+    } catch (e) {
+      // Handle errors and return failure
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchSearch(name) async {
+    try {
+      // Fetch the document snapshot
+      final QuerySnapshot<Object?> snapshot =
+          await usersCollection.where('tags', arrayContains: name).get();
 
       List<UserProfile> profiles = [];
 

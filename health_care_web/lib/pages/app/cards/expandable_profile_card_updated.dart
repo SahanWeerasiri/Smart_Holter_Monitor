@@ -41,7 +41,7 @@ class _ExpandableProfileCardUpdatedState
   bool _isExpanded = false;
   double _cardHeight = 70;
   final List<Color> _stateColors = [
-    StyleSheet().stateHeartBoxGood,
+    StyleSheet().myPatients,
     StyleSheet().avgHeartBox
   ];
 

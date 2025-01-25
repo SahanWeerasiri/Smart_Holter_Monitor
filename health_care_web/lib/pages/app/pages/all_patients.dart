@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/pages/app/cards/expandable_profile_card_updated.dart';
 import 'package:health_care_web/pages/app/services/firestore_db_service.dart';
+import 'package:iconly/iconly.dart';
 
 class AllPatients extends StatefulWidget {
   const AllPatients({super.key});
@@ -12,6 +13,7 @@ class AllPatients extends StatefulWidget {
 }
 
 class _AllPatientsState extends State<AllPatients> {
+  final TextEditingController controller = TextEditingController();
   List<UserProfile> profiles = [];
   bool isLoading = false;
 
@@ -54,7 +56,10 @@ class _AllPatientsState extends State<AllPatients> {
   }
 
   Future<void> fetchPatients() async {
-    setState(() => isLoading = true);
+    setState(() {
+      isLoading = true;
+      profiles = [];
+    });
 
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -63,6 +68,41 @@ class _AllPatientsState extends State<AllPatients> {
       }
 
       Map<String, dynamic> res = await FirestoreDbService().fetchPatient();
+
+      if (res['success']) {
+        setState(() {
+          profiles = res['data'] as List<UserProfile>;
+        });
+      } else {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('An error occurred: ${res["error"]}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occurred: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  Future<void> fetchSearch(String name) async {
+    setState(() {
+      profiles = [];
+      isLoading = true;
+    });
+    try {
+      Map<String, dynamic> res =
+          await FirestoreDbService().fetchSearch(name.toLowerCase());
 
       if (res['success']) {
         setState(() {
@@ -101,56 +141,102 @@ class _AllPatientsState extends State<AllPatients> {
     return profiles.isEmpty
         ? Padding(
             padding: const EdgeInsets.all(16.0),
-            child: const Center(
-              child: Text(
-                "No profiles available",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            child: Column(spacing: 10, children: [
+              SearchBar(
+                onSubmitted: (value) =>
+                    value.isNotEmpty ? fetchSearch(value) : fetchPatients(),
+                leading: Icon(IconlyLight.search),
+                hintText: "Search...",
+                controller: controller,
               ),
-            ))
-        : SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              spacing: 10,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 150,
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(12),
-                          ),
-                          color: StyleSheet().stateHeartBoxGood),
-                      child: Row(
-                        spacing: 3,
-                        children: [Icon(Icons.people), Text("My Patients")],
-                      ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 150,
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(12),
+                        ),
+                        color: StyleSheet().myPatients),
+                    child: Row(
+                      spacing: 3,
+                      children: [Icon(Icons.people), Text("My Patients")],
                     ),
-                  ],
+                  ),
+                ],
+              ),
+              const Center(
+                child: Text(
+                  "No profiles available",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: profiles.map((p) {
-                    return ExpandableProfileCardUpdated(
-                      id: p.id,
-                      name: p.name,
-                      profilePic: p.pic,
-                      email: p.email,
-                      address: p.address,
-                      mobile: p.mobile,
-                      device: p.device,
-                      docId: p.doctorId,
-                      myId: FirebaseAuth.instance.currentUser!.uid,
-                      onRemove: () => removePatients(p.id),
-                      onAdd: () => addPatients(
-                          p.id, FirebaseAuth.instance.currentUser!.uid),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ));
+              ),
+            ]),
+          )
+        : Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              SingleChildScrollView(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    spacing: 10,
+                    children: [
+                      SearchBar(
+                        onSubmitted: (value) => {
+                          value.isNotEmpty
+                              ? fetchSearch(value)
+                              : fetchPatients()
+                        },
+                        leading: Icon(IconlyLight.search),
+                        hintText: "Search...",
+                        controller: controller,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 150,
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(12),
+                                ),
+                                color: StyleSheet().myPatients),
+                            child: Row(
+                              spacing: 3,
+                              children: [
+                                Icon(Icons.people),
+                                Text("My Patients")
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: profiles.map((p) {
+                          return ExpandableProfileCardUpdated(
+                            id: p.id,
+                            name: p.name,
+                            profilePic: p.pic,
+                            email: p.email,
+                            address: p.address,
+                            mobile: p.mobile,
+                            device: p.device,
+                            docId: p.doctorId,
+                            myId: FirebaseAuth.instance.currentUser!.uid,
+                            onRemove: () => removePatients(p.id),
+                            onAdd: () => addPatients(
+                                p.id, FirebaseAuth.instance.currentUser!.uid),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ))
+            ],
+          );
   }
 }

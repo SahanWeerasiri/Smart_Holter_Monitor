@@ -2,7 +2,6 @@ import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/controllers/textController.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care_web/pages/app/cards/signup_card.dart';
-import 'package:health_care_web/pages/app/services/auth_service.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -30,75 +29,6 @@ class _SignupPageState extends State<SignupPage> {
         color: CustomColors().blueDark,
         fontSize: 15,
         fontWeight: FontWeight.bold);
-  }
-
-  Future<bool> checkCredentials() async {
-    if (credentialController.confirmPassword != credentialController.password) {
-      setState(() {
-        msg = "Passwords do not match";
-      });
-      return false;
-    }
-    if (credentialController.username.isEmpty) {
-      setState(() {
-        msg = "Email is required";
-      });
-      return false;
-    }
-
-    if (credentialController.password.isEmpty) {
-      setState(() {
-        msg = "Password is required";
-      });
-      return false;
-    }
-
-    if (credentialController.password.length < 8) {
-      setState(() {
-        msg = "Password required at least 8 characters";
-      });
-      return false;
-    }
-
-    AuthService auth = AuthService();
-    Map<String, dynamic> result = await auth.createUserWithEmailAndPassword(
-        credentialController.name,
-        credentialController.username,
-        credentialController.password);
-    if (result["status"] == "error") {
-      setState(() {
-        msg = result["message"];
-      });
-      return false;
-    }
-    setState(() {
-      msg = result["message"];
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(msg),
-          backgroundColor: Colors.green,
-        ),
-      );
-    });
-    return true;
-  }
-
-  void signUpError() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(msg),
-          backgroundColor: Colors.red,
-        ),
-      );
-    });
-  }
-
-  void navigateToHome() {
-    credentialController.clear();
-    Navigator.pushNamed(context, '/login');
   }
 
   @override

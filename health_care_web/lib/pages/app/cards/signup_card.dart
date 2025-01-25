@@ -4,6 +4,7 @@ import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/controllers/textController.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care_web/pages/app/services/auth_service.dart';
+import 'package:health_care_web/pages/app/services/util.dart';
 
 class SignupCard extends StatefulWidget {
   const SignupCard({super.key});
@@ -65,7 +66,8 @@ class _SignupCardState extends State<SignupCard> {
     Map<String, dynamic> result = await auth.createUserWithEmailAndPassword(
         credentialController.name,
         credentialController.username,
-        credentialController.password);
+        credentialController.password,
+        generateTags(credentialController.name));
     if (result["status"] == "error") {
       setState(() {
         msg = result["message"];
