@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:health_care_web/components/drawer/simple_drawer/drawer_index_controller.dart';
 import 'package:health_care_web/components/drawer/simple_drawer/simple_drawer.dart';
 import 'package:health_care_web/components/top_app_bar/top_app_bar3.dart';
+import 'package:health_care_web/pages/app/pages/all_patients.dart';
+import 'package:health_care_web/pages/app/pages/devices.dart';
+import 'package:health_care_web/pages/app/pages/profile.dart';
+import 'package:health_care_web/pages/app/pages/summary.dart';
 import 'package:health_care_web/pages/app/services/auth_service.dart';
 import '../../constants/consts.dart';
 import 'package:iconly/iconly.dart';
@@ -16,13 +20,11 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final DrawerIndexController drawerIndexController = DrawerIndexController();
   final List<Widget> pages = [
-    const Text('Test Drawer 1'),
-    const Text('Test Drawer 2'),
-    const Text('Test Drawer 3'),
+    const Summary(),
+    const AllPatients(),
+    const Devices(),
     const Text('Test Drawer 4'),
-    const Text('Test Drawer 5'),
-    const Text('Test Drawer 6'),
-    const Text('Test Drawer 7'),
+    const Profile(user: null),
   ];
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,7 @@ class _HomeState extends State<Home> {
           items: [
             DrawerItems(
                 index: 0,
-                title: 'Item 1',
+                title: 'Home',
                 icon: Icons.home,
                 onTap: () {
                   setState(() {
@@ -44,11 +46,38 @@ class _HomeState extends State<Home> {
                 }),
             DrawerItems(
                 index: 1,
-                title: 'Item 2',
-                icon: Icons.search,
+                title: 'Patients',
+                icon: Icons.local_hospital,
                 onTap: () {
                   setState(() {
                     drawerIndexController.setSelectedIndex(1);
+                  });
+                }),
+            DrawerItems(
+                index: 2,
+                title: 'Device Manager',
+                icon: Icons.devices_other,
+                onTap: () {
+                  setState(() {
+                    drawerIndexController.setSelectedIndex(2);
+                  });
+                }),
+            DrawerItems(
+                index: 3,
+                title: '',
+                icon: Icons.search,
+                onTap: () {
+                  setState(() {
+                    drawerIndexController.setSelectedIndex(3);
+                  });
+                }),
+            DrawerItems(
+                index: 4,
+                title: 'Profile',
+                icon: Icons.person,
+                onTap: () {
+                  setState(() {
+                    drawerIndexController.setSelectedIndex(4);
                   });
                 }),
           ],

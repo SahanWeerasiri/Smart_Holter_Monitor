@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flame/extensions.dart';
 import 'package:health_care_web/constants/consts.dart';
+import 'package:health_care_web/pages/app/services/real_db_service.dart';
 
 class FirestoreDbService {
   final CollectionReference usersCollection =
@@ -58,42 +59,75 @@ class FirestoreDbService {
     }
   }
 
-  Future<Map<String, dynamic>> fetchPatient(String uid) async {
+  Future<Map<String, dynamic>> fetchPatient() async {
     try {
       // Fetch the document snapshot
       final QuerySnapshot<Object?> snapshot = await usersCollection.get();
 
-      const List<UserProfile> profiles = [];
+      List<UserProfile> profiles = [];
 
       // Iterate through all documents in the snapshot
       for (DocumentSnapshot doc in snapshot.docs) {
         final patientData = doc.data() as Map<String, dynamic>;
-        // Check if the 'doctor_id' matches the provided UID
-        if (patientData['doctor_id'] == uid) {
-          // Add the user profile to the list
-          profiles.add(
-            UserProfile(
-              name: patientData['name'],
-              email: patientData['email'],
-              pic: patientData['pic'],
-              address: patientData['address'],
-              mobile: patientData['mobile'],
-              device: patientData['device'],
-              isDone: patientData['is_done'],
-            ),
-          );
+        // Add the user profile to the list
+        // final QuerySnapshot<Object?> snapshotContacts =
+        //     await usersCollection.doc(doc.id).collection("emergency").get();
+        // List<ContactProfile> contacts = [];
+        // for (DocumentSnapshot docContacts in snapshotContacts.docs) {
+        //   final contactData = docContacts.data() as Map<String, dynamic>;
+        //   contacts.add(ContactProfile(
+        //       name: contactData['name'], mobile: contactData['mobile']));
+        // }
+        profiles.add(UserProfile(
+          id: doc.id,
+          name: patientData['name'],
+          email: patientData['email'],
+          pic: patientData['pic'],
+          doctorId: patientData['doctor_id'],
+          address: patientData['address'],
+          mobile: patientData['mobile'],
+          device: patientData['device'],
+          isDone: patientData['is_done'],
+          // contacts: contacts,
+        ));
+      }
+
+      // Check if any profiles were found
+      return {'success': true, 'data': profiles};
+    } catch (e) {
+      // Handle errors and return failure
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchSearch(String name) async {
+    try {
+      // Fetch the document snapshot
+      final QuerySnapshot<Object?> snapshot = await usersCollection.get();
+
+      List<UserProfile> profiles = [];
+
+      // Iterate through all documents in the snapshot
+      for (DocumentSnapshot doc in snapshot.docs) {
+        final patientData = doc.data() as Map<String, dynamic>;
+        // Add the user profile to the list
+        if (patientData['name'].toString().toLowerCase().contains(name)) {
+          profiles.add(UserProfile(
+            id: doc.id,
+            name: patientData['name'],
+            email: patientData['email'],
+            pic: patientData['pic'],
+            doctorId: patientData['doctor_id'],
+            address: patientData['address'],
+            mobile: patientData['mobile'],
+            device: patientData['device'],
+            isDone: patientData['is_done'],
+          ));
         }
       }
 
       // Check if any profiles were found
-      if (profiles.isNotEmpty) {
-        return {'success': true, 'data': profiles};
-      } else {
-        return {
-          'success': false,
-          'error': 'No patients found for the given doctor'
-        };
-      }
+      return {'success': true, 'data': profiles};
     } catch (e) {
       // Handle errors and return failure
       return {'success': false, 'error': e.toString()};
@@ -123,6 +157,76 @@ class FirestoreDbService {
       } else {
         return {'success': false, 'error': 'You are not a doctor'};
       }
+    } catch (e) {
+      // Handle errors and return failure
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> removePatiet(String uid) async {
+    try {
+      // Fetch the document snapshot
+      await usersCollection.doc(uid).update({
+        'doctor_id': "",
+      });
+
+      return {'success': true, 'message': "Patient is removed succesfully"};
+    } catch (e) {
+      // Handle errors and return failure
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> addPatiet(String uid, String docId) async {
+    try {
+      // Fetch the document snapshot
+      await usersCollection.doc(uid).update({
+        'doctor_id': docId,
+      });
+
+      return {'success': true, 'message': "Patient is added succesfully"};
+    } catch (e) {
+      // Handle errors and return failure
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchCurrentPatient(String uid) async {
+    try {
+      // Fetch the document snapshot
+      final QuerySnapshot<Object?> snapshot = await usersCollection.get();
+
+      List<UserProfile> profiles = [];
+
+      // Iterate through all documents in the snapshot
+      for (DocumentSnapshot doc in snapshot.docs) {
+        final patientData = doc.data() as Map<String, dynamic>;
+        // Check if the 'doctor_id' matches the provided UID
+        if (patientData['doctor_id'] == uid) {
+          final QuerySnapshot<Object?> snapshotContacts =
+              await usersCollection.doc(doc.id).collection("emergency").get();
+          List<ContactProfile> contacts = [];
+          for (DocumentSnapshot docContacts in snapshotContacts.docs) {
+            final contactData = docContacts.data() as Map<String, dynamic>;
+            contacts.add(ContactProfile(
+                name: contactData['name'], mobile: contactData['mobile']));
+          }
+          // Add the user profile to the list
+          profiles.add(UserProfile(
+              id: doc.id,
+              name: patientData['name'],
+              email: patientData['email'],
+              pic: patientData['pic'],
+              address: patientData['address'],
+              mobile: patientData['mobile'],
+              device: patientData['device'],
+              isDone: patientData['is_done'],
+              contacts: contacts));
+        }
+      }
+
+      // Check if any profiles were found
+      return {'success': true, 'data': profiles};
     } catch (e) {
       // Handle errors and return failure
       return {'success': false, 'error': e.toString()};
@@ -209,7 +313,7 @@ class FirestoreDbService {
     try {
       // Fetch the document snapshot
 
-      await usersCollection.doc(uid).update({
+      await doctorCollection.doc(uid).update({
         'mobile': mobile,
         'address': address,
         'language': language,
@@ -222,47 +326,54 @@ class FirestoreDbService {
     }
   }
 
-  Future<Map<String, dynamic>> addContact(
-      String uid, String name, String mobile) async {
+  Future<Map<String, dynamic>> addDeviceToPatient(
+      String uid, String device) async {
     try {
       // Fetch the document snapshot
 
-      await usersCollection.doc(uid).collection("emergency").add({
-        "name": name,
-        "mobile": mobile,
+      await usersCollection.doc(uid).update({
+        'device': device,
       });
-      return {'success': true, 'message': "Add contact successfully!"};
+      Map<String, dynamic> res =
+          await RealDbService().connectDeviceData(device);
+      if (res['success']) {
+        return {'success': true, 'message': res['message']};
+      } else {
+        return {'success': false, 'error': res['error']};
+      }
     } catch (e) {
       // Handle errors and return failure
       return {'success': false, 'error': e.toString()};
     }
   }
 
-  Future<Map<String, dynamic>> fetchEmergency(String uid) async {
+  Future<Map<String, dynamic>> removeDeviceFromPatient(
+      String uid, String device) async {
     try {
       // Fetch the document snapshot
-      final QuerySnapshot<Object?> snapshot =
-          await usersCollection.doc(uid).collection("emergency").get();
+      Map<String, dynamic> res =
+          await RealDbService().transferDeviceData(device);
+      if (res['success']) {
+        await usersCollection.doc(uid).collection("data").add({
+          'device': device,
+          'timestamp': DateTime.now(),
+          'data': res['data'],
+        });
 
-      final docs = snapshot.docs;
-
-      List<Map<String, dynamic>> people = [];
-
-      for (final DocumentSnapshot<Object?> doc in docs) {
-        // Check if the document exists
-        if (doc.exists) {
-          people.add({
-            'name': doc.get("name"),
-            'mobile': doc.get("mobile"),
+        Map<String, dynamic> res2 =
+            await RealDbService().deleteDeviceData(device);
+        if (res2['success']) {
+          await usersCollection.doc(uid).update({
+            'device': "Device",
+            // "is_done":false, keep it as it is until the report is done
           });
+          return {'success': true, 'message': res2['message']};
         } else {
-          people.add({
-            'name': "",
-            'mobile': "",
-          });
+          return {'success': false, 'message': res2['message']};
         }
+      } else {
+        return {'success': false, 'message': res['message']};
       }
-      return {'success': true, 'data': people};
     } catch (e) {
       // Handle errors and return failure
       return {'success': false, 'error': e.toString()};

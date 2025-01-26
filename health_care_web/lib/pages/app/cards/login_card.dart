@@ -212,6 +212,31 @@ class _LoginCardState extends State<LoginCard> {
                   textColor: StyleSheet().btnText,
                   icon: Icons.login,
                 ),
+                CustomTextButton(
+                  label: "Test",
+                  onPressed: () async {
+                    setState(() {
+                      credentialController.username = "doctor@smartcare.com";
+                      credentialController.password = "doctor123";
+                      role = "Doctor";
+                    });
+                    if (await checkCredentials()) {
+                      setState(() {
+                        credentialController.clear();
+                      });
+                      if (role == "Admin") {
+                        navigateToSignup();
+                      } else {
+                        navigateToHome();
+                      }
+                    } else {
+                      loginError();
+                    }
+                  },
+                  backgroundColor: StyleSheet().btnBackground,
+                  textColor: StyleSheet().btnText,
+                  icon: Icons.login,
+                ),
                 // Row(
                 //   mainAxisAlignment: MainAxisAlignment.center,
                 //   crossAxisAlignment: CrossAxisAlignment.center,

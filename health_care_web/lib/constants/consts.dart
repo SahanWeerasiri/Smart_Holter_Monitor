@@ -84,6 +84,19 @@ class StyleSheet {
 
   final Color doctorDetailsPopPrimary = const Color.fromARGB(255, 64, 124, 226);
   final Color doctorDetailsPopPSecondary = const Color.fromARGB(255, 0, 0, 0);
+
+  final Color patientsDelete = const Color.fromARGB(255, 208, 0, 0);
+  final Color patientsAdd = const Color.fromARGB(255, 64, 124, 226);
+
+  final Color myPatients = const Color.fromARGB(255, 171, 202, 255);
+
+  final Color availableDevices = const Color.fromARGB(255, 171, 202, 255);
+  final Color unavailableDevices = const Color.fromARGB(255, 255, 168, 168);
+
+  final Color step1 = const Color.fromARGB(255, 255, 168, 168);
+  final Color step2 = const Color.fromARGB(255, 255, 252, 173);
+  final Color step3 = const Color.fromARGB(255, 168, 255, 212);
+  final Color step4 = const Color.fromARGB(255, 180, 216, 255);
 }
 
 class AppSizes {
@@ -150,6 +163,7 @@ class DrawerItems {
 }
 
 class UserProfile {
+  String id;
   String name;
   String email;
   String pic;
@@ -160,7 +174,9 @@ class UserProfile {
   String language;
   String device;
   String doctorId;
+  List<ContactProfile> contacts;
   UserProfile({
+    required this.id,
     required this.name,
     required this.email,
     this.pic = "",
@@ -171,6 +187,7 @@ class UserProfile {
     this.isDone = false,
     this.language = "",
     this.doctorId = "",
+    this.contacts = const [],
   });
 }
 
@@ -200,5 +217,16 @@ class ContactProfile {
   ContactProfile({
     required this.name,
     this.mobile = "",
+  });
+}
+
+class DeviceProfile {
+  String code;
+  String detail;
+  bool state;
+  DeviceProfile({
+    required this.code,
+    this.detail = "",
+    this.state = false,
   });
 }

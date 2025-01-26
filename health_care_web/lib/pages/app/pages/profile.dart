@@ -3,13 +3,9 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care_web/components/buttons/custom_text_button/custom_text_button.dart';
-import 'package:health_care_web/components/list/design1/list_item1.dart';
 import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/controllers/profileController.dart';
-import 'package:health_care_web/controllers/textController.dart';
-import 'package:health_care_web/pages/app/additional/add_contact_popup.dart';
 import 'package:health_care_web/pages/app/additional/edit_profile_popup.dart';
-import 'package:health_care_web/pages/app/additional/show_contact_popup.dart';
 import 'package:health_care_web/pages/app/services/firestore_db_service.dart';
 import 'package:iconly/iconly.dart';
 
@@ -23,37 +19,32 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  final UserProfile _userProfile = UserProfile(name: "Name", email: "Email");
-  final List<ContactProfile> _people = [];
-  late final CredentialController credentialController = CredentialController();
+  final UserProfile _userProfile =
+      UserProfile(id: "", name: "Name", email: "Email");
   late final ProfileController profileController = ProfileController();
-  bool _isLoading = true; // Loading state
+  bool _isLoading = false; // Loading state
 
   @override
   void initState() {
     super.initState();
     fetchProfileData();
-    fetchEmergency();
   }
 
   Future<void> fetchProfileData() async {
     setState(() {
       _isLoading = true;
     });
-    Map<String, dynamic> res =
-        await FirestoreDbService().fetchAccount(widget.user!.uid);
+    Map<String, dynamic> res = await FirestoreDbService()
+        .fetchAccount(FirebaseAuth.instance.currentUser!.uid);
     if (res['success']) {
       setState(() {
         _userProfile.name = res['data']['name'];
         _userProfile.email = res['data']['email'];
         _userProfile.address = res['data']['address'];
         _userProfile.color = res['data']['color'];
-        _userProfile.device = res['data']['device'];
-        _userProfile.isDone = res['data']['is_done'];
         _userProfile.language = res['data']['language'];
         _userProfile.mobile = res['data']['mobile'];
         _userProfile.pic = res['data']['pic'];
-        _userProfile.doctorId = res['data']['doctor_id'];
       });
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -72,7 +63,7 @@ class _ProfileState extends State<Profile> {
 
   Future<void> onSubmit() async {
     Map<String, dynamic> res = await FirestoreDbService().updateProfile(
-        widget.user!.uid,
+        FirebaseAuth.instance.currentUser!.uid,
         profileController.mobile.text,
         profileController.language.text,
         profileController.address.text,
@@ -98,61 +89,6 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-  Future<void> onSubmitContact() async {
-    Map<String, dynamic> res = await FirestoreDbService().addContact(
-        widget.user!.uid,
-        profileController.name.text,
-        profileController.mobile.text);
-    if (res['success']) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(res['message']),
-            backgroundColor: Colors.green,
-          ),
-        );
-      });
-    } else {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(res['error']),
-            backgroundColor: Colors.red,
-          ),
-        );
-      });
-    }
-  }
-
-  Future<void> fetchEmergency() async {
-    setState(() {
-      _isLoading = true;
-    });
-    Map<String, dynamic> res =
-        await FirestoreDbService().fetchEmergency(widget.user!.uid);
-    if (res['success']) {
-      setState(() {
-        final people = res['data'] as List<Map<String, dynamic>>;
-        for (var person in people) {
-          _people.add(
-              ContactProfile(name: person['name'], mobile: person['mobile']));
-        }
-      });
-    } else {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(res['error']),
-            backgroundColor: Colors.red,
-          ),
-        );
-      });
-    }
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     AppSizes().initSizes(context);
@@ -169,20 +105,21 @@ class _ProfileState extends State<Profile> {
         width: double.infinity,
         padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
         child: Column(
-          spacing: AppSizes().getBlockSizeVertical(1),
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // Profile Picture Section
             Container(
               clipBehavior: Clip.hardEdge,
-              width: AppSizes().getBlockSizeHorizontal(50),
-              height: AppSizes().getBlockSizeHorizontal(50),
+              width: 200,
+              height: 200,
               decoration: BoxDecoration(
-                  color: StyleSheet().btnBackground,
-                  borderRadius: BorderRadius.circular(60)),
+                color: StyleSheet().btnBackground,
+                borderRadius: BorderRadius.circular(60),
+              ),
               child: _userProfile.pic.isNotEmpty
                   ? Image.memory(
                       base64Decode(_userProfile.pic),
-                      fit: BoxFit
-                          .cover, // Ensures the image fills the CircleAvatar nicely
+                      fit: BoxFit.cover, // Ensures the image fills the circle
                     )
                   : const Icon(
                       Icons.person,
@@ -190,102 +127,9 @@ class _ProfileState extends State<Profile> {
                       color: Colors.white, // Optional: Adjust icon color
                     ),
             ),
-            Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  color: StyleSheet().profileBase,
-                ),
-                width: double.infinity,
-                child: Padding(
-                  padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
-                  child: Text(
-                    _userProfile.name,
-                    style: TextStyle(
-                      fontSize: AppSizes().getBlockSizeHorizontal(5),
-                      color: StyleSheet().profiletext,
-                    ),
-                  ),
-                )),
-            Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  color: StyleSheet().profileBase,
-                ),
-                width: double.infinity,
-                child: Padding(
-                  padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
-                  child: Text(
-                    _userProfile.email,
-                    style: TextStyle(
-                      fontSize: AppSizes().getBlockSizeHorizontal(5),
-                      color: StyleSheet().profiletext,
-                    ),
-                  ),
-                )),
-            Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  color: StyleSheet().profileBase,
-                ),
-                width: double.infinity,
-                child: Padding(
-                  padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
-                  child: Text(
-                    _userProfile.mobile,
-                    style: TextStyle(
-                      fontSize: AppSizes().getBlockSizeHorizontal(5),
-                      color: StyleSheet().profiletext,
-                    ),
-                  ),
-                )),
-            Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  color: StyleSheet().profileBase,
-                ),
-                width: double.infinity,
-                child: Padding(
-                  padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
-                  child: Text(
-                    _userProfile.address,
-                    style: TextStyle(
-                      fontSize: AppSizes().getBlockSizeHorizontal(5),
-                      color: StyleSheet().profiletext,
-                    ),
-                  ),
-                )),
-            Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  color: StyleSheet().profileBase,
-                ),
-                width: double.infinity,
-                child: Padding(
-                  padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
-                  child: Text(
-                    _userProfile.language,
-                    style: TextStyle(
-                      fontSize: AppSizes().getBlockSizeHorizontal(5),
-                      color: StyleSheet().profiletext,
-                    ),
-                  ),
-                )),
-            Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  color: StyleSheet().profileBase,
-                ),
-                width: double.infinity,
-                child: Padding(
-                  padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
-                  child: Text(
-                    _userProfile.device,
-                    style: TextStyle(
-                      fontSize: AppSizes().getBlockSizeHorizontal(5),
-                      color: StyleSheet().profiletext,
-                    ),
-                  ),
-                )),
+            const SizedBox(height: 20),
+
+            // Edit Profile Button
             CustomTextButton(
               label: "Edit Profile",
               onPressed: () {
@@ -294,67 +138,56 @@ class _ProfileState extends State<Profile> {
                 profileController.language.text = _userProfile.language;
                 profileController.pic.text = _userProfile.pic;
                 showDialog(
-                    context: context,
-                    builder: (context) => EditProfilePopup(
-                        mobileController: profileController.mobile,
-                        addressController: profileController.address,
-                        languageController: profileController.language,
-                        picController: profileController.pic,
-                        onSubmit: () {
-                          onSubmit();
-                          profileController.clear();
-                          Navigator.pop(context);
-                          fetchProfileData();
-                        }));
+                  context: context,
+                  builder: (context) => EditProfilePopup(
+                    mobileController: profileController.mobile,
+                    addressController: profileController.address,
+                    languageController: profileController.language,
+                    picController: profileController.pic,
+                    onSubmit: () {
+                      onSubmit();
+                      profileController.clear();
+                      Navigator.pop(context);
+                      fetchProfileData();
+                    },
+                  ),
+                );
               },
               icon: IconlyLight.edit,
               backgroundColor: StyleSheet().btnBackground,
               textColor: StyleSheet().btnText,
             ),
-            Container(
-                width: double.infinity,
-                color: StyleSheet().uiBackground,
-                child: Padding(
-                  padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
-                  child: Text(
-                    "Emergency Contacts",
-                    style: TextStyle(
-                        fontSize: AppSizes().getBlockSizeHorizontal(4),
-                        color: StyleSheet().profiletext,
-                        fontWeight: FontWeight.bold),
-                  ),
-                )),
-            CustomTextButton(
-                label: "Add",
-                icon: IconlyLight.add_user,
-                backgroundColor: StyleSheet().btnBackground,
-                textColor: StyleSheet().btnText,
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (context) => AddContactPopup(
-                          mobileController: profileController.mobile,
-                          nameController: profileController.name,
-                          onSubmit: () {
-                            onSubmitContact();
-                            profileController.clear();
-                            Navigator.pop(context);
-                            fetchEmergency();
-                          }));
-                }),
-            Column(
-                children: _people.map((person) {
-              return ListItem1(
-                  title: person.name,
-                  icon: IconlyLight.profile,
-                  onPressed: () {
-                    showDialog(
-                        context: context,
-                        builder: (context) =>
-                            ShowContactPopup(profile: person));
-                  });
-            }).toList())
+            const SizedBox(height: 20),
+
+            // Profile Details Section
+            _buildProfileDetail(_userProfile.name),
+            _buildProfileDetail(_userProfile.email),
+            _buildProfileDetail(_userProfile.mobile),
+            _buildProfileDetail(_userProfile.address),
+            _buildProfileDetail(_userProfile.language),
           ],
+        ),
+      ),
+    );
+  }
+
+  // Helper widget for profile details
+  Widget _buildProfileDetail(String text) {
+    return Container(
+      margin: const EdgeInsets.only(top: 10),
+      decoration: BoxDecoration(
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
+        color: StyleSheet().profileBase,
+      ),
+      width: double.infinity,
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 16,
+            color: StyleSheet().profiletext,
+          ),
         ),
       ),
     );
