@@ -4,6 +4,7 @@ import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/pages/app/additional/connect_device_popup.dart';
 import 'package:health_care_web/pages/app/cards/expandable_profile_card.dart';
 import 'package:health_care_web/pages/app/cards/mobile_home_popup.dart';
+import 'package:health_care_web/pages/app/pages/medical_report.dart';
 import 'package:health_care_web/pages/app/services/firestore_db_service.dart';
 import 'package:health_care_web/pages/app/services/real_db_service.dart';
 import 'package:iconly/iconly.dart';
@@ -71,7 +72,50 @@ class _SummaryState extends State<Summary> {
     fetchCurrentPatients();
   }
 
-  Future<void> createReport() async {}
+  Future<ReportModel> fetchAIReport() async {
+    setState(() => isLoading = true);
+    // Fetching ai report
+    final ReportModel reportModel = ReportModel(
+        timestamp: DateTime.now().toIso8601String(),
+        brief: "Brief about the report",
+        description: "Description about the report",
+        aiSuggestions: "Suggestion1\nsuggestion2",
+        avgHeart: "120 bpm",
+        docSuggestions: "docsuggestion1\ndocsuggestion2",
+        graph: "",
+        reportId: "");
+    setState(() {
+      isLoading = false;
+    });
+    return reportModel;
+  }
+
+  Future<void> createReport(UserProfile profile) async {
+    Map<String, dynamic> res = await FirestoreDbService()
+        .fetchAccount(FirebaseAuth.instance.currentUser!.uid);
+
+    final ReportModel reportModel = await fetchAIReport();
+
+    if (res['success']) {
+      final doctor = UserProfile(
+          id: "", name: res['data']['name'], email: res['data']['email']);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => MedicalReport(
+                  profile: profile, doctor: doctor, report: reportModel)));
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(res['error'] ?? 'Unknown error occurred'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      });
+    }
+  }
+
   Future<void> connectDevice(String uid, String device) async {
     setState(() {
       isLoading = true;
@@ -265,7 +309,11 @@ class _SummaryState extends State<Summary> {
                           onAddDevice: () {
                             addDevice(p.id);
                           },
-                          onCreateReport: createReport,
+                          onCreateReport: () {
+                            createReport(
+                              p,
+                            );
+                          },
                           onPending: () {
                             pendingData(p.device);
                           },
