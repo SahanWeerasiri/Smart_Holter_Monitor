@@ -172,4 +172,38 @@ class RealDbService {
       return {'success': false, 'message': 'An error occurred: $e'};
     }
   }
+
+  Future<int> fetchDeviceDataAvg(String device) async {
+    final FirebaseDatabase database = FirebaseDatabase.instance;
+    final ref = database.ref('devices').child(device).child('data');
+
+    try {
+      final snapshot =
+          await ref.get(); // Get a single snapshot instead of listening
+
+      if (snapshot.exists) {
+        final data = snapshot.value as Map<dynamic, dynamic>?;
+        if (data != null && data.isNotEmpty) {
+          // Extract numerical heart rate values (adjust as needed based on your data structure)
+          List<num> heartRates = data.values
+              .whereType<num>()
+              .toList(); //Assuming values are numbers
+
+          if (heartRates.isEmpty)
+            return 0; // Handle case where no numerical values are found.
+
+          // Calculate the average
+          double avgHeartRate =
+              heartRates.reduce((a, b) => a + b) / heartRates.length;
+          return avgHeartRate.round(); // Return as a rounded integer
+        } else {
+          return 0; // Handle the case where data is empty
+        }
+      } else {
+        return 0; // Handle the case where the data doesn't exist
+      }
+    } catch (e) {
+      return 0; // Return 0 or handle the error as appropriate
+    }
+  }
 }

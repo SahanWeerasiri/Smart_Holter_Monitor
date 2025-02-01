@@ -4,7 +4,6 @@ import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/pages/app/additional/connect_device_popup.dart';
 import 'package:health_care_web/pages/app/cards/expandable_profile_card.dart';
 import 'package:health_care_web/pages/app/cards/mobile_home_popup.dart';
-import 'package:health_care_web/pages/app/pages/medical_report.dart';
 import 'package:health_care_web/pages/app/services/firestore_db_service.dart';
 import 'package:health_care_web/pages/app/services/real_db_service.dart';
 import 'package:iconly/iconly.dart';
@@ -91,6 +90,7 @@ class _SummaryState extends State<Summary> {
             docSuggestions: res['data']['doc_suggestions'] ??
                 "docsuggestion1\ndocsuggestion2",
             graph: res['data']['graph'] ?? "",
+            anomalies: res['data']['anomalies'] ?? "anomaly1\nanomaly2",
             isEditing: true,
             docName: res['name'] ?? "",
             docEmail: res['email'] ?? "",
@@ -183,6 +183,8 @@ class _SummaryState extends State<Summary> {
       'doctor': doctor,
       'report': reportModel,
       'reportsList': reports['data'] as List<ReportModel>,
+    }).then((value) {
+      refresh();
     });
   }
 
@@ -214,6 +216,8 @@ class _SummaryState extends State<Summary> {
       'doctor': doctor,
       'report': null,
       'reportsList': reports['data'] as List<ReportModel>,
+    }).then((value) {
+      refresh();
     });
 
     setState(() {

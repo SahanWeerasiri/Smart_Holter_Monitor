@@ -1,3 +1,4 @@
+import 'package:flame/experimental.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
 import 'package:health_care_web/constants/consts.dart';
@@ -63,6 +64,37 @@ class _MedicalReportState extends State<MedicalReport> {
     }
   }
 
+  Future<void> saveDraftReport(String uid) async {
+    // Handle saving logic
+    selectedReport!.aiSuggestions = aiOpinionController.text;
+    selectedReport!.brief = summaryController.text;
+    selectedReport!.description = descriptionController.text;
+    selectedReport!.docSuggestions = suggestionsController.text;
+    selectedReport!.anomalies = anomaliesController.text;
+    selectedReport!.isEditing = false;
+    selectedReport!.graph = "";
+    selectedReport!.timestamp = DateTime.now().toString();
+
+    Map<String, dynamic> res =
+        await FirestoreDbService().saveReportData(uid, selectedReport!);
+    if (res['success']) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(res['message']),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(res['message']),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -86,25 +118,71 @@ class _MedicalReportState extends State<MedicalReport> {
           Expanded(
             flex: 2,
             child: Container(
-              color: Colors.grey[200],
+              color: StyleSheet().uiBackground,
               child: ListView(
                 children: widget.reportsList.isNotEmpty
                     ? widget.reportsList.map((r) {
-                        return ListTile(
-                          leading: Icon(Icons.history),
-                          title: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        return Container(
+                          padding: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                            color: selectedReport != null &&
+                                    selectedReport!.reportId == r.reportId
+                                ? StyleSheet().btnBackground
+                                : StyleSheet().uiBackground,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('${r.brief.substring(0, 15)}...'),
-                              Text(r.timestamp),
+                              Icon(
+                                Icons.history,
+                                color: selectedReport == null ||
+                                        selectedReport!.reportId != r.reportId
+                                    ? StyleSheet().btnBackground
+                                    : StyleSheet().uiBackground,
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${r.brief.length > 15 ? r.brief.substring(0, 15) : r.brief}...',
+                                    style: TextStyle(
+                                      color: selectedReport == null ||
+                                              selectedReport!.reportId !=
+                                                  r.reportId
+                                          ? StyleSheet().btnBackground
+                                          : StyleSheet().uiBackground,
+                                    ),
+                                  ),
+                                  Text(
+                                    r.timestamp,
+                                    style: TextStyle(
+                                      color: selectedReport == null ||
+                                              selectedReport!.reportId !=
+                                                  r.reportId
+                                          ? StyleSheet().btnBackground
+                                          : StyleSheet().uiBackground,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      selectedReport = r;
+                                    });
+                                  },
+                                  icon: Icon(
+                                    Icons.check,
+                                    color: selectedReport == null ||
+                                            selectedReport!.reportId !=
+                                                r.reportId
+                                        ? StyleSheet().btnBackground
+                                        : StyleSheet().uiBackground,
+                                  ))
                             ],
                           ),
-                          onTap: () {
-                            setState(() {
-                              selectedReport = r;
-                            });
-                          },
                         );
                       }).toList()
                     : [Text("No reports available")],
@@ -146,14 +224,28 @@ class _MedicalReportState extends State<MedicalReport> {
                             title: "AI Second Opinion",
                             inputType: "numbered",
                             controller: aiOpinionController),
-                        CustomButton(
-                          label: "Save Report",
-                          onPressed: () async {
-                            await saveReport(widget.profile.id);
-                          },
-                          backgroundColor: StyleSheet().btnBackground,
-                          textColor: StyleSheet().btnText,
-                          icon: Icons.save,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            CustomButton(
+                              label: "Save Report",
+                              onPressed: () async {
+                                await saveReport(widget.profile.id);
+                              },
+                              backgroundColor: StyleSheet().btnBackground,
+                              textColor: StyleSheet().btnText,
+                              icon: Icons.save,
+                            ),
+                            CustomButton(
+                              label: "Save Darft",
+                              onPressed: () async {
+                                await saveDraftReport(widget.profile.id);
+                              },
+                              backgroundColor: StyleSheet().btnBackground,
+                              textColor: StyleSheet().btnText,
+                              icon: Icons.save,
+                            ),
+                          ],
                         )
                       ]
                     : selectedReport != null && !selectedReport!.isEditing

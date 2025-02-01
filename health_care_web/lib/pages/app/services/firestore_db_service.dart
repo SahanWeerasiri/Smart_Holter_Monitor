@@ -329,6 +329,7 @@ class FirestoreDbService {
       String uid, String device) async {
     try {
       // Fetch the document snapshot
+      final int avgHeart = await RealDbService().fetchDeviceDataAvg(device);
       Map<String, dynamic> res =
           await RealDbService().transferDeviceData(device);
       if (res['success']) {
@@ -336,8 +337,9 @@ class FirestoreDbService {
             await usersCollection.doc(uid).get();
         await usersCollection.doc(uid).collection("data").add({
           'device': device,
-          'timestamp': DateTime.now(),
+          'timestamp': DateTime.now().toString(),
           'data': res['data'],
+          'avg_heart': avgHeart.toString(),
           'doc_id': sns.get('doctor_id'),
         });
 
@@ -373,7 +375,7 @@ class FirestoreDbService {
       if (snapshot.docs.isNotEmpty) {
         final DocumentSnapshot<Map<String, dynamic>> doc = snapshot.docs.first;
         final data = doc.data();
-        if (data!.keys.contains('doc_id')) {
+        if (data!.keys.contains('doc_id') && !data.keys.contains('doc_name')) {
           final DocumentSnapshot<Object?> sns =
               await doctorCollection.doc(doc.get('doc_id').toString()).get();
           return {
@@ -388,6 +390,8 @@ class FirestoreDbService {
             'success': true,
             'data': data,
             'data_id': doc.id,
+            'name': data['doc_name'] ?? "",
+            'email': data['doc_email'] ?? "",
           };
         }
       } else {
@@ -413,7 +417,7 @@ class FirestoreDbService {
         'avg_heart': report.avgHeart,
         'graph': report.graph,
         'anomalies': report.anomalies,
-        'timestamp': DateTime.now(),
+        'timestamp': DateTime.now().toString(),
         'doc_id': report.reportId,
         'doc_name': report.docName,
         'doc_email': report.docEmail,
