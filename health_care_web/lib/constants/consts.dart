@@ -200,6 +200,7 @@ class ReportModel {
   final String avgHeart;
   final String graph;
   final String reportId;
+  final String anomalies;
   ReportModel(
       {required this.timestamp,
       required this.brief,
@@ -208,7 +209,8 @@ class ReportModel {
       required this.avgHeart,
       required this.docSuggestions,
       required this.graph,
-      required this.reportId});
+      required this.reportId,
+      this.anomalies = ""});
 }
 
 class ContactProfile {
