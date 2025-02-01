@@ -5,6 +5,7 @@ import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/pages/app/before_login_page.dart';
 import 'package:health_care_web/pages/app/home.dart';
 import 'package:health_care_web/pages/app/login_page.dart';
+import 'package:health_care_web/pages/app/pages/medical_report.dart';
 import 'package:health_care_web/pages/app/signup_page.dart';
 // import 'package:health_care_web/pages/app/splash.dart';
 
@@ -50,6 +51,15 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => const SignupPage(),
         '/before_login': (context) => const BeforeLoginPage(),
         '/home': (context) => const Home(),
+        '/medical_report': (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as Map;
+          return MedicalReport(
+            profile: args['profile'],
+            doctor: args['doctor'],
+            report: args['report'],
+            reportsList: args['reportsList'],
+          );
+        },
       },
     );
   }
