@@ -13,6 +13,7 @@ class ExpandableProfileCard extends StatefulWidget {
   final bool isDone;
   final List<ContactProfile> contactProfiles;
   final VoidCallback onCreateReport;
+  final VoidCallback onViewReport;
   final VoidCallback onRemoveDevice;
   final VoidCallback onAddDevice;
   final VoidCallback onPending;
@@ -30,6 +31,7 @@ class ExpandableProfileCard extends StatefulWidget {
     required this.onRemoveDevice,
     required this.onAddDevice,
     required this.onPending,
+    required this.onViewReport,
     required this.contactProfiles,
   });
 
@@ -93,7 +95,7 @@ class _ExpandableProfileCardState extends State<ExpandableProfileCard> {
                   setState(() {
                     _isExpanded = !_isExpanded;
                     if (_isExpanded) {
-                      _cardHeight = 240;
+                      _cardHeight = 260;
                     } else {
                       _cardHeight = 70;
                     }
@@ -127,6 +129,15 @@ class _ExpandableProfileCardState extends State<ExpandableProfileCard> {
                             textColor: StyleSheet().btnText,
                             onPressed: () {
                               showContacts();
+                            }),
+                        const SizedBox(height: 4),
+                        CustomButton(
+                            label: "View Reports",
+                            icon: Icons.history,
+                            backgroundColor: StyleSheet().btnBackground,
+                            textColor: StyleSheet().btnText,
+                            onPressed: () {
+                              widget.onViewReport();
                             })
                       ],
                     ),

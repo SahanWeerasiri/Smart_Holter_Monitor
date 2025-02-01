@@ -4,7 +4,6 @@ import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/pages/app/additional/connect_device_popup.dart';
 import 'package:health_care_web/pages/app/cards/expandable_profile_card.dart';
 import 'package:health_care_web/pages/app/cards/mobile_home_popup.dart';
-import 'package:health_care_web/pages/app/pages/medical_report.dart';
 import 'package:health_care_web/pages/app/services/firestore_db_service.dart';
 import 'package:health_care_web/pages/app/services/real_db_service.dart';
 import 'package:iconly/iconly.dart';
@@ -72,39 +71,72 @@ class _SummaryState extends State<Summary> {
     fetchCurrentPatients();
   }
 
-  Future<ReportModel> fetchAIReport() async {
-    setState(() => isLoading = true);
+  Future<ReportModel?> fetchAIReport(String uid) async {
     // Fetching ai report
-    final ReportModel reportModel = ReportModel(
-        timestamp: DateTime.now().toIso8601String(),
-        brief: "Brief about the report",
-        description: "Description about the report",
-        aiSuggestions: "Suggestion1\nsuggestion2",
-        avgHeart: "120 bpm",
-        docSuggestions: "docsuggestion1\ndocsuggestion2",
-        graph: "",
-        reportId: "");
-    setState(() {
-      isLoading = false;
-    });
-    return reportModel;
+
+    try {
+      Map<String, dynamic> res =
+          await FirestoreDbService().getLatestDeviceReadings(uid);
+
+      if (res['success']) {
+        final ReportModel reportModel = ReportModel(
+            timestamp: res['data']['timestamp'].toString(),
+            brief: res['data']['brief'] ?? "Brief about the report",
+            description:
+                res['data']['description'] ?? "Description about the report",
+            aiSuggestions:
+                res['data']['ai_suggestions'] ?? "Suggestion1\nsuggestion2",
+            avgHeart: res['data']['avg_heart'] ?? "120 bpm",
+            docSuggestions: res['data']['doc_suggestions'] ??
+                "docsuggestion1\ndocsuggestion2",
+            graph: res['data']['graph'] ?? "",
+            anomalies: res['data']['anomalies'] ?? "anomaly1\nanomaly2",
+            isEditing: true,
+            docName: res['name'] ?? "",
+            docEmail: res['email'] ?? "",
+            reportId: res['data_id']);
+        return reportModel;
+      } else {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(res['error'] ?? 'Unknown error occurred'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        });
+        return null;
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occurred: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return null;
+    }
   }
 
   Future<void> createReport(UserProfile profile) async {
+    setState(() {
+      isLoading = true;
+    });
     Map<String, dynamic> res = await FirestoreDbService()
         .fetchAccount(FirebaseAuth.instance.currentUser!.uid);
 
-    final ReportModel reportModel = await fetchAIReport();
+    final ReportModel? reportModel = await fetchAIReport(profile.id);
+    final Map<String, dynamic> reports =
+        await FirestoreDbService().fetchReports(profile.id);
 
-    if (res['success']) {
-      final doctor = UserProfile(
-          id: "", name: res['data']['name'], email: res['data']['email']);
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => MedicalReport(
-                  profile: profile, doctor: doctor, report: reportModel)));
-    } else {
+    if (reportModel == null) {
+      setState(() {
+        isLoading = false;
+      });
+      return;
+    }
+
+    if (!res['success']) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -113,7 +145,84 @@ class _SummaryState extends State<Summary> {
           ),
         );
       });
+      setState(() {
+        isLoading = false;
+      });
+      return;
     }
+
+    if (!reports['success']) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(reports['error'] ?? 'Unknown error occurred'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      });
+      setState(() {
+        isLoading = false;
+      });
+      return;
+    }
+
+    final doctor = UserProfile(
+      id: "",
+      name: reportModel.docName.isEmpty
+          ? res['data']['name']
+          : reportModel.docName,
+      email: reportModel.docEmail.isEmpty
+          ? res['data']['email']
+          : reportModel.docEmail,
+    );
+    setState(() {
+      isLoading = false;
+    });
+    Navigator.pushNamed(context, '/medical_report', arguments: {
+      'profile': profile,
+      'doctor': doctor,
+      'report': reportModel,
+      'reportsList': reports['data'] as List<ReportModel>,
+    }).then((value) {
+      refresh();
+    });
+  }
+
+  Future<void> viewReports(UserProfile profile) async {
+    setState(() {
+      isLoading = true;
+    });
+    final Map<String, dynamic> reports =
+        await FirestoreDbService().fetchReports(profile.id);
+
+    if (!reports['success']) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(reports['error'] ?? 'Unknown error occurred'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      });
+      setState(() {
+        isLoading = false;
+      });
+      return;
+    }
+
+    final doctor = UserProfile(id: "", name: "", email: "");
+    Navigator.pushNamed(context, '/medical_report', arguments: {
+      'profile': profile,
+      'doctor': doctor,
+      'report': null,
+      'reportsList': reports['data'] as List<ReportModel>,
+    }).then((value) {
+      refresh();
+    });
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   Future<void> connectDevice(String uid, String device) async {
@@ -306,6 +415,9 @@ class _SummaryState extends State<Summary> {
                           device: p.device,
                           isDone: p.isDone,
                           contactProfiles: p.contacts,
+                          onViewReport: () {
+                            viewReports(p);
+                          },
                           onAddDevice: () {
                             addDevice(p.id);
                           },

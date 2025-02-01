@@ -192,15 +192,19 @@ class UserProfile {
 }
 
 class ReportModel {
-  final String timestamp;
-  final String description;
-  final String brief;
-  final String docSuggestions;
-  final String aiSuggestions;
-  final String avgHeart;
-  final String graph;
-  final String reportId;
-  final String anomalies;
+  String timestamp;
+  String description;
+  String brief;
+  String docSuggestions;
+  String aiSuggestions;
+  String avgHeart;
+  String graph;
+  String reportId;
+  String anomalies;
+  bool isEditing;
+  String docName;
+  String docEmail;
+
   ReportModel(
       {required this.timestamp,
       required this.brief,
@@ -210,6 +214,9 @@ class ReportModel {
       required this.docSuggestions,
       required this.graph,
       required this.reportId,
+      required this.isEditing,
+      required this.docName,
+      required this.docEmail,
       this.anomalies = ""});
 }
 
