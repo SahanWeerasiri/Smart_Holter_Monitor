@@ -165,6 +165,7 @@ class DrawerItems {
 class UserProfile {
   String id;
   String name;
+  String age;
   String email;
   String pic;
   String address;
@@ -178,6 +179,7 @@ class UserProfile {
   UserProfile({
     required this.id,
     required this.name,
+    this.age = "0",
     required this.email,
     this.pic = "",
     this.address = "",
@@ -204,6 +206,7 @@ class ReportModel {
   bool isEditing;
   String docName;
   String docEmail;
+  String age;
 
   ReportModel(
       {required this.timestamp,
@@ -216,6 +219,7 @@ class ReportModel {
       required this.reportId,
       required this.isEditing,
       required this.docName,
+      required this.age,
       required this.docEmail,
       this.anomalies = ""});
 }

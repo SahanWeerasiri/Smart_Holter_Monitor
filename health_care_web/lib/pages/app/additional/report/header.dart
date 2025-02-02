@@ -5,7 +5,7 @@ class MedicalReportHeader extends StatelessWidget {
   final String doctorName;
   final String doctorSpecialization;
   final String patientName;
-  final int patientAge;
+  final String patientAge;
   final String patientId;
   final DateTime reportDate;
   final String avgHeartRate;
