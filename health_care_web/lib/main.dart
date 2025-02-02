@@ -8,7 +8,7 @@ import 'package:health_care_web/pages/app/login_page.dart';
 import 'package:health_care_web/pages/app/pages/medical_report.dart';
 import 'package:health_care_web/pages/app/signup_page.dart';
 // import 'package:health_care_web/pages/app/splash.dart';
-
+//
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Load the .env file
