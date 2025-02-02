@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flame/extensions.dart';
 import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/pages/app/services/real_db_service.dart';
+import 'package:health_care_web/pages/app/services/util.dart';
 
 class FirestoreDbService {
   final CollectionReference usersCollection =
@@ -83,6 +84,7 @@ class FirestoreDbService {
           name: patientData['name'],
           email: patientData['email'],
           pic: patientData['pic'],
+          age: getAge(patientData['birthday']),
           doctorId: patientData['doctor_id'],
           address: patientData['address'],
           mobile: patientData['mobile'],
@@ -117,6 +119,7 @@ class FirestoreDbService {
             name: patientData['name'],
             email: patientData['email'],
             pic: patientData['pic'],
+            age: getAge(patientData['birthday']),
             doctorId: patientData['doctor_id'],
             address: patientData['address'],
             mobile: patientData['mobile'],
@@ -257,6 +260,7 @@ class FirestoreDbService {
               docSuggestions: doc.get("suggestions"),
               description: doc.get("description"),
               graph: doc.get("graph"),
+              age: doc.get('age') ?? "",
               anomalies: doc.get("anomalies"),
               isEditing: false,
               docName: doc.get('doc_name'),
@@ -272,6 +276,7 @@ class FirestoreDbService {
             description: "",
             graph: "",
             anomalies: "",
+            age: "",
             docName: "",
             docEmail: "",
             isEditing: false,
@@ -341,6 +346,7 @@ class FirestoreDbService {
           'data': res['data'],
           'avg_heart': avgHeart.toString(),
           'doc_id': sns.get('doctor_id'),
+          'age': getAge(sns.get('birthday')),
         });
 
         Map<String, dynamic> res2 =

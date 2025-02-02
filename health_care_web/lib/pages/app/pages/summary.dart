@@ -92,6 +92,7 @@ class _SummaryState extends State<Summary> {
             graph: res['data']['graph'] ?? "",
             anomalies: res['data']['anomalies'] ?? "anomaly1\nanomaly2",
             isEditing: true,
+            age: res['data']['age'],
             docName: res['name'] ?? "",
             docEmail: res['email'] ?? "",
             reportId: res['data_id']);
@@ -174,6 +175,7 @@ class _SummaryState extends State<Summary> {
       email: reportModel.docEmail.isEmpty
           ? res['data']['email']
           : reportModel.docEmail,
+      age: "0",
     );
     setState(() {
       isLoading = false;
@@ -210,7 +212,7 @@ class _SummaryState extends State<Summary> {
       return;
     }
 
-    final doctor = UserProfile(id: "", name: "", email: "");
+    final doctor = UserProfile(id: "", name: "", email: "", age: "");
     Navigator.pushNamed(context, '/medical_report', arguments: {
       'profile': profile,
       'doctor': doctor,
