@@ -12,7 +12,8 @@ class FirestoreDbService {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<Map<String, dynamic>> createAccount(String name, String email) async {
+  Future<Map<String, dynamic>> createAccount(
+      String name, String email, String birthday) async {
     try {
       // Example data for the account
       final accountData = {
@@ -26,7 +27,8 @@ class FirestoreDbService {
         'device': 'Device',
         'color': 'Color',
         'pic': '',
-        'doctor_id': ''
+        'doctor_id': '',
+        'birthday': birthday,
       };
 
       // Store data in the database

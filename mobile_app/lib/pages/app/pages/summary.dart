@@ -17,8 +17,10 @@ class Summary extends StatefulWidget {
 }
 
 class _SummaryState extends State<Summary> {
-  final UserProfile _userProfile = UserProfile(name: "Name", email: "Email");
-  final UserProfile doctorProfile = UserProfile(name: "Name", email: "Email");
+  final UserProfile _userProfile =
+      UserProfile(name: "Name", email: "Email", birthday: "Birthday");
+  final UserProfile doctorProfile =
+      UserProfile(name: "Name", email: "Email", birthday: "Birthday");
   bool isLoading = true;
   int currentHeartRate = 0;
   num avgHeartRate = 0.0;
@@ -46,6 +48,7 @@ class _SummaryState extends State<Summary> {
         _userProfile.language = res['data']['language'];
         _userProfile.mobile = res['data']['mobile'];
         _userProfile.pic = res['data']['pic'];
+        _userProfile.birthday = res['data']['birthday'] ?? "";
         _userProfile.doctorId = res['data']['doctor_id'];
       });
       if (res['data']['device'] != "Device") {

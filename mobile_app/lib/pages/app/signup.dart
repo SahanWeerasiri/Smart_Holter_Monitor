@@ -18,6 +18,7 @@ class _SignupState extends State<Signup> {
   late final TextStyle textStyleHeading;
   late final TextStyle textStyleTextInputTopic;
   late final TextStyle textStyleInputField;
+  String birthday = "";
   String msg = "";
 
   @override
@@ -62,11 +63,19 @@ class _SignupState extends State<Signup> {
       return false;
     }
 
+    if (birthday == "") {
+      setState(() {
+        msg = "Select your birthday";
+      });
+      return false;
+    }
+
     AuthService auth = AuthService();
     Map<String, dynamic> result = await auth.createUserWithEmailAndPassword(
         credentialController.name,
         credentialController.username,
-        credentialController.password);
+        credentialController.password,
+        birthday);
     if (result["status"] == "error") {
       setState(() {
         msg = result["message"];
@@ -226,6 +235,40 @@ class _SignupState extends State<Signup> {
                     focusedBorderColor: StyleSheet().enableBorder,
                     isPassword: true,
                     typeKey: CustomTextInputTypes().confirmPassword),
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(5),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text("Birth Day : $birthday",
+                        style: textStyleTextInputTopic)
+                  ],
+                ),
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(2),
+                ),
+                CustomTextButton(
+                  label: "Set Birth Day",
+                  onPressed: () async {
+                    DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(1900),
+                      lastDate: DateTime.now(),
+                    );
+
+                    if (pickedDate != null) {
+                      setState(() {
+                        birthday =
+                            "${pickedDate.year}-${pickedDate.month}-${pickedDate.day}";
+                      });
+                    }
+                  },
+                  backgroundColor: StyleSheet().btnBackground,
+                  textColor: StyleSheet().btnText,
+                  icon: Icons.calendar_month,
+                ),
                 SizedBox(
                   height: AppSizes().getBlockSizeVertical(5),
                 ),

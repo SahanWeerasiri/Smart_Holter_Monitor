@@ -160,6 +160,7 @@ class UserProfile {
   String language;
   String device;
   String doctorId;
+  String birthday;
   UserProfile({
     required this.name,
     required this.email,
@@ -171,6 +172,7 @@ class UserProfile {
     this.isDone = false,
     this.language = "",
     this.doctorId = "",
+    required this.birthday,
   });
 }
 

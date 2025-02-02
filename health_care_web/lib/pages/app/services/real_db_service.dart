@@ -189,8 +189,9 @@ class RealDbService {
               .whereType<num>()
               .toList(); //Assuming values are numbers
 
-          if (heartRates.isEmpty)
+          if (heartRates.isEmpty) {
             return 0; // Handle case where no numerical values are found.
+          }
 
           // Calculate the average
           double avgHeartRate =

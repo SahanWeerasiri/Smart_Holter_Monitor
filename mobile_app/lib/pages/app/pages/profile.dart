@@ -23,7 +23,11 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  final UserProfile _userProfile = UserProfile(name: "Name", email: "Email");
+  final UserProfile _userProfile = UserProfile(
+    name: "Name",
+    email: "Email",
+    birthday: "Birthday",
+  );
   final List<ContactProfile> _people = [];
   late final CredentialController credentialController = CredentialController();
   late final ProfileController profileController = ProfileController();
@@ -53,6 +57,7 @@ class _ProfileState extends State<Profile> {
         _userProfile.language = res['data']['language'];
         _userProfile.mobile = res['data']['mobile'];
         _userProfile.pic = res['data']['pic'];
+        _userProfile.birthday = res['data']['birthday'] ?? "";
         _userProfile.doctorId = res['data']['doctor_id'];
       });
     } else {
@@ -232,6 +237,22 @@ class _ProfileState extends State<Profile> {
                   padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
                   child: Text(
                     _userProfile.mobile,
+                    style: TextStyle(
+                      fontSize: AppSizes().getBlockSizeHorizontal(5),
+                      color: StyleSheet().profiletext,
+                    ),
+                  ),
+                )),
+            Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: StyleSheet().profileBase,
+                ),
+                width: double.infinity,
+                child: Padding(
+                  padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
+                  child: Text(
+                    _userProfile.birthday,
                     style: TextStyle(
                       fontSize: AppSizes().getBlockSizeHorizontal(5),
                       color: StyleSheet().profiletext,
