@@ -3,19 +3,19 @@ import 'package:health_care_web/components/buttons/custom_button_1/custom_button
 import 'package:health_care_web/components/dropdown/CustomDropDown.dart';
 import 'package:health_care_web/constants/consts.dart';
 
-typedef DeviceSubmitCallback = void Function(String code);
+typedef DeviceSubmitCallback = void Function(UserProfile? profile);
 
 class ConnectDevicePatientPopup extends StatefulWidget {
   final String id;
-  final List<String> patient;
+  final List<UserProfile> profiles;
   final DeviceSubmitCallback onSubmit;
   final VoidCallback onClose;
 
   const ConnectDevicePatientPopup(
       {super.key,
       required this.id,
-      required this.patient,
       required this.onSubmit,
+      required this.profiles,
       required this.onClose});
   @override
   State<StatefulWidget> createState() => _StateConnectDevicePatientPopup();
@@ -23,6 +23,7 @@ class ConnectDevicePatientPopup extends StatefulWidget {
 
 class _StateConnectDevicePatientPopup extends State<ConnectDevicePatientPopup> {
   String device = "";
+  UserProfile? selectedPatient;
 
   @override
   Widget build(BuildContext context) {
@@ -44,10 +45,13 @@ class _StateConnectDevicePatientPopup extends State<ConnectDevicePatientPopup> {
           children: [
             CustomDropdown(
                 label: "Select a patient",
-                options: widget.patient,
+                options:
+                    widget.profiles.map((e) => ('${e.name}\n${e.id}')).toList(),
                 onChanged: (value) {
                   setState(() {
-                    device = value;
+                    device = value.split('\n')[1].trim();
+                    selectedPatient = widget.profiles
+                        .firstWhere((element) => element.id == device);
                   });
                 })
           ],
@@ -70,7 +74,7 @@ class _StateConnectDevicePatientPopup extends State<ConnectDevicePatientPopup> {
         ),
         CustomButton(
           label: "Add",
-          onPressed: () => widget.onSubmit(device),
+          onPressed: () => widget.onSubmit(selectedPatient),
           backgroundColor: StyleSheet().btnBackground,
           textColor: StyleSheet().btnText,
           icon: Icons.add,

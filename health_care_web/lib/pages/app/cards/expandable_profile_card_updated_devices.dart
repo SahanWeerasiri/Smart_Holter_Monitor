@@ -28,7 +28,7 @@ class _ExpandableProfileCardUpdatedDevicesState
     extends State<ExpandableProfileCardUpdatedDevices> {
   bool _isExpanded = false;
   bool isLoading = false;
-  List<String> patient = [];
+  List<UserProfile> patients = [];
   double _cardHeight = 70;
   final List<Color> _stateColors = [
     StyleSheet().availableDevices,
@@ -36,7 +36,7 @@ class _ExpandableProfileCardUpdatedDevicesState
     StyleSheet().pendingDevices,
   ];
 
-  Future<void> showPatients(device) async {
+  Future<void> showPatients(String device, String detail) async {
     setState(() {
       isLoading = true;
     });
@@ -52,18 +52,30 @@ class _ExpandableProfileCardUpdatedDevicesState
           context: context,
           builder: (context) => ConnectDevicePatientPopup(
                 id: device,
-                onSubmit: (uid) {
+                profiles: patients,
+                onSubmit: (userProfile) async {
                   setState(() {
                     isLoading = true;
                   });
-                  RealDbService().connectDeviceData(device);
-                  FirestoreDbService().addDeviceToPatient(uid, device);
+                  if (userProfile == null) {
+                    setState(() {
+                      isLoading = false;
+                    });
+                    return;
+                  }
+                  await RealDbService().connectDeviceData(
+                    userProfile.id,
+                    "Assigned to: ${userProfile.name}\nmobile: ${userProfile.mobile}\nemail: ${userProfile.email}\n$detail",
+                  );
+                  await FirestoreDbService().addDeviceToPatient(
+                    userProfile.id,
+                    device,
+                  );
                   setState(() {
                     isLoading = false;
                   });
                   Navigator.pop(context);
                 },
-                patient: patient,
                 onClose: () {
                   RealDbService().disconnectDevicePending(device);
                 },
@@ -76,15 +88,13 @@ class _ExpandableProfileCardUpdatedDevicesState
 
   Future<void> fetchPatients() async {
     setState(() {
-      patient = [];
+      patients = [];
     });
     Map<String, dynamic> res = await FirestoreDbService().fetchPatient();
     if (res['success']) {
       final pl = res['data'] as List<UserProfile>;
       setState(() {
-        for (UserProfile element in pl) {
-          patient.add(element.id);
-        }
+        patients = pl;
       });
     } else {
       ScaffoldMessenger.of(context)
@@ -129,7 +139,7 @@ class _ExpandableProfileCardUpdatedDevicesState
                     textColor: StyleSheet().uiBackground,
                     backgroundColor: StyleSheet().btnBackground,
                     onPressed: () {
-                      showPatients(widget.code);
+                      showPatients(widget.code, widget.detail);
                     },
                   ),
               ]),

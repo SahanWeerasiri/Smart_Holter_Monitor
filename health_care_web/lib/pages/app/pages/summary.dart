@@ -225,34 +225,6 @@ class _SummaryState extends State<Summary> {
     });
   }
 
-  Future<void> connectDevice(String uid, String device) async {
-    setState(() {
-      isLoading = true;
-    });
-    Map<String, dynamic> res =
-        await FirestoreDbService().addDeviceToPatient(uid, device);
-    if (res['success']) {
-      refresh();
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(res['message']),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(res['error'] ?? 'Unknown error occurred'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-    setState(() {
-      isLoading = false;
-    });
-  }
-
   Future<void> removeDevice(String uid, String deviceId) async {
     setState(() {
       isLoading = true;

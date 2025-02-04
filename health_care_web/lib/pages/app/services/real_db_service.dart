@@ -163,10 +163,14 @@ class RealDbService {
     }
   }
 
-  Future<Map<String, dynamic>> connectDeviceData(String code) async {
+  Future<Map<String, dynamic>> connectDeviceData(
+      String code, String other) async {
     try {
       // Check if the ref already exists
-      await _database.ref('devices').child(code).update({'assigned': 1});
+      await _database
+          .ref('devices')
+          .child(code)
+          .update({'assigned': 1, 'other': other});
       return {'success': true, 'data': 'Device is connected successfully'};
     } catch (e) {
       // Handle any errors during the operation
