@@ -106,11 +106,11 @@ class _LoginCardState extends State<LoginCard> {
     Navigator.pushNamed(context, '/home');
   }
 
-  void navigateToSignup() {
+  void navigateToAdmin() {
     setState(() {
       credentialController.clear();
     });
-    Navigator.pushNamed(context, '/signup');
+    Navigator.pushNamed(context, '/admin_dashboard');
   }
 
   void onDropDownSelected(value) {
@@ -200,7 +200,7 @@ class _LoginCardState extends State<LoginCard> {
                         credentialController.clear();
                       });
                       if (role == "Admin") {
-                        navigateToSignup();
+                        navigateToAdmin();
                       } else {
                         navigateToHome();
                       }
@@ -216,16 +216,16 @@ class _LoginCardState extends State<LoginCard> {
                   label: "Test",
                   onPressed: () async {
                     setState(() {
-                      credentialController.username = "doctor@smartcare.com";
-                      credentialController.password = "doctor123";
-                      role = "Doctor";
+                      credentialController.username = "admin@smartcare.com";
+                      credentialController.password = "admin123";
+                      role = "Admin";
                     });
                     if (await checkCredentials()) {
                       setState(() {
                         credentialController.clear();
                       });
                       if (role == "Admin") {
-                        navigateToSignup();
+                        navigateToAdmin();
                       } else {
                         navigateToHome();
                       }

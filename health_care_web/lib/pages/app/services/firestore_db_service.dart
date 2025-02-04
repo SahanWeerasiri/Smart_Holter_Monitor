@@ -448,6 +448,7 @@ class FirestoreDbService {
         'graph': report.graph,
         'anomalies': report.anomalies,
         'is_seen': false,
+        'age': report.age,
         'doc_id': report.reportId,
         'doc_name': report.docName,
         'doc_email': report.docEmail,

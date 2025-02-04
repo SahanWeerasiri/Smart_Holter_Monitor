@@ -52,7 +52,7 @@ class RealDbService {
       for (final child in dataSnapshot.children) {
         final device = child.key;
         final other = child.child('other').value as String;
-        final state = child.child('assigned').value as bool;
+        final state = child.child('assigned').value as int;
         devices.add(DeviceProfile(
             code: device.toString(), detail: other.toString(), state: state));
       }
@@ -80,7 +80,7 @@ class RealDbService {
       for (final child in dataSnapshot.children) {
         final device = child.key.toString();
         final other = child.child('other').value as String;
-        final state = child.child('assigned').value as bool;
+        final state = child.child('assigned').value as int;
         if (device.toLowerCase().contains(name)) {
           devices.add(DeviceProfile(
               code: device.toString(), detail: other.toString(), state: state));
@@ -112,7 +112,7 @@ class RealDbService {
         // If the device does not exist, add the data
         await ref.set({
           'other': other,
-          'assigned': false,
+          'assigned': 0,
         });
         return {'success': true, 'message': 'Device added successfully.'};
       }
@@ -165,8 +165,30 @@ class RealDbService {
   Future<Map<String, dynamic>> connectDeviceData(String code) async {
     try {
       // Check if the ref already exists
-      await _database.ref('devices').child(code).update({'assigned': true});
+      await _database.ref('devices').child(code).update({'assigned': 1});
       return {'success': true, 'data': 'Device is connected successfully'};
+    } catch (e) {
+      // Handle any errors during the operation
+      return {'success': false, 'message': 'An error occurred: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> connectDevicePending(String code) async {
+    try {
+      // Check if the ref already exists
+      await _database.ref('devices').child(code).update({'assigned': 2});
+      return {'success': true, 'data': 'Device is in pending state'};
+    } catch (e) {
+      // Handle any errors during the operation
+      return {'success': false, 'message': 'An error occurred: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> disconnectDevicePending(String code) async {
+    try {
+      // Check if the ref already exists
+      await _database.ref('devices').child(code).update({'assigned': 0});
+      return {'success': true, 'data': 'Device is in pending state'};
     } catch (e) {
       // Handle any errors during the operation
       return {'success': false, 'message': 'An error occurred: $e'};
