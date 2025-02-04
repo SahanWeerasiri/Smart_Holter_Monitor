@@ -1,11 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care_web/constants/consts.dart';
-import 'package:health_care_web/pages/app/additional/connect_device_popup.dart';
 import 'package:health_care_web/pages/app/cards/expandable_profile_card.dart';
 import 'package:health_care_web/pages/app/cards/mobile_home_popup.dart';
 import 'package:health_care_web/pages/app/services/firestore_db_service.dart';
-import 'package:health_care_web/pages/app/services/real_db_service.dart';
 import 'package:iconly/iconly.dart';
 
 class Summary extends StatefulWidget {
