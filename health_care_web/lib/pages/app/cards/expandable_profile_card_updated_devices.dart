@@ -8,6 +8,7 @@ import 'package:health_care_web/pages/app/services/real_db_service.dart';
 class ExpandableProfileCardUpdatedDevices extends StatefulWidget {
   final String code;
   final String detail;
+  final String deadline;
   final int state;
   final VoidCallback onRemove;
 
@@ -15,6 +16,7 @@ class ExpandableProfileCardUpdatedDevices extends StatefulWidget {
     super.key,
     required this.code,
     required this.detail,
+    required this.deadline,
     required this.onRemove,
     this.state = 0,
   });
@@ -172,6 +174,9 @@ class _ExpandableProfileCardUpdatedDevicesState
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        widget.deadline.isNotEmpty
+                            ? Text("Deadline: ${widget.deadline}")
+                            : const Text("No Deadline"),
                         Text(widget.detail),
                         const SizedBox(height: 4),
                         // widget.myId == widget.docId

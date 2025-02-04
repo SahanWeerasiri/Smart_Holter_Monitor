@@ -54,7 +54,9 @@ class RealDbService {
         final other = child.child('other').value as String;
         final useData = child.child('use').value as String;
         final state = child.child('assigned').value as int;
+        final deadline = child.child('deadline').value as String;
         devices.add(DeviceProfile(
+            deadline: deadline.toString(),
             code: device.toString(),
             detail: other.toString(),
             state: state,
@@ -86,12 +88,14 @@ class RealDbService {
         final other = child.child('other').value as String;
         final useData = child.child('use').value as String;
         final state = child.child('assigned').value as int;
+        final deadline = child.child('deadline').value as String;
         if (device.toLowerCase().contains(name)) {
           devices.add(DeviceProfile(
               code: device.toString(),
               detail: other.toString(),
               state: state,
-              use: useData.toString()));
+              use: useData.toString(),
+              deadline: deadline.toString()));
         }
       }
 
@@ -122,6 +126,7 @@ class RealDbService {
           'other': other,
           'assigned': 0,
           'is_done': false,
+          'deadline': "",
         });
         return {'success': true, 'message': 'Device added successfully.'};
       }
@@ -178,10 +183,11 @@ class RealDbService {
       String code, String other) async {
     try {
       // Check if the ref already exists
-      await _database
-          .ref('devices')
-          .child(code)
-          .update({'assigned': 1, 'use': other});
+      await _database.ref('devices').child(code).update({
+        'assigned': 1,
+        'use': other,
+        'deadline': (DateTime.now().add(Duration(hours: period))).toString()
+      });
       return {'success': true, 'data': 'Device is connected successfully'};
     } catch (e) {
       // Handle any errors during the operation

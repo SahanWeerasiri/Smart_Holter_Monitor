@@ -88,10 +88,12 @@ class _DeviceAssignmentSectionState extends State<DeviceAssignmentSection> {
               if (value is Map) {
                 final other = (value)['other'] as String?;
                 final state = (value)['assigned'] as int?;
+                final deadline = (value)['deadline'] as String?;
                 final useData = (value)['use'] as String?;
 
                 if (other != null && state != null) {
                   devices.add(DeviceProfile(
+                      deadline: deadline.toString(),
                       code: key,
                       detail: other,
                       state: state,
@@ -162,6 +164,7 @@ class _DeviceAssignmentSectionState extends State<DeviceAssignmentSection> {
                 final state = (v)['assigned'] as int?;
                 final code = key;
                 final useData = (v)['use'] as String?;
+                final deadline = (v)['deadline'] as String?;
 
                 if (other != null && state != null) {
                   if (code
@@ -171,6 +174,7 @@ class _DeviceAssignmentSectionState extends State<DeviceAssignmentSection> {
                     devices.add(DeviceProfile(
                         code: key,
                         detail: other,
+                        deadline: deadline.toString(),
                         state: state,
                         use: useData.toString()));
                   }
@@ -334,6 +338,7 @@ class _DeviceAssignmentSectionState extends State<DeviceAssignmentSection> {
                       code: p.code,
                       detail: "${p.use}\n${p.detail}",
                       onRemove: () {},
+                      deadline: p.deadline,
                       state: p.state,
                     );
                   }).toList(),

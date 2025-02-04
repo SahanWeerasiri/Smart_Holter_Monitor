@@ -3,7 +3,6 @@ import 'package:health_care_web/components/drawer/simple_drawer/drawer_index_con
 import 'package:health_care_web/components/drawer/simple_drawer/simple_drawer.dart';
 import 'package:health_care_web/components/top_app_bar/top_app_bar3.dart';
 import 'package:health_care_web/pages/app/pages/all_patients.dart';
-import 'package:health_care_web/pages/app/pages/devices.dart';
 import 'package:health_care_web/pages/app/pages/profile.dart';
 import 'package:health_care_web/pages/app/pages/summary.dart';
 import 'package:health_care_web/pages/app/services/auth_service.dart';
@@ -22,7 +21,6 @@ class _HomeState extends State<Home> {
   final List<Widget> pages = [
     const Summary(),
     const AllPatients(),
-    const Devices(),
     const Text('Test Drawer 4'),
     const Profile(user: null),
   ];
@@ -55,15 +53,6 @@ class _HomeState extends State<Home> {
                 }),
             DrawerItems(
                 index: 2,
-                title: 'Device Manager',
-                icon: Icons.devices_other,
-                onTap: () {
-                  setState(() {
-                    drawerIndexController.setSelectedIndex(2);
-                  });
-                }),
-            DrawerItems(
-                index: 3,
                 title: '',
                 icon: Icons.search,
                 onTap: () {
@@ -72,7 +61,7 @@ class _HomeState extends State<Home> {
                   });
                 }),
             DrawerItems(
-                index: 4,
+                index: 3,
                 title: 'Profile',
                 icon: Icons.person,
                 onTap: () {
