@@ -113,6 +113,7 @@ class RealDbService {
         await ref.set({
           'other': other,
           'assigned': 0,
+          'is_done': false,
         });
         return {'success': true, 'message': 'Device added successfully.'};
       }
