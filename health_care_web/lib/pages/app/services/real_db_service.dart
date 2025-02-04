@@ -52,9 +52,13 @@ class RealDbService {
       for (final child in dataSnapshot.children) {
         final device = child.key;
         final other = child.child('other').value as String;
+        final useData = child.child('use').value as String;
         final state = child.child('assigned').value as int;
         devices.add(DeviceProfile(
-            code: device.toString(), detail: other.toString(), state: state));
+            code: device.toString(),
+            detail: other.toString(),
+            state: state,
+            use: useData.toString()));
       }
 
       return {
@@ -80,10 +84,14 @@ class RealDbService {
       for (final child in dataSnapshot.children) {
         final device = child.key.toString();
         final other = child.child('other').value as String;
+        final useData = child.child('use').value as String;
         final state = child.child('assigned').value as int;
         if (device.toLowerCase().contains(name)) {
           devices.add(DeviceProfile(
-              code: device.toString(), detail: other.toString(), state: state));
+              code: device.toString(),
+              detail: other.toString(),
+              state: state,
+              use: useData.toString()));
         }
       }
 
@@ -155,7 +163,10 @@ class RealDbService {
     try {
       // Check if the ref already exists
       await ref.remove();
-      await _database.ref('devices').child(code).update({'assigned': false});
+      await _database
+          .ref('devices')
+          .child(code)
+          .update({'assigned': 0, 'use': ""});
       return {'success': true, 'data': 'Data removed from the device.'};
     } catch (e) {
       // Handle any errors during the operation
@@ -170,7 +181,7 @@ class RealDbService {
       await _database
           .ref('devices')
           .child(code)
-          .update({'assigned': 1, 'other': other});
+          .update({'assigned': 1, 'use': other});
       return {'success': true, 'data': 'Device is connected successfully'};
     } catch (e) {
       // Handle any errors during the operation

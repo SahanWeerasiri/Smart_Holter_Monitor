@@ -53,7 +53,7 @@ class _ExpandableProfileCardUpdatedDevicesState
           builder: (context) => ConnectDevicePatientPopup(
                 id: device,
                 profiles: patients,
-                onSubmit: (userProfile) async {
+                onSubmit: (userProfile) {
                   setState(() {
                     isLoading = true;
                   });
@@ -63,11 +63,11 @@ class _ExpandableProfileCardUpdatedDevicesState
                     });
                     return;
                   }
-                  await RealDbService().connectDeviceData(
-                    userProfile.id,
-                    "Assigned to: ${userProfile.name}\nmobile: ${userProfile.mobile}\nemail: ${userProfile.email}\n$detail",
+                  RealDbService().connectDeviceData(
+                    device,
+                    "Assigned to: ${userProfile.name}\nmobile: ${userProfile.mobile}\nemail: ${userProfile.email}",
                   );
-                  await FirestoreDbService().addDeviceToPatient(
+                  FirestoreDbService().addDeviceToPatient(
                     userProfile.id,
                     device,
                   );
@@ -153,7 +153,7 @@ class _ExpandableProfileCardUpdatedDevicesState
                   setState(() {
                     _isExpanded = !_isExpanded;
                     if (_isExpanded) {
-                      _cardHeight = 150;
+                      _cardHeight = 250;
                     } else {
                       _cardHeight = 70;
                     }

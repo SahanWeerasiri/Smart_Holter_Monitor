@@ -88,10 +88,14 @@ class _DeviceAssignmentSectionState extends State<DeviceAssignmentSection> {
               if (value is Map) {
                 final other = (value)['other'] as String?;
                 final state = (value)['assigned'] as int?;
+                final useData = (value)['use'] as String?;
 
                 if (other != null && state != null) {
-                  devices.add(
-                      DeviceProfile(code: key, detail: other, state: state));
+                  devices.add(DeviceProfile(
+                      code: key,
+                      detail: other,
+                      state: state,
+                      use: useData.toString()));
                 } else {
                   // Handle missing 'other' or 'assigned' values as needed
                 }
@@ -157,14 +161,18 @@ class _DeviceAssignmentSectionState extends State<DeviceAssignmentSection> {
                 final other = (v)['other'] as String?;
                 final state = (v)['assigned'] as int?;
                 final code = key;
+                final useData = (v)['use'] as String?;
 
                 if (other != null && state != null) {
                   if (code
                       .toLowerCase()
                       .contains(value.toLowerCase())) // Search by detail
                   {
-                    devices.add(
-                        DeviceProfile(code: key, detail: other, state: state));
+                    devices.add(DeviceProfile(
+                        code: key,
+                        detail: other,
+                        state: state,
+                        use: useData.toString()));
                   }
                 }
               }
@@ -324,7 +332,7 @@ class _DeviceAssignmentSectionState extends State<DeviceAssignmentSection> {
                   children: profiles.map((p) {
                     return ExpandableProfileCardUpdatedDevices(
                       code: p.code,
-                      detail: p.detail,
+                      detail: "${p.use}\n${p.detail}",
                       onRemove: () {},
                       state: p.state,
                     );

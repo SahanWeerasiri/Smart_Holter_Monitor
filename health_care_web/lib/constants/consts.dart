@@ -236,11 +236,13 @@ class ContactProfile {
 
 class DeviceProfile {
   String code;
+  String use;
   String detail;
   int state;
   DeviceProfile({
     required this.code,
     this.detail = "",
+    required this.use,
     this.state = 0,
   });
 }
