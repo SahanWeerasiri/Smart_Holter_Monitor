@@ -255,33 +255,6 @@ class _SummaryState extends State<Summary> {
     });
   }
 
-  Future<void> addDevice(uid) async {
-    Map<String, dynamic> res = await RealDbService().fetchDevices();
-    if (res['success']) {
-      List<DeviceProfile> devices = res['data'];
-      List<String> codes = [];
-      for (DeviceProfile deviceProfile in devices) {
-        if (deviceProfile.state == 0) {
-          codes.add(deviceProfile.code);
-        }
-      }
-      showDialog(
-          context: context,
-          builder: (context) => ConnectDevicePopup(
-              id: uid,
-              devices: codes,
-              onSubmit: (value) {
-                connectDevice(uid, value);
-              }));
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(res['error'] ?? 'Unknown error occurred'),
-            backgroundColor: Colors.red),
-      );
-    }
-  }
-
   Future<void> removeDevice(String uid, String deviceId) async {
     setState(() {
       isLoading = true;
@@ -419,9 +392,6 @@ class _SummaryState extends State<Summary> {
                           contactProfiles: p.contacts,
                           onViewReport: () {
                             viewReports(p);
-                          },
-                          onAddDevice: () {
-                            addDevice(p.id);
                           },
                           onCreateReport: () {
                             createReport(
