@@ -91,6 +91,7 @@ class StyleSheet {
   final Color myPatients = const Color.fromARGB(255, 171, 202, 255);
 
   final Color availableDevices = const Color.fromARGB(255, 171, 202, 255);
+  final Color pendingDevices = const Color.fromARGB(255, 255, 252, 173);
   final Color unavailableDevices = const Color.fromARGB(255, 255, 168, 168);
 
   final Color step1 = const Color.fromARGB(255, 255, 168, 168);
@@ -235,11 +236,22 @@ class ContactProfile {
 
 class DeviceProfile {
   String code;
+  String use;
   String detail;
-  bool state;
+  int state;
+  String deadline;
   DeviceProfile({
     required this.code,
     this.detail = "",
-    this.state = false,
+    required this.use,
+    required this.deadline,
+    this.state = 0,
   });
+}
+
+final int period = 48;
+
+class AdminTabs {
+  final String doctorRegistration = "DOCTOR_REGISTRATION";
+  final String deviceAssignment = "DEVICE_ASSIGNMENT";
 }

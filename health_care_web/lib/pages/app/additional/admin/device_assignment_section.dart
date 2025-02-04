@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
 import 'package:health_care_web/constants/consts.dart';
@@ -8,19 +9,20 @@ import 'package:health_care_web/pages/app/services/firestore_db_service.dart';
 import 'package:health_care_web/pages/app/services/real_db_service.dart';
 import 'package:iconly/iconly.dart';
 
-class Devices extends StatefulWidget {
-  const Devices({super.key});
+class DeviceAssignmentSection extends StatefulWidget {
+  const DeviceAssignmentSection({super.key});
 
   @override
-  State<Devices> createState() => _DevicesState();
+  State<DeviceAssignmentSection> createState() =>
+      _DeviceAssignmentSectionState();
 }
 
-class _DevicesState extends State<Devices> {
+class _DeviceAssignmentSectionState extends State<DeviceAssignmentSection> {
   final TextEditingController controller = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   List<DeviceProfile> profiles = [];
-  bool isLoading = false;
+  bool isLoading = true;
   bool isOpen = false;
 
   @override
@@ -56,7 +58,7 @@ class _DevicesState extends State<Devices> {
   void refresh() {
     setState(() {
       profiles = [];
-      isLoading = false;
+      isLoading = true;
     });
     fetcheDevices();
   }
@@ -72,22 +74,56 @@ class _DevicesState extends State<Devices> {
       if (user == null) {
         throw Exception("User is not logged in.");
       }
+      final FirebaseDatabase database = FirebaseDatabase.instance;
+      try {
+        final ref = database.ref('devices');
 
-      Map<String, dynamic> res = await RealDbService().fetchDevices();
+        ref.onValue.listen((DatabaseEvent event) {
+          final data = event.snapshot.value;
 
-      if (res['success']) {
+          if (data != null && data is Map) {
+            List<DeviceProfile> devices = [];
+
+            data.forEach((key, value) {
+              if (value is Map) {
+                final other = (value)['other'] as String?;
+                final state = (value)['assigned'] as int?;
+                final deadline = (value)['deadline'] as String?;
+                final useData = (value)['use'] as String?;
+
+                if (other != null && state != null) {
+                  devices.add(DeviceProfile(
+                      deadline: deadline.toString(),
+                      code: key,
+                      detail: other,
+                      state: state,
+                      use: useData.toString()));
+                } else {
+                  // Handle missing 'other' or 'assigned' values as needed
+                }
+              } else {
+                // Handle non-map values appropriately.
+              }
+            });
+
+            setState(() {
+              profiles = devices;
+            });
+          } else {
+            // Handle cases where data is null or not a map
+            setState(() {
+              profiles = []; // Or handle the empty state as appropriate
+            });
+          }
+        }, onError: (error) {
+          // Handle errors
+        });
+      } catch (e) {
         setState(() {
-          profiles = res['data'] as List<DeviceProfile>;
+          profiles = []; // Or handle the empty state as appropriate
         });
-      } else {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('An error occurred: ${res["error"]}'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        });
+      } finally {
+        setState(() => isLoading = false);
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -112,22 +148,70 @@ class _DevicesState extends State<Devices> {
         throw Exception("User is not logged in.");
       }
 
-      Map<String, dynamic> res = await RealDbService()
-          .fetchSearchDevices(value.toString().toLowerCase());
+      final FirebaseDatabase database = FirebaseDatabase.instance;
+      try {
+        final ref = database.ref('devices');
 
-      if (res['success']) {
-        setState(() {
-          profiles = res['data'] as List<DeviceProfile>;
-        });
-      } else {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.onValue.listen((DatabaseEvent event) {
+          final data = event.snapshot.value;
+
+          if (data != null && data is Map) {
+            List<DeviceProfile> devices = [];
+
+            data.forEach((key, v) {
+              if (v is Map) {
+                final other = (v)['other'] as String?;
+                final state = (v)['assigned'] as int?;
+                final code = key;
+                final useData = (v)['use'] as String?;
+                final deadline = (v)['deadline'] as String?;
+
+                if (other != null && state != null) {
+                  if (code
+                      .toLowerCase()
+                      .contains(value.toLowerCase())) // Search by detail
+                  {
+                    devices.add(DeviceProfile(
+                        code: key,
+                        detail: other,
+                        deadline: deadline.toString(),
+                        state: state,
+                        use: useData.toString()));
+                  }
+                }
+              }
+            });
+
+            setState(() {
+              profiles = devices;
+            });
+          } else {
+            // Handle null or non-map data
+            setState(() {
+              profiles = []; // Clear the list to show an empty state
+            });
+          }
+        }, onError: (error) {
+          // Handle errors
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('An error occurred: ${res["error"]}'),
+              content: Text('An error occurred: $error'),
               backgroundColor: Colors.red,
             ),
           );
         });
+      } catch (e) {
+        setState(() {
+          profiles = []; // Or handle the empty state as appropriate
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('An error occurred: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } finally {
+        setState(() => isLoading = false);
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -140,41 +224,6 @@ class _DevicesState extends State<Devices> {
       setState(() => isLoading = false);
     }
   }
-
-  // Future<void> fetchSearch(String name) async {
-  //   setState(() {
-  //     profiles = [];
-  //     isLoading = true;
-  //   });
-  //   try {
-  //     Map<String, dynamic> res =
-  //         await FirestoreDbService().fetchSearch(name.toLowerCase());
-
-  //     if (res['success']) {
-  //       setState(() {
-  //         profiles = res['data'] as List<UserProfile>;
-  //       });
-  //     } else {
-  //       WidgetsBinding.instance.addPostFrameCallback((_) {
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           SnackBar(
-  //             content: Text('An error occurred: ${res["error"]}'),
-  //             backgroundColor: Colors.red,
-  //           ),
-  //         );
-  //       });
-  //     }
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text('An error occurred: $e'),
-  //         backgroundColor: Colors.red,
-  //       ),
-  //     );
-  //   } finally {
-  //     setState(() => isLoading = false);
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -246,6 +295,22 @@ class _DevicesState extends State<Devices> {
                     borderRadius: BorderRadius.all(
                       Radius.circular(12),
                     ),
+                    color: StyleSheet().pendingDevices),
+                child: Row(
+                  spacing: 3,
+                  children: [
+                    Icon(IconlyLight.time_circle),
+                    Text("Pending Devices")
+                  ],
+                ),
+              ),
+              Container(
+                width: 180,
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(12),
+                    ),
                     color: StyleSheet().unavailableDevices),
                 child: Row(
                   spacing: 3,
@@ -260,7 +325,7 @@ class _DevicesState extends State<Devices> {
           profiles.isEmpty
               ? const Center(
                   child: Text(
-                    "No profiles available",
+                    "No Devices available",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 )
@@ -271,8 +336,9 @@ class _DevicesState extends State<Devices> {
                   children: profiles.map((p) {
                     return ExpandableProfileCardUpdatedDevices(
                       code: p.code,
-                      detail: p.detail,
+                      detail: "${p.use}\n${p.detail}",
                       onRemove: () {},
+                      deadline: p.deadline,
                       state: p.state,
                     );
                   }).toList(),

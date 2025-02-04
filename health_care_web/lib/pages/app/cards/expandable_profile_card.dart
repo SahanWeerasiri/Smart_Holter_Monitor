@@ -15,7 +15,6 @@ class ExpandableProfileCard extends StatefulWidget {
   final VoidCallback onCreateReport;
   final VoidCallback onViewReport;
   final VoidCallback onRemoveDevice;
-  final VoidCallback onAddDevice;
   final VoidCallback onPending;
 
   const ExpandableProfileCard({
@@ -29,7 +28,6 @@ class ExpandableProfileCard extends StatefulWidget {
     required this.isDone,
     required this.onCreateReport,
     required this.onRemoveDevice,
-    required this.onAddDevice,
     required this.onPending,
     required this.onViewReport,
     required this.contactProfiles,
@@ -190,17 +188,7 @@ class _ExpandableProfileCardState extends State<ExpandableProfileCard> {
                               : (!widget.isDone &&
                                       widget.device ==
                                           "Device") //No device assigned.(1 step)
-                                  ? [
-                                      CustomButton(
-                                          label: "Add a device",
-                                          icon: Icons.add,
-                                          backgroundColor:
-                                              StyleSheet().btnBackground,
-                                          textColor: StyleSheet().btnText,
-                                          onPressed: () {
-                                            widget.onAddDevice();
-                                          })
-                                    ]
+                                  ? []
                                   : [
                                       CustomButton(
                                         label: "Pending...",

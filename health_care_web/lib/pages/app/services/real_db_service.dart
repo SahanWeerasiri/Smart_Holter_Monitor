@@ -52,9 +52,15 @@ class RealDbService {
       for (final child in dataSnapshot.children) {
         final device = child.key;
         final other = child.child('other').value as String;
-        final state = child.child('assigned').value as bool;
+        final useData = child.child('use').value as String;
+        final state = child.child('assigned').value as int;
+        final deadline = child.child('deadline').value as String;
         devices.add(DeviceProfile(
-            code: device.toString(), detail: other.toString(), state: state));
+            deadline: deadline.toString(),
+            code: device.toString(),
+            detail: other.toString(),
+            state: state,
+            use: useData.toString()));
       }
 
       return {
@@ -80,10 +86,16 @@ class RealDbService {
       for (final child in dataSnapshot.children) {
         final device = child.key.toString();
         final other = child.child('other').value as String;
-        final state = child.child('assigned').value as bool;
+        final useData = child.child('use').value as String;
+        final state = child.child('assigned').value as int;
+        final deadline = child.child('deadline').value as String;
         if (device.toLowerCase().contains(name)) {
           devices.add(DeviceProfile(
-              code: device.toString(), detail: other.toString(), state: state));
+              code: device.toString(),
+              detail: other.toString(),
+              state: state,
+              use: useData.toString(),
+              deadline: deadline.toString()));
         }
       }
 
@@ -112,7 +124,9 @@ class RealDbService {
         // If the device does not exist, add the data
         await ref.set({
           'other': other,
-          'assigned': false,
+          'assigned': 0,
+          'is_done': false,
+          'deadline': "",
         });
         return {'success': true, 'message': 'Device added successfully.'};
       }
@@ -154,7 +168,10 @@ class RealDbService {
     try {
       // Check if the ref already exists
       await ref.remove();
-      await _database.ref('devices').child(code).update({'assigned': false});
+      await _database
+          .ref('devices')
+          .child(code)
+          .update({'assigned': 0, 'use': ""});
       return {'success': true, 'data': 'Data removed from the device.'};
     } catch (e) {
       // Handle any errors during the operation
@@ -162,11 +179,38 @@ class RealDbService {
     }
   }
 
-  Future<Map<String, dynamic>> connectDeviceData(String code) async {
+  Future<Map<String, dynamic>> connectDeviceData(
+      String code, String other) async {
     try {
       // Check if the ref already exists
-      await _database.ref('devices').child(code).update({'assigned': true});
+      await _database.ref('devices').child(code).update({
+        'assigned': 1,
+        'use': other,
+        'deadline': (DateTime.now().add(Duration(hours: period))).toString()
+      });
       return {'success': true, 'data': 'Device is connected successfully'};
+    } catch (e) {
+      // Handle any errors during the operation
+      return {'success': false, 'message': 'An error occurred: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> connectDevicePending(String code) async {
+    try {
+      // Check if the ref already exists
+      await _database.ref('devices').child(code).update({'assigned': 2});
+      return {'success': true, 'data': 'Device is in pending state'};
+    } catch (e) {
+      // Handle any errors during the operation
+      return {'success': false, 'message': 'An error occurred: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> disconnectDevicePending(String code) async {
+    try {
+      // Check if the ref already exists
+      await _database.ref('devices').child(code).update({'assigned': 0});
+      return {'success': true, 'data': 'Device is in pending state'};
     } catch (e) {
       // Handle any errors during the operation
       return {'success': false, 'message': 'An error occurred: $e'};

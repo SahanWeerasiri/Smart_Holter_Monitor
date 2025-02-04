@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart'; // Import the dotenv package
 import 'package:firebase_core/firebase_core.dart';
 import 'package:health_care_web/constants/consts.dart';
+import 'package:health_care_web/pages/app/admin_dashboard.dart';
 import 'package:health_care_web/pages/app/before_login_page.dart';
 import 'package:health_care_web/pages/app/home.dart';
 import 'package:health_care_web/pages/app/login_page.dart';
@@ -51,6 +52,7 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => const SignupPage(),
         '/before_login': (context) => const BeforeLoginPage(),
         '/home': (context) => const Home(),
+        '/admin_dashboard': (context) => const AdminDashboard(),
         '/medical_report': (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Map;
           return MedicalReport(
