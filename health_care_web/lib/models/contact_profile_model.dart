@@ -1,8 +1,8 @@
-class ContactProfile {
+class ContactProfileModel {
   String name;
   String mobile;
-  ContactProfile({
+  ContactProfileModel({
     required this.name,
-    this.mobile = "",
+    required this.mobile,
   });
 }

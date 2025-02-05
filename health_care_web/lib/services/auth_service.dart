@@ -1,82 +1,78 @@
 import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:health_care_web/pages/services/firestore_db_service.dart';
+import 'package:health_care_web/models/return_model.dart';
+import 'package:health_care_web/models/user_profile_model.dart';
+import 'package:health_care_web/services/firestore_db_service.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirestoreDbService _firestoreDbService =
+      FirestoreDbService(); // Inject Firestore service
 
-  Future<Map<String, dynamic>> createUserWithEmailAndPassword(
+  Future<ReturnModel> createUserWithEmailAndPassword(
       String name, String email, String password) async {
     try {
-      final cred = await _auth.createUserWithEmailAndPassword(
+      final userCredential = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
-      Map<String, dynamic> res =
-          await FirestoreDbService().createAccount(name, email);
-      if (res['success']) {
-        return {
-          "status": "success",
-          "message": "Account created successfully",
-          "user": cred.user
-        };
+      final createAccountResult =
+          await _firestoreDbService.createAccount(name, email);
+      if (createAccountResult.state) {
+        return ReturnModel(
+            state: true,
+            message: "Account created successfully",
+            userProfileModel: UserProfileModel(
+                id: userCredential.user!.uid,
+                name: name,
+                age: "",
+                email: email,
+                pic: "",
+                address: "",
+                mobile: "",
+                color: "",
+                language: "",
+                contacts: []));
       } else {
-        throw Exception(res["error"]);
+        await _auth.currentUser
+            ?.delete(); // Clean up if account creation fails.
+        return createAccountResult;
       }
+    } on FirebaseAuthException catch (e) {
+      return ReturnModel(state: false, message: _handleFirebaseAuthError(e));
     } catch (e) {
-      return {
-        "status": "error",
-        "message": e.toString(),
-      };
+      return ReturnModel(state: false, message: 'Error creating user: $e');
     }
   }
 
-  Future<Map<String, dynamic>> loginUserWithEmailAndPassword(
+  Future<ReturnModel> loginUserWithEmailAndPassword(
       String email, String password, String role) async {
-    if (role == "Doctor") {
-      try {
-        final cred = await _auth.signInWithEmailAndPassword(
-            email: email, password: password);
-
-        final Map<String, dynamic> res =
-            await FirestoreDbService().isDoctor(email);
-        if (!res['success']) {
-          await signout();
-          return {
-            "status": "error",
-            "message": res['error'],
-          };
-        }
-        return {
-          "status": "success",
-          "message": "Logged in successfully",
-          "user": cred.user
-        };
-      } catch (e) {
-        return {
-          "status": "error",
-          "message": e.toString(),
-        };
-      }
-    }
-    if (role != "Admin") {
-      return {
-        "status": "error",
-        "message": "Select a role",
-      };
-    }
     try {
-      final cred = await _auth.signInWithEmailAndPassword(
+      final userCredential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
-
-      return {
-        "status": "success",
-        "message": "Logged in successfully",
-        "user": cred.user
-      };
+      if (role == "Doctor") {
+        final isDoctorResult = await _firestoreDbService.isDoctor(email);
+        if (!isDoctorResult.state) {
+          await signout();
+          return isDoctorResult;
+        }
+      }
+      return ReturnModel(
+          state: true,
+          message: "Logged in successfully",
+          userProfileModel: UserProfileModel(
+              id: userCredential.user!.uid,
+              name: "",
+              age: "",
+              email: email,
+              pic: "",
+              address: "",
+              mobile: "",
+              color: "",
+              language: "",
+              contacts: []));
+    } on FirebaseAuthException catch (e) {
+      return ReturnModel(state: false, message: _handleFirebaseAuthError(e));
     } catch (e) {
-      return {
-        "status": "error",
-        "message": e.toString(),
-      };
+      return ReturnModel(state: false, message: 'Error logging in: $e');
     }
   }
 
@@ -84,83 +80,24 @@ class AuthService {
     try {
       await _auth.signOut();
     } catch (e) {
-      log("Something went wrong");
+      log("Something went wrong during signout: $e");
     }
   }
 
-  // Future<Map<String, dynamic>> signWithGoogle() async {
-  //   try {
-  //     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-  //     final GoogleSignInAuthentication? googleAuth =
-  //         await googleUser?.authentication;
-  //     final credential = GoogleAuthProvider.credential(
-  //         accessToken: googleAuth?.accessToken, idToken: googleAuth?.idToken);
-  //     final userCredential = await _auth.signInWithCredential(credential);
-
-  //     final Map<String, dynamic> res =
-  //         await FirestoreDbService().isDoctor(userCredential.user!.email!);
-  //     if (!res['success']) {
-  //       await signout();
-  //       return {
-  //         "status": "error",
-  //         "message": res['error'],
-  //       };
-  //     }
-
-  //     return {
-  //       "status": "success",
-  //       "message": "Logged in successfully",
-  //       "user": userCredential.user
-  //     };
-  //   } catch (e) {
-  //     return {
-  //       "status": "error",
-  //       "message": e.toString(),
-  //     };
-  //   }
-  // }
-
-  // Future<Map<String, dynamic>> signUpWithGoogle() async {
-  //   try {
-  //     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-  //     final GoogleSignInAuthentication? googleAuth =
-  //         await googleUser?.authentication;
-  //     final credential = GoogleAuthProvider.credential(
-  //       accessToken: googleAuth?.accessToken,
-  //       idToken: googleAuth?.idToken,
-  //     );
-
-  //     final userCredential = await _auth.signInWithCredential(credential);
-
-  //     final Map<String, dynamic> res =
-  //         await FirestoreDbService().isDoctor(userCredential.user!.email!);
-  //     if (!res['success']) {
-  //       await signout();
-  //       return {
-  //         "status": "error",
-  //         "message": res['error'],
-  //       };
-  //     }
-
-  //     // You can check if the user is new or existing
-  //     if (userCredential.additionalUserInfo?.isNewUser ?? false) {
-  //       return {
-  //         "status": "success",
-  //         "message": "Account created successfully",
-  //         "user": userCredential.user,
-  //       };
-  //     } else {
-  //       return {
-  //         "status": "success",
-  //         "message": "Logged in successfully",
-  //         "user": userCredential.user,
-  //       };
-  //     }
-  //   } catch (e) {
-  //     return {
-  //       "status": "error",
-  //       "message": e.toString(),
-  //     };
-  //   }
-  // }
+  String _handleFirebaseAuthError(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'user-not-found':
+        return 'No user found for that email.';
+      case 'wrong-password':
+        return 'Wrong password provided for that user.';
+      case 'invalid-email':
+        return 'The email address is badly formatted.';
+      case 'too-many-requests':
+        return 'Too many requests to sign in. Please try again later.';
+      case 'user-disabled':
+        return 'This user has been disabled.';
+      default:
+        return 'An unknown error occurred.';
+    }
+  }
 }

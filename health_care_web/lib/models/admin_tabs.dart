@@ -1,4 +1,4 @@
 class AdminTabs {
-  final String doctorRegistration = "DOCTOR_REGISTRATION";
-  final String deviceAssignment = "DEVICE_ASSIGNMENT";
+  static final String doctorRegistration = "DOCTOR_REGISTRATION";
+  static final String deviceAssignment = "DEVICE_ASSIGNMENT";
 }
