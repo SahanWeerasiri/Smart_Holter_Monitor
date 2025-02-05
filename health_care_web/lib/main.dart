@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart'; // Import the dotenv package
 import 'package:firebase_core/firebase_core.dart';
 import 'package:health_care_web/constants/consts.dart';
-import 'package:health_care_web/pages/app/admin_dashboard.dart';
-import 'package:health_care_web/pages/app/before_login_page.dart';
-import 'package:health_care_web/pages/app/home.dart';
-import 'package:health_care_web/pages/app/login_page.dart';
-import 'package:health_care_web/pages/app/pages/medical_report.dart';
-import 'package:health_care_web/pages/app/signup_page.dart';
+import 'package:health_care_web/pages/navigations/admin_dashboard.dart';
+import 'package:health_care_web/pages/navigations/before_login_page.dart';
+import 'package:health_care_web/pages/navigations/home.dart';
+import 'package:health_care_web/pages/navigations/login_page.dart';
+import 'package:health_care_web/pages/pages/medical_report.dart';
+import 'package:health_care_web/pages/navigations/signup_page.dart';
+
 // import 'package:health_care_web/pages/app/splash.dart';
 //
 Future<void> main() async {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
 import 'package:health_care_web/constants/consts.dart';
-import "package:health_care_web/pages/app/additional/admin/doctor_signup_section.dart";
-import 'package:health_care_web/pages/app/additional/admin/device_assignment_section.dart';
+import "package:health_care_web/pages/additional/admin/doctor_signup_section.dart";
+import 'package:health_care_web/pages/additional/admin/device_assignment_section.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});

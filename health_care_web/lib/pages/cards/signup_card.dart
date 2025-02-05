@@ -3,7 +3,7 @@ import 'package:health_care_web/components/text_input/text_input_with_leading_ic
 import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/controllers/textController.dart';
 import 'package:flutter/material.dart';
-import 'package:health_care_web/pages/app/services/auth_service.dart';
+import 'package:health_care_web/pages/services/auth_service.dart';
 
 class SignupCard extends StatefulWidget {
   const SignupCard({super.key});

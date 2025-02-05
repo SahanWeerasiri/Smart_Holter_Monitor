@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:health_care_web/constants/consts.dart';
-import 'package:health_care_web/pages/app/cards/signup_card.dart';
+import 'package:health_care_web/pages/cards/signup_card.dart';
 
 class DoctorSignupSection extends StatelessWidget {
   const DoctorSignupSection({super.key});

@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:health_care_web/components/buttons/custom_text_button/custom_text_button.dart';
 import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/controllers/profileController.dart';
-import 'package:health_care_web/pages/app/additional/edit_profile_popup.dart';
-import 'package:health_care_web/pages/app/services/firestore_db_service.dart';
+import 'package:health_care_web/pages/additional/popups/edit_profile_popup.dart';
+import 'package:health_care_web/pages/services/firestore_db_service.dart';
 import 'package:iconly/iconly.dart';
 
 class Profile extends StatefulWidget {

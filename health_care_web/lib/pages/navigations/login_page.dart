@@ -1,10 +1,15 @@
 import 'package:health_care_web/constants/consts.dart';
 import 'package:flutter/material.dart';
-import 'package:health_care_web/pages/app/cards/before_login_card.dart';
+import 'package:health_care_web/pages/cards/login_card.dart';
 
-class BeforeLoginPage extends StatelessWidget {
-  const BeforeLoginPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     AppSizes().initSizes(context);
@@ -24,7 +29,7 @@ class BeforeLoginPage extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [BeforeLoginCard()],
+                      children: [LoginCard()],
                     )))));
   }
 }

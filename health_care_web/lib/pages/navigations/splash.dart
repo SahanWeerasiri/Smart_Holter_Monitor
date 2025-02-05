@@ -1,6 +1,6 @@
 import 'package:flame_splash_screen/flame_splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:health_care_web/pages/app/before_login_page.dart';
+import 'package:health_care_web/pages/navigations/before_login_page.dart';
 
 class Splash extends StatefulWidget {
   const Splash({super.key});

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
 import 'package:health_care_web/constants/consts.dart';
-import 'package:health_care_web/pages/app/additional/report/fixed_section.dart';
-import 'package:health_care_web/pages/app/additional/report/header.dart';
-import 'package:health_care_web/pages/app/additional/report/section.dart';
-import 'package:health_care_web/pages/app/services/firestore_db_service.dart';
+import 'package:health_care_web/pages/additional/report/fixed_section.dart';
+import 'package:health_care_web/pages/additional/report/header.dart';
+import 'package:health_care_web/pages/additional/report/section.dart';
+import 'package:health_care_web/pages/services/firestore_db_service.dart';
 
 class MedicalReport extends StatefulWidget {
   final UserProfile profile;

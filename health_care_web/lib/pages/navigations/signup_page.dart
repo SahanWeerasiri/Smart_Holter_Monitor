@@ -1,7 +1,7 @@
 import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/controllers/textController.dart';
 import 'package:flutter/material.dart';
-import 'package:health_care_web/pages/app/cards/signup_card.dart';
+import 'package:health_care_web/pages/cards/signup_card.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});

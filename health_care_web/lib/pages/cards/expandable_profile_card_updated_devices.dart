@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
 import 'package:health_care_web/constants/consts.dart';
-import 'package:health_care_web/pages/app/additional/connect_device_patient_popup.dart';
-import 'package:health_care_web/pages/app/services/firestore_db_service.dart';
-import 'package:health_care_web/pages/app/services/real_db_service.dart';
+import 'package:health_care_web/pages/additional/popups/connect_device_patient_popup.dart';
+import 'package:health_care_web/pages/services/firestore_db_service.dart';
+import 'package:health_care_web/pages/services/real_db_service.dart';
 
 class ExpandableProfileCardUpdatedDevices extends StatefulWidget {
   final String code;

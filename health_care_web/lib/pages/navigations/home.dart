@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:health_care_web/components/drawer/simple_drawer/drawer_index_controller.dart';
 import 'package:health_care_web/components/drawer/simple_drawer/simple_drawer.dart';
 import 'package:health_care_web/components/top_app_bar/top_app_bar3.dart';
-import 'package:health_care_web/pages/app/pages/all_patients.dart';
-import 'package:health_care_web/pages/app/pages/profile.dart';
-import 'package:health_care_web/pages/app/pages/summary.dart';
-import 'package:health_care_web/pages/app/services/auth_service.dart';
+import 'package:health_care_web/pages/pages/all_patients.dart';
+import 'package:health_care_web/pages/pages/profile.dart';
+import 'package:health_care_web/pages/pages/summary.dart';
+import 'package:health_care_web/pages/services/auth_service.dart';
 import '../../constants/consts.dart';
 import 'package:iconly/iconly.dart';
 

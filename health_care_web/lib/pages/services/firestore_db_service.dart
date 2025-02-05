@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flame/extensions.dart';
 import 'package:health_care_web/constants/consts.dart';
-import 'package:health_care_web/pages/app/services/real_db_service.dart';
-import 'package:health_care_web/pages/app/services/util.dart';
+import 'package:health_care_web/pages/services/real_db_service.dart';
+import 'package:health_care_web/pages/services/util.dart';
 
 class FirestoreDbService {
   final CollectionReference usersCollection =
