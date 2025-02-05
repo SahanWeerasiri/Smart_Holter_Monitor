@@ -8,27 +8,14 @@ import 'package:health_care_web/pages/navigations/home.dart';
 import 'package:health_care_web/pages/navigations/login_page.dart';
 import 'package:health_care_web/pages/pages/medical_report.dart';
 import 'package:health_care_web/pages/navigations/signup_page.dart';
+import 'package:health_care_web/services/firebase_init.dart';
 
 // import 'package:health_care_web/pages/app/splash.dart';
 //
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Load the .env file
-  await dotenv.load(fileName: ".env");
 
-  // Initialize Firebase
-  await Firebase.initializeApp(
-    options: FirebaseOptions(
-      apiKey: dotenv.env['API_KEY']!,
-      authDomain: dotenv.env['AUTH_DOMAIN'],
-      databaseURL: dotenv.env['DATABASE_URL'],
-      projectId: dotenv.env['PROJECT_ID']!,
-      storageBucket: dotenv.env['STORAGE_BUCKET'],
-      messagingSenderId: dotenv.env['MESSAGING_SENDER_ID']!,
-      appId: dotenv.env['APP_ID']!,
-      measurementId: dotenv.env['MEASUREMENT_ID'],
-    ),
-  );
+  await FirebaseInit.init();
 
   runApp(const MyApp());
 }
