@@ -1,4 +1,4 @@
-import '../../../constants/consts.dart';
+import 'package:health_care_web/models/app_sizes.dart';
 
 double animatedPositionedLeftValueTest(int currentIndex) {
   switch (currentIndex) {
