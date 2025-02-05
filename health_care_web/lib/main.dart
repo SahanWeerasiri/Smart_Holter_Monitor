@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart'; // Import the dotenv package
-import 'package:firebase_core/firebase_core.dart';
-import 'package:health_care_web/constants/consts.dart';
+import 'package:health_care_web/models/style_sheet.dart';
 import 'package:health_care_web/pages/navigations/admin_dashboard.dart';
 import 'package:health_care_web/pages/navigations/before_login_page.dart';
 import 'package:health_care_web/pages/navigations/home.dart';
@@ -29,8 +27,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Smart Care',
       theme: ThemeData(
-        colorScheme:
-            ColorScheme.fromSeed(seedColor: StyleSheet().btnBackground),
+        colorScheme: ColorScheme.fromSeed(seedColor: StyleSheet.btnBackground),
         useMaterial3: true,
       ),
       home: BeforeLoginPage(),
