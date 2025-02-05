@@ -1,4 +1,5 @@
-import '../constants/consts.dart';
+// ignore: file_names
+import 'package:health_care_web/models/custom_text_input_types.dart';
 
 class CredentialController {
   String username = "";
