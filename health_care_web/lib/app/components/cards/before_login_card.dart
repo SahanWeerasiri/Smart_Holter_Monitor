@@ -1,5 +1,4 @@
 import 'package:health_care_web/components/buttons/custom_text_button/custom_text_button.dart';
-import 'package:health_care_web/constants/consts.dart';
 import 'package:flutter/material.dart';
 
 class BeforeLoginCard extends StatelessWidget {

@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:health_care_web/constants/consts.dart';
-import 'package:health_care_web/pages/cards/expandable_profile_card_updated.dart';
-import 'package:health_care_web/pages/services/firestore_db_service.dart';
+import 'package:health_care_web/app/components/cards/expandable_profile_card_updated.dart';
+import 'package:health_care_web/models/app_sizes.dart';
+import 'package:health_care_web/models/style_sheet.dart';
+import 'package:health_care_web/models/user_profile_model.dart';
+import 'package:health_care_web/services/firestore_db_service.dart';
 import 'package:iconly/iconly.dart';
 
 class AllPatients extends StatefulWidget {
@@ -14,7 +16,7 @@ class AllPatients extends StatefulWidget {
 
 class _AllPatientsState extends State<AllPatients> {
   final TextEditingController controller = TextEditingController();
-  List<UserProfile> profiles = [];
+  List<UserProfileModel> profiles = [];
   bool isLoading = false;
 
   @override
@@ -71,7 +73,7 @@ class _AllPatientsState extends State<AllPatients> {
 
       if (res['success']) {
         setState(() {
-          profiles = res['data'] as List<UserProfile>;
+          profiles = res['data'] as List<UserProfileModel>;
         });
       } else {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -106,7 +108,7 @@ class _AllPatientsState extends State<AllPatients> {
 
       if (res['success']) {
         setState(() {
-          profiles = res['data'] as List<UserProfile>;
+          profiles = res['data'] as List<UserProfileModel>;
         });
       } else {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -160,7 +162,7 @@ class _AllPatientsState extends State<AllPatients> {
                     borderRadius: BorderRadius.all(
                       Radius.circular(12),
                     ),
-                    color: StyleSheet().myPatients),
+                    color: StyleSheet.myPatients),
                 child: Row(
                   spacing: 3,
                   children: [Icon(Icons.people), Text("My Patients")],

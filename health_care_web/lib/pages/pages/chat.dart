@@ -1,6 +1,5 @@
 import 'package:health_care_web/components/list/design1/list1.dart';
 import 'package:health_care_web/components/list/design1/list_item_data.dart';
-import 'package:health_care_web/constants/consts.dart';
 import 'package:flutter/material.dart';
 
 class Chat extends StatefulWidget {

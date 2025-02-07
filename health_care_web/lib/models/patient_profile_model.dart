@@ -51,6 +51,7 @@ class PatientProfileModel extends UserProfileModel {
             patients: []));
   }
 
+  @override
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -108,6 +109,7 @@ class PatientReportModel extends UserProfileModel {
     );
   }
 
+  @override
   Map<String, dynamic> toMap() {
     return {
       'id': id,

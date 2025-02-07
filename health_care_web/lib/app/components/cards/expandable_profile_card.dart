@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
-import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/pages/additional/popups/contacts_popup.dart';
 
 class ExpandableProfileCard extends StatefulWidget {

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:health_care_web/constants/consts.dart';
 
 class MedicalReportHeader extends StatelessWidget {
   final String doctorName;

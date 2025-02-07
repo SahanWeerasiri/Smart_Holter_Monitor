@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
 import 'package:health_care_web/components/dropdown/CustomDropDown.dart';
-import 'package:health_care_web/constants/consts.dart';
 
 typedef DeviceSubmitCallback = void Function(String code);
 

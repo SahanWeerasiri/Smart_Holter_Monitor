@@ -1,4 +1,3 @@
-import 'package:health_care_web/constants/consts.dart';
 import 'package:flutter/material.dart';
 
 class ChatBubble extends StatelessWidget {
