@@ -258,13 +258,11 @@ class _SignupState extends State<Signup> {
                       lastDate: DateTime.now(),
                     );
 
-                    if (pickedDate != null) {
-                      setState(() {
-                        birthday =
-                            "${pickedDate.year}-${pickedDate.month}-${pickedDate.day}";
-                      });
-                    }
-                  },
+                    setState(() {
+                      birthday =
+                          "${pickedDate!.year}-${pickedDate.month}-${pickedDate.day}";
+                    });
+                                    },
                   backgroundColor: StyleSheet().btnBackground,
                   textColor: StyleSheet().btnText,
                   icon: Icons.calendar_month,
