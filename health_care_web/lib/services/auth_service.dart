@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:health_care_web/models/patient_profile_model.dart';
 import 'package:health_care_web/models/return_model.dart';
-import 'package:health_care_web/models/user_profile_model.dart';
 import 'package:health_care_web/services/firestore_db_service.dart';
 
 class AuthService {
@@ -20,12 +20,15 @@ class AuthService {
         return ReturnModel(
             state: true,
             message: "Account created successfully",
-            userProfileModel: UserProfileModel(
+            patientProfileModel: PatientProfileModel(
                 id: userCredential.user!.uid,
                 name: name,
                 age: "",
                 email: email,
                 pic: "",
+                isDone: false,
+                device: null,
+                doctorProfileModel: null,
                 address: "",
                 mobile: "",
                 color: "",
@@ -58,9 +61,12 @@ class AuthService {
       return ReturnModel(
           state: true,
           message: "Logged in successfully",
-          userProfileModel: UserProfileModel(
+          patientProfileModel: PatientProfileModel(
               id: userCredential.user!.uid,
               name: "",
+              device: null,
+              doctorProfileModel: null,
+              isDone: false,
               age: "",
               email: email,
               pic: "",

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:health_care_web/controllers/profileController.dart';
 import 'package:health_care_web/models/patient_profile_model.dart';
 import 'package:health_care_web/models/report_model.dart';
 import 'package:health_care_web/models/return_model.dart';
@@ -173,6 +174,28 @@ class DoctorProfileModel {
       'mobile': mobile,
       'color': color,
     };
+  }
+
+  Future<DoctorProfileModel?> fetchProfileData(BuildContext context) async {
+    ReturnModel res = await FirestoreDbService()
+        .fetchAccount();
+    if (res.state) {
+      return res.doctorProfileModel;
+    } else {
+      showMessages(res.state, res.message, context);
+      return null;
+    }
+    
+  }
+
+  Future<void> updateProfile(BuildContext context, ProfileController profileController)async {
+    ReturnModel res = await FirestoreDbService().updateProfile(
+        FirebaseAuth.instance.currentUser!.uid,
+        profileController.mobile.text,
+        profileController.language.text,
+        profileController.address.text,
+        profileController.pic.text);
+    showMessages(res.state, res.message, context);
   }
 
   DoctorReportModel toDoctorReportModel (){

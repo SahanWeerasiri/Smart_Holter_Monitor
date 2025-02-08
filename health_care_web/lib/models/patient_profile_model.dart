@@ -4,7 +4,7 @@ import 'package:health_care_web/models/doctor_profile_model.dart';
 class PatientProfileModel{
   bool isDone;
   DeviceProfileModel? device;
-  DoctorProfileModel doctorProfileModel;
+  DoctorProfileModel? doctorProfileModel;
   String id;
   String address;
   String name;
@@ -27,10 +27,10 @@ class PatientProfileModel{
     this.mobile = "",
     this.color = "",
     this.language = "",
-    required this.isDone,
+    this.isDone = false,
     this.contacts = const [],
-    required this.device,
-    required this.doctorProfileModel,
+    this.device,
+    this.doctorProfileModel,
   });
 
   factory PatientProfileModel.fromMap(Map<String, dynamic> map, String id) {
@@ -74,7 +74,7 @@ class PatientProfileModel{
       'language': language,
       'isDone': isDone,
       'device': DeviceProfileModel.toMap(device!),
-      'doctorProfileModel': doctorProfileModel.toMap(),
+      'doctorProfileModel': doctorProfileModel!.toMap(),
     };
   }
 

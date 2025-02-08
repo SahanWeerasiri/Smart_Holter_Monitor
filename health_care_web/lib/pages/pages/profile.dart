@@ -1,15 +1,12 @@
 import 'dart:convert';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care_web/app/components/popups/edit_profile_popup.dart';
 import 'package:health_care_web/components/buttons/custom_text_button/custom_text_button.dart';
 import 'package:health_care_web/controllers/profileController.dart';
 import 'package:health_care_web/models/app_sizes.dart';
-import 'package:health_care_web/models/return_model.dart';
+import 'package:health_care_web/models/doctor_profile_model.dart';
 import 'package:health_care_web/models/style_sheet.dart';
-import 'package:health_care_web/models/user_profile_model.dart';
-import 'package:health_care_web/services/firestore_db_service.dart';
 import 'package:iconly/iconly.dart';
 
 class Profile extends StatefulWidget {
@@ -21,8 +18,8 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  UserProfileModel? _userProfile =
-      UserProfileModel(id: "", name: "Name", email: "Email", age:"0");
+  DoctorProfileModel? _userProfile =
+      DoctorProfileModel(id: "", name: "Name", email: "Email", age:"0");
   late final ProfileController profileController = ProfileController();
   bool _isLoading = false; // Loading state
 
@@ -36,53 +33,20 @@ class _ProfileState extends State<Profile> {
     setState(() {
       _isLoading = true;
     });
-    ReturnModel res = await FirestoreDbService()
-        .fetchAccount(FirebaseAuth.instance.currentUser!.uid);
-    if (res.state) {
-      setState(() {
-        _userProfile=res.userProfileModel;
-      });
-    } else {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(res.message),
-            backgroundColor: Colors.red,
-          ),
-        );
-      });
-    }
+    _userProfile= await _userProfile?.initDoctor(context);
     setState(() {
       _isLoading = false;
     });
   }
 
   Future<void> onSubmit() async {
-    ReturnModel res = await FirestoreDbService().updateProfile(
-        FirebaseAuth.instance.currentUser!.uid,
-        profileController.mobile.text,
-        profileController.language.text,
-        profileController.address.text,
-        profileController.pic.text);
-    if (res.state) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(res.message),
-            backgroundColor: Colors.green,
-          ),
-        );
-      });
-    } else {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(res.message),
-            backgroundColor: Colors.red,
-          ),
-        );
-      });
-    }
+    setState(() {
+      _isLoading = true;
+    });
+    await _userProfile?.updateProfile(context, profileController);
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -131,7 +95,6 @@ class _ProfileState extends State<Profile> {
               onPressed: () {
                 profileController.mobile.text = _userProfile!.mobile;
                 profileController.address.text = _userProfile!.address;
-                profileController.language.text = _userProfile!.language;
                 profileController.pic.text = _userProfile!.pic;
                 showDialog(
                   context: context,
@@ -160,7 +123,6 @@ class _ProfileState extends State<Profile> {
             _buildProfileDetail(_userProfile!.email),
             _buildProfileDetail(_userProfile!.mobile),
             _buildProfileDetail(_userProfile!.address),
-            _buildProfileDetail(_userProfile!.language),
           ],
         ),
       ),
