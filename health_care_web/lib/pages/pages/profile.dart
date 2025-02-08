@@ -2,25 +2,27 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:health_care_web/app/components/popups/edit_profile_popup.dart';
 import 'package:health_care_web/components/buttons/custom_text_button/custom_text_button.dart';
-import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/controllers/profileController.dart';
-import 'package:health_care_web/pages/additional/popups/edit_profile_popup.dart';
-import 'package:health_care_web/pages/services/firestore_db_service.dart';
+import 'package:health_care_web/models/app_sizes.dart';
+import 'package:health_care_web/models/return_model.dart';
+import 'package:health_care_web/models/style_sheet.dart';
+import 'package:health_care_web/models/user_profile_model.dart';
+import 'package:health_care_web/services/firestore_db_service.dart';
 import 'package:iconly/iconly.dart';
 
 class Profile extends StatefulWidget {
-  final User? user;
 
-  const Profile({super.key, required this.user});
+  const Profile({super.key});
 
   @override
   State<Profile> createState() => _ProfileState();
 }
 
 class _ProfileState extends State<Profile> {
-  final UserProfile _userProfile =
-      UserProfile(id: "", name: "Name", email: "Email");
+  UserProfileModel? _userProfile =
+      UserProfileModel(id: "", name: "Name", email: "Email", age:"0");
   late final ProfileController profileController = ProfileController();
   bool _isLoading = false; // Loading state
 
@@ -34,23 +36,17 @@ class _ProfileState extends State<Profile> {
     setState(() {
       _isLoading = true;
     });
-    Map<String, dynamic> res = await FirestoreDbService()
+    ReturnModel res = await FirestoreDbService()
         .fetchAccount(FirebaseAuth.instance.currentUser!.uid);
-    if (res['success']) {
+    if (res.state) {
       setState(() {
-        _userProfile.name = res['data']['name'];
-        _userProfile.email = res['data']['email'];
-        _userProfile.address = res['data']['address'];
-        _userProfile.color = res['data']['color'];
-        _userProfile.language = res['data']['language'];
-        _userProfile.mobile = res['data']['mobile'];
-        _userProfile.pic = res['data']['pic'];
+        _userProfile=res.userProfileModel;
       });
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(res['error']),
+            content: Text(res.message),
             backgroundColor: Colors.red,
           ),
         );
@@ -62,17 +58,17 @@ class _ProfileState extends State<Profile> {
   }
 
   Future<void> onSubmit() async {
-    Map<String, dynamic> res = await FirestoreDbService().updateProfile(
+    ReturnModel res = await FirestoreDbService().updateProfile(
         FirebaseAuth.instance.currentUser!.uid,
         profileController.mobile.text,
         profileController.language.text,
         profileController.address.text,
         profileController.pic.text);
-    if (res['success']) {
+    if (res.state) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(res['message']),
+            content: Text(res.message),
             backgroundColor: Colors.green,
           ),
         );
@@ -81,7 +77,7 @@ class _ProfileState extends State<Profile> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(res['error']),
+            content: Text(res.message),
             backgroundColor: Colors.red,
           ),
         );
@@ -95,13 +91,13 @@ class _ProfileState extends State<Profile> {
     if (_isLoading) {
       return Center(
           child: CircularProgressIndicator(
-        backgroundColor: StyleSheet().uiBackground,
-        color: StyleSheet().btnBackground,
+        backgroundColor: StyleSheet.uiBackground,
+        color: StyleSheet.btnBackground,
       ));
     }
     return SingleChildScrollView(
       child: Container(
-        color: StyleSheet().uiBackground,
+        color: StyleSheet.uiBackground,
         width: double.infinity,
         padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
         child: Column(
@@ -113,12 +109,12 @@ class _ProfileState extends State<Profile> {
               width: 200,
               height: 200,
               decoration: BoxDecoration(
-                color: StyleSheet().btnBackground,
+                color: StyleSheet.btnBackground,
                 borderRadius: BorderRadius.circular(60),
               ),
-              child: _userProfile.pic.isNotEmpty
+              child: _userProfile!.pic.isNotEmpty
                   ? Image.memory(
-                      base64Decode(_userProfile.pic),
+                      base64Decode(_userProfile!.pic),
                       fit: BoxFit.cover, // Ensures the image fills the circle
                     )
                   : const Icon(
@@ -133,10 +129,10 @@ class _ProfileState extends State<Profile> {
             CustomTextButton(
               label: "Edit Profile",
               onPressed: () {
-                profileController.mobile.text = _userProfile.mobile;
-                profileController.address.text = _userProfile.address;
-                profileController.language.text = _userProfile.language;
-                profileController.pic.text = _userProfile.pic;
+                profileController.mobile.text = _userProfile!.mobile;
+                profileController.address.text = _userProfile!.address;
+                profileController.language.text = _userProfile!.language;
+                profileController.pic.text = _userProfile!.pic;
                 showDialog(
                   context: context,
                   builder: (context) => EditProfilePopup(
@@ -154,17 +150,17 @@ class _ProfileState extends State<Profile> {
                 );
               },
               icon: IconlyLight.edit,
-              backgroundColor: StyleSheet().btnBackground,
-              textColor: StyleSheet().btnText,
+              backgroundColor: StyleSheet.btnBackground,
+              textColor: StyleSheet.btnText,
             ),
             const SizedBox(height: 20),
 
             // Profile Details Section
-            _buildProfileDetail(_userProfile.name),
-            _buildProfileDetail(_userProfile.email),
-            _buildProfileDetail(_userProfile.mobile),
-            _buildProfileDetail(_userProfile.address),
-            _buildProfileDetail(_userProfile.language),
+            _buildProfileDetail(_userProfile!.name),
+            _buildProfileDetail(_userProfile!.email),
+            _buildProfileDetail(_userProfile!.mobile),
+            _buildProfileDetail(_userProfile!.address),
+            _buildProfileDetail(_userProfile!.language),
           ],
         ),
       ),
@@ -177,7 +173,7 @@ class _ProfileState extends State<Profile> {
       margin: const EdgeInsets.only(top: 10),
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.all(Radius.circular(10)),
-        color: StyleSheet().profileBase,
+        color: StyleSheet.profileBase,
       ),
       width: double.infinity,
       child: Padding(
@@ -186,7 +182,7 @@ class _ProfileState extends State<Profile> {
           text,
           style: TextStyle(
             fontSize: 16,
-            color: StyleSheet().profiletext,
+            color: StyleSheet.profiletext,
           ),
         ),
       ),

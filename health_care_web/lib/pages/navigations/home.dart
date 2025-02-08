@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:health_care_web/components/drawer/simple_drawer/drawer_index_controller.dart';
 import 'package:health_care_web/components/drawer/simple_drawer/simple_drawer.dart';
 import 'package:health_care_web/components/top_app_bar/top_app_bar3.dart';
+import 'package:health_care_web/models/app_sizes.dart';
+import 'package:health_care_web/models/drawer_items.dart';
+import 'package:health_care_web/models/style_sheet.dart';
 import 'package:health_care_web/pages/pages/all_patients.dart';
 import 'package:health_care_web/pages/pages/profile.dart';
 import 'package:health_care_web/pages/pages/summary.dart';
-import 'package:health_care_web/pages/services/auth_service.dart';
-import '../../constants/consts.dart';
+import 'package:health_care_web/services/auth_service.dart';
 import 'package:iconly/iconly.dart';
 
 class Home extends StatefulWidget {
@@ -22,14 +24,14 @@ class _HomeState extends State<Home> {
     const Summary(),
     const AllPatients(),
     const Text('Test Drawer 4'),
-    const Profile(user: null),
+    const Profile(),
   ];
   @override
   Widget build(BuildContext context) {
     AppSizes appSizes = AppSizes();
     appSizes.initSizes(context);
     return Scaffold(
-      backgroundColor: StyleSheet().uiBackground,
+      backgroundColor: StyleSheet.uiBackground,
       drawer: DrawerFb1(
           title: "Dashboard",
           items: [
@@ -70,19 +72,19 @@ class _HomeState extends State<Home> {
                   });
                 }),
           ],
-          backgroundColor: StyleSheet().uiBackground,
-          textColor: StyleSheet().uiBackground,
-          titleColor: StyleSheet().btnBackground,
-          selectedTextColor: StyleSheet().btnBackground,
-          dividerColor: StyleSheet().divider,
+          backgroundColor: StyleSheet.uiBackground,
+          textColor: StyleSheet.uiBackground,
+          titleColor: StyleSheet.btnBackground,
+          selectedTextColor: StyleSheet.btnBackground,
+          dividerColor: StyleSheet.divider,
           drawerWidth: 350,
           drawerRadius: 10,
           drawerIndexController: drawerIndexController),
       appBar: CustomTopAppBar3(
         title: "Smart Care - Doctor",
         backOnPressed: () {},
-        backgroundColor: StyleSheet().topbarBackground,
-        titleColor: StyleSheet().topbarText,
+        backgroundColor: StyleSheet.topbarBackground,
+        titleColor: StyleSheet.topbarText,
         leadingIcon: Builder(
           builder: (context) => IconButton(
             onPressed: () {
@@ -90,7 +92,7 @@ class _HomeState extends State<Home> {
             },
             icon: Icon(
               Icons.menu,
-              color: StyleSheet().topbarText,
+              color: StyleSheet.topbarText,
             ),
           ),
         ),
@@ -98,9 +100,9 @@ class _HomeState extends State<Home> {
           IconButton(
             icon: Icon(
               IconlyLight.logout,
-              color: StyleSheet().topbarText,
+              color: StyleSheet.topbarText,
             ),
-            color: StyleSheet().topbarText,
+            color: StyleSheet.topbarText,
             onPressed: () {
               AuthService().signout();
               WidgetsBinding.instance.addPostFrameCallback((_) {
