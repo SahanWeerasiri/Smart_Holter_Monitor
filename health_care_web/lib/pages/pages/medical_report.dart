@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:health_care_web/app/components/report/fixed_section.dart';
+import 'package:health_care_web/app/components/report/header.dart';
+import 'package:health_care_web/app/components/report/section.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
-import 'package:health_care_web/constants/consts.dart';
-import 'package:health_care_web/pages/additional/report/fixed_section.dart';
-import 'package:health_care_web/pages/additional/report/header.dart';
-import 'package:health_care_web/pages/additional/report/section.dart';
-import 'package:health_care_web/pages/services/firestore_db_service.dart';
+import 'package:health_care_web/models/doctor_profile_model.dart';
+import 'package:health_care_web/models/patient_profile_model.dart';
+import 'package:health_care_web/models/report_model.dart';
+import 'package:health_care_web/models/return_model.dart';
+import 'package:health_care_web/models/style_sheet.dart';
+import 'package:health_care_web/services/firestore_db_service.dart';
 
 class MedicalReport extends StatefulWidget {
-  final UserProfile profile;
-  final UserProfile doctor;
+  final PatientProfileModel profile;
+  final DoctorProfileModel doctor;
   final ReportModel? report;
   final List<ReportModel> reportsList;
   const MedicalReport(
@@ -33,65 +37,26 @@ class _MedicalReportState extends State<MedicalReport> {
   final TextEditingController aiOpinionController = TextEditingController();
 
   Future<void> saveReport(String uid) async {
-    // Handle saving logic
-    selectedReport!.aiSuggestions = aiOpinionController.text;
-    selectedReport!.brief = summaryController.text;
-    selectedReport!.description = descriptionController.text;
-    selectedReport!.docSuggestions = suggestionsController.text;
-    selectedReport!.anomalies = anomaliesController.text;
-    selectedReport!.isEditing = false;
-    selectedReport!.graph = "";
-    selectedReport!.timestamp = DateTime.now().toString();
-
-    Map<String, dynamic> res =
-        await FirestoreDbService().saveReport(uid, selectedReport!);
-    if (res['success']) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(res['message']),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(res['message']),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
+    configReportData(false);
+    await widget.doctor.saveReport(uid, selectedReport!, context);
   }
 
   Future<void> saveDraftReport(String uid) async {
+    configReportData(true);
+    await widget.doctor.saveDraftReport(uid, selectedReport!, context);
+    
+  }
+
+  void configReportData(bool isEditing){
     // Handle saving logic
     selectedReport!.aiSuggestions = aiOpinionController.text;
     selectedReport!.brief = summaryController.text;
     selectedReport!.description = descriptionController.text;
     selectedReport!.docSuggestions = suggestionsController.text;
     selectedReport!.anomalies = anomaliesController.text;
-    selectedReport!.isEditing = false;
+    selectedReport!.isEditing = isEditing;
     selectedReport!.graph = "";
     selectedReport!.timestamp = DateTime.now().toString();
-
-    Map<String, dynamic> res =
-        await FirestoreDbService().saveReportData(uid, selectedReport!);
-    if (res['success']) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(res['message']),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(res['message']),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
   }
 
   @override
@@ -117,7 +82,7 @@ class _MedicalReportState extends State<MedicalReport> {
           Expanded(
             flex: 2,
             child: Container(
-              color: StyleSheet().uiBackground,
+              color: StyleSheet.uiBackground,
               child: ListView(
                 children: widget.reportsList.isNotEmpty
                     ? widget.reportsList.map((r) {
@@ -127,8 +92,8 @@ class _MedicalReportState extends State<MedicalReport> {
                             borderRadius: BorderRadius.all(Radius.circular(8)),
                             color: selectedReport != null &&
                                     selectedReport!.reportId == r.reportId
-                                ? StyleSheet().btnBackground
-                                : StyleSheet().uiBackground,
+                                ? StyleSheet.btnBackground
+                                : StyleSheet.uiBackground,
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -137,8 +102,8 @@ class _MedicalReportState extends State<MedicalReport> {
                                 Icons.history,
                                 color: selectedReport == null ||
                                         selectedReport!.reportId != r.reportId
-                                    ? StyleSheet().btnBackground
-                                    : StyleSheet().uiBackground,
+                                    ? StyleSheet.btnBackground
+                                    : StyleSheet.uiBackground,
                               ),
                               Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -150,8 +115,8 @@ class _MedicalReportState extends State<MedicalReport> {
                                       color: selectedReport == null ||
                                               selectedReport!.reportId !=
                                                   r.reportId
-                                          ? StyleSheet().btnBackground
-                                          : StyleSheet().uiBackground,
+                                          ? StyleSheet.btnBackground
+                                          : StyleSheet.uiBackground,
                                     ),
                                   ),
                                   Text(
@@ -160,8 +125,8 @@ class _MedicalReportState extends State<MedicalReport> {
                                       color: selectedReport == null ||
                                               selectedReport!.reportId !=
                                                   r.reportId
-                                          ? StyleSheet().btnBackground
-                                          : StyleSheet().uiBackground,
+                                          ? StyleSheet.btnBackground
+                                          : StyleSheet.uiBackground,
                                     ),
                                   ),
                                 ],
@@ -177,8 +142,8 @@ class _MedicalReportState extends State<MedicalReport> {
                                     color: selectedReport == null ||
                                             selectedReport!.reportId !=
                                                 r.reportId
-                                        ? StyleSheet().btnBackground
-                                        : StyleSheet().uiBackground,
+                                        ? StyleSheet.btnBackground
+                                        : StyleSheet.uiBackground,
                                   ))
                             ],
                           ),
@@ -199,7 +164,7 @@ class _MedicalReportState extends State<MedicalReport> {
                             doctorName: selectedReport!.docName,
                             doctorSpecialization: selectedReport!.docEmail,
                             patientName: widget.profile.name,
-                            patientAge: selectedReport!.age,
+                            patientAge: selectedReport!.patientProfileModel.age,
                             avgHeartRate: widget.report!.avgHeart,
                             patientId: widget.profile.id,
                             reportDate: DateTime.now()),
@@ -231,8 +196,8 @@ class _MedicalReportState extends State<MedicalReport> {
                               onPressed: () async {
                                 await saveReport(widget.profile.id);
                               },
-                              backgroundColor: StyleSheet().btnBackground,
-                              textColor: StyleSheet().btnText,
+                              backgroundColor: StyleSheet.btnBackground,
+                              textColor: StyleSheet.btnText,
                               icon: Icons.save,
                             ),
                             CustomButton(
@@ -240,8 +205,8 @@ class _MedicalReportState extends State<MedicalReport> {
                               onPressed: () async {
                                 await saveDraftReport(widget.profile.id);
                               },
-                              backgroundColor: StyleSheet().btnBackground,
-                              textColor: StyleSheet().btnText,
+                              backgroundColor: StyleSheet.btnBackground,
+                              textColor: StyleSheet.btnText,
                               icon: Icons.save,
                             ),
                           ],

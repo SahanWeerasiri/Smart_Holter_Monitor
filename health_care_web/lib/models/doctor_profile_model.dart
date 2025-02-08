@@ -1,4 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:health_care_web/models/patient_profile_model.dart';
+import 'package:health_care_web/models/report_model.dart';
+import 'package:health_care_web/models/return_model.dart';
+import 'package:health_care_web/services/firestore_db_service.dart';
 
 class DoctorProfileModel {
   final String id;
@@ -35,6 +39,48 @@ class DoctorProfileModel {
       color: map['color'] ?? '',
       patients: [], //Patients need to be fetched separately!
     );
+  }
+
+  Future<void> saveReport(String uid,ReportModel selectedReport, BuildContext context)async{
+    ReturnModel res =
+        await FirestoreDbService().saveReport(uid, selectedReport);
+    if (res.state) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(res.message),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(res.message),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> saveDraftReport(String uid, ReportModel selectedReport, BuildContext context)async{
+    ReturnModel res =
+        await FirestoreDbService().saveReportData(uid, selectedReport);
+    if (res.state) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(res.message),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(res.message),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   Map<String, dynamic> toMap() {

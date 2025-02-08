@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:health_care_web/app/components/admin/device_assignment_section.dart';
+import 'package:health_care_web/app/components/admin/doctor_signup_section.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
-import 'package:health_care_web/constants/consts.dart';
-import "package:health_care_web/pages/additional/admin/doctor_signup_section.dart";
-import 'package:health_care_web/pages/additional/admin/device_assignment_section.dart';
+import 'package:health_care_web/models/admin_tabs.dart';
+import 'package:health_care_web/models/style_sheet.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -12,7 +13,7 @@ class AdminDashboard extends StatefulWidget {
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
-  String selectedTab = AdminTabs().doctorRegistration;
+  String selectedTab = AdminTabs.doctorRegistration;
 
   @override
   Widget build(BuildContext context) {
@@ -33,28 +34,28 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     label: "Doctor Registration",
                     onPressed: () {
                       setState(() {
-                        selectedTab = AdminTabs().doctorRegistration;
+                        selectedTab = AdminTabs.doctorRegistration;
                       });
                     },
-                    backgroundColor: StyleSheet().btnBackground,
-                    textColor: StyleSheet().btnText,
+                    backgroundColor: StyleSheet.btnBackground,
+                    textColor: StyleSheet.btnText,
                     icon: Icons.create,
                   ),
                   CustomButton(
                     label: "Device Assignment",
                     onPressed: () {
                       setState(() {
-                        selectedTab = AdminTabs().deviceAssignment;
+                        selectedTab = AdminTabs.deviceAssignment;
                       });
                     },
-                    backgroundColor: StyleSheet().btnBackground,
-                    textColor: StyleSheet().btnText,
+                    backgroundColor: StyleSheet.btnBackground,
+                    textColor: StyleSheet.btnText,
                     icon: Icons.devices,
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-              (selectedTab == AdminTabs().doctorRegistration)
+              (selectedTab == AdminTabs.doctorRegistration)
                   ? const DoctorSignupSection()
                   : const DeviceAssignmentSection(),
             ],

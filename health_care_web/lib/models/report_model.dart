@@ -1,16 +1,16 @@
 import 'package:health_care_web/models/patient_profile_model.dart';
 
 class ReportModel {
-  final String timestamp;
-  final String description;
-  final String brief;
-  final String docSuggestions;
-  final String aiSuggestions;
-  final String graph;
-  final String reportId;
-  final String anomalies;
-  final bool isEditing;
-  final PatientReportModel patientProfileModel;
+  String timestamp;
+  String description;
+  String brief;
+  String docSuggestions;
+  String aiSuggestions;
+  String graph;
+  String reportId;
+  String anomalies;
+  bool isEditing;
+  PatientReportModel patientProfileModel;
 
   ReportModel({
     required this.timestamp,
