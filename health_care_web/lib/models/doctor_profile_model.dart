@@ -73,24 +73,43 @@ class DoctorProfileModel {
   
   }
 
-  Future<ReturnModel> fetchCurrentPatient(BuildContext context) async{
-    ReturnModel res = ReturnModel(state: false, message: "");
+  Future<List<PatientProfileModel>> fetchCurrentPatient(BuildContext context) async{
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
-        showMessages(true, "Wave01", context);
         throw Exception("User is not logged in.");
       }
 
       ReturnModel res =
           await FirestoreDbService().fetchCurrentPatients(user.uid);
 
-      showMessages(res.state, res.message, context);
+      List<PatientProfileModel> profiles = [];
+
+      if (res.state) {
+        for(PatientProfileModel patient in res.patients){
+            patient.doctorProfileModel = this;
+            // showMessages(true, "${patient.id} | ${patient.doctorProfileModel!.email} | ${patient.docId}", context);
+          ReturnModel res2 = await RealDbService().fetchDeviceData(patient.deviceId);
+          if(res2.state){
+            patient.device = res2.deviceProfileModel;
+            // showMessages(true, "${patient.id} | ${patient.device!.deadline} | ${patient.docId}", context);
+          }
+          profiles.add(patient);
+
+        }
+        
+        return profiles;
+        
+      } else {
+        showMessages(res.state, res.message, context);
+        return [];
+      }
+
     } catch (e) {
-      showMessages(true, "Wave02", context);
       showMessages(false, e.toString(), context);
+      return [];
+
     }
-    return res;
   }
 
   Future<ReportModel?> fetchAIReport(String uid, BuildContext context) async {

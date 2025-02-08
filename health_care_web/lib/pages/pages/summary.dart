@@ -4,7 +4,6 @@ import 'package:health_care_web/app/components/cards/mobile_home_popup.dart';
 import 'package:health_care_web/models/app_sizes.dart';
 import 'package:health_care_web/models/doctor_profile_model.dart';
 import 'package:health_care_web/models/patient_profile_model.dart';
-import 'package:health_care_web/models/return_model.dart';
 import 'package:health_care_web/models/style_sheet.dart';
 import 'package:iconly/iconly.dart';
 
@@ -31,17 +30,14 @@ class _SummaryState extends State<Summary> {
   Future<void> fetchCurrentPatients() async {
     setState(() => isLoading = true);
 
-    doctor = await DoctorProfileModel(id: "", name: "",  email: "").initDoctor(context);
+    doctor = DoctorProfileModel(id: "", name: "",  email: "");
+    doctor = await doctor.initDoctor(context);
 
-    ReturnModel res = await doctor.fetchCurrentPatient(context);
+    List<PatientProfileModel> res = await doctor.fetchCurrentPatient(context);
 
-    if(res.state){
       setState(() {
-        currentProfiles = res.patients;
+        currentProfiles = res;
       });
-    }else{
-      currentProfiles = [];
-    }
 
     setState(() => isLoading = false);    
   }
