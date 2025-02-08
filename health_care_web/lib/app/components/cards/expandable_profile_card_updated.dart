@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
+import 'package:health_care_web/models/app_sizes.dart';
+import 'package:health_care_web/models/style_sheet.dart';
 import 'package:iconly/iconly.dart';
 
 class ExpandableProfileCardUpdated extends StatefulWidget {
@@ -40,8 +42,8 @@ class _ExpandableProfileCardUpdatedState
   bool _isExpanded = false;
   double _cardHeight = 70;
   final List<Color> _stateColors = [
-    StyleSheet().myPatients,
-    StyleSheet().avgHeartBox
+    StyleSheet.myPatients,
+    StyleSheet.avgHeartBox
   ];
 
   @override
@@ -105,14 +107,14 @@ class _ExpandableProfileCardUpdatedState
                             ? CustomButton(
                                 label: "Remove",
                                 icon: IconlyLight.delete,
-                                textColor: StyleSheet().uiBackground,
-                                backgroundColor: StyleSheet().patientsDelete,
+                                textColor: StyleSheet.uiBackground,
+                                backgroundColor: StyleSheet.patientsDelete,
                                 onPressed: () => {widget.onRemove()})
                             : CustomButton(
                                 label: "Add",
-                                textColor: StyleSheet().uiBackground,
+                                textColor: StyleSheet.uiBackground,
                                 icon: IconlyLight.add_user,
-                                backgroundColor: StyleSheet().patientsAdd,
+                                backgroundColor: StyleSheet.patientsAdd,
                                 onPressed: () => {widget.onAdd()})
                       ],
                     ),

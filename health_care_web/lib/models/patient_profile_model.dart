@@ -1,3 +1,4 @@
+import 'package:health_care_web/models/contact_profile_model.dart';
 import 'package:health_care_web/models/device_profile_model.dart';
 import 'package:health_care_web/models/doctor_profile_model.dart';
 
@@ -14,7 +15,7 @@ class PatientProfileModel{
   String mobile;
   String color;
   String language;
-  List<String> contacts;
+  List<ContactProfileModel> contacts;
 
 
   PatientProfileModel({

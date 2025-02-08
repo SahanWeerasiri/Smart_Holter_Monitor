@@ -1,9 +1,12 @@
 import 'package:health_care_web/components/buttons/custom_text_button/custom_text_button.dart';
 import 'package:health_care_web/components/text_input/text_input_with_leading_icon.dart';
-import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/controllers/textController.dart';
 import 'package:flutter/material.dart';
-import 'package:health_care_web/pages/services/auth_service.dart';
+import 'package:health_care_web/models/app_sizes.dart';
+import 'package:health_care_web/models/custom_text_input_types.dart';
+import 'package:health_care_web/models/return_model.dart';
+import 'package:health_care_web/models/style_sheet.dart';
+import 'package:health_care_web/services/auth_service.dart';
 
 class SignupCard extends StatefulWidget {
   const SignupCard({super.key});
@@ -24,11 +27,11 @@ class _SignupCardState extends State<SignupCard> {
     super.initState();
     credentialController = CredentialController();
     textStyleHeading = TextStyle(
-        color: CustomColors().blue, fontSize: 30, fontWeight: FontWeight.bold);
+        color: StyleSheet.btnBackground, fontSize: 30, fontWeight: FontWeight.bold);
     textStyleTextInputTopic = const TextStyle(
         color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
     textStyleInputField = TextStyle(
-        color: CustomColors().blueDark,
+        color: StyleSheet.btnBackground,
         fontSize: 15,
         fontWeight: FontWeight.bold);
   }
@@ -62,18 +65,18 @@ class _SignupCardState extends State<SignupCard> {
     }
 
     AuthService auth = AuthService();
-    Map<String, dynamic> result = await auth.createUserWithEmailAndPassword(
+    ReturnModel result = await auth.createUserWithEmailAndPassword(
         credentialController.name,
         credentialController.username,
         credentialController.password);
-    if (result["status"] == "error") {
+    if (result.state) {
       setState(() {
-        msg = result["message"];
+        msg = result.message;
       });
       return false;
     }
     setState(() {
-      msg = result["message"];
+      msg = result.message;
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -111,7 +114,7 @@ class _SignupCardState extends State<SignupCard> {
         height: AppSizes().getBlockSizeVertical(80),
         child: Container(
           decoration: BoxDecoration(
-              color: StyleSheet().uiBackground,
+              color: StyleSheet.uiBackground,
               borderRadius: BorderRadius.all(Radius.circular(20)),
               boxShadow: List.of([
                 BoxShadow(
@@ -144,12 +147,12 @@ class _SignupCardState extends State<SignupCard> {
                     inputController: credentialController,
                     hint: "Name",
                     icon: Icons.person,
-                    hintColor: StyleSheet().greyHint,
-                    textColor: StyleSheet().text,
-                    shadowColor: StyleSheet().textBackground,
-                    enableBorderColor: StyleSheet().disabledBorder,
-                    borderColor: StyleSheet().greyHint,
-                    focusedBorderColor: StyleSheet().enableBorder,
+                    hintColor: StyleSheet.greyHint,
+                    textColor: StyleSheet.text,
+                    shadowColor: StyleSheet.textBackground,
+                    enableBorderColor: StyleSheet.disabledBorder,
+                    borderColor: StyleSheet.greyHint,
+                    focusedBorderColor: StyleSheet.enableBorder,
                     typeKey: CustomTextInputTypes().name),
                 SizedBox(
                   height: AppSizes().getBlockSizeVertical(3),
@@ -170,12 +173,12 @@ class _SignupCardState extends State<SignupCard> {
                     inputController: credentialController,
                     hint: "Email",
                     icon: Icons.email,
-                    hintColor: StyleSheet().greyHint,
-                    textColor: StyleSheet().text,
-                    shadowColor: StyleSheet().textBackground,
-                    enableBorderColor: StyleSheet().disabledBorder,
-                    borderColor: StyleSheet().greyHint,
-                    focusedBorderColor: StyleSheet().enableBorder,
+                    hintColor: StyleSheet.greyHint,
+                    textColor: StyleSheet.text,
+                    shadowColor: StyleSheet.textBackground,
+                    enableBorderColor: StyleSheet.disabledBorder,
+                    borderColor: StyleSheet.greyHint,
+                    focusedBorderColor: StyleSheet.enableBorder,
                     typeKey: CustomTextInputTypes().username),
                 SizedBox(
                   height: AppSizes().getBlockSizeVertical(3),
@@ -191,12 +194,12 @@ class _SignupCardState extends State<SignupCard> {
                     inputController: credentialController,
                     hint: "Password",
                     icon: Icons.key,
-                    hintColor: StyleSheet().greyHint,
-                    textColor: StyleSheet().text,
-                    shadowColor: StyleSheet().textBackground,
-                    enableBorderColor: StyleSheet().disabledBorder,
-                    borderColor: StyleSheet().greyHint,
-                    focusedBorderColor: StyleSheet().enableBorder,
+                    hintColor: StyleSheet.greyHint,
+                    textColor: StyleSheet.text,
+                    shadowColor: StyleSheet.textBackground,
+                    enableBorderColor: StyleSheet.disabledBorder,
+                    borderColor: StyleSheet.greyHint,
+                    focusedBorderColor: StyleSheet.enableBorder,
                     isPassword: true,
                     typeKey: CustomTextInputTypes().password),
                 SizedBox(
@@ -215,12 +218,12 @@ class _SignupCardState extends State<SignupCard> {
                     inputController: credentialController,
                     hint: "Confirm Password",
                     icon: Icons.key,
-                    hintColor: StyleSheet().greyHint,
-                    textColor: StyleSheet().text,
-                    shadowColor: StyleSheet().textBackground,
-                    enableBorderColor: StyleSheet().disabledBorder,
-                    borderColor: StyleSheet().greyHint,
-                    focusedBorderColor: StyleSheet().enableBorder,
+                    hintColor: StyleSheet.greyHint,
+                    textColor: StyleSheet.text,
+                    shadowColor: StyleSheet.textBackground,
+                    enableBorderColor: StyleSheet.disabledBorder,
+                    borderColor: StyleSheet.greyHint,
+                    focusedBorderColor: StyleSheet.enableBorder,
                     isPassword: true,
                     typeKey: CustomTextInputTypes().confirmPassword),
                 SizedBox(
@@ -237,8 +240,8 @@ class _SignupCardState extends State<SignupCard> {
                       signUpError();
                     }
                   },
-                  backgroundColor: StyleSheet().btnBackground,
-                  textColor: StyleSheet().btnText,
+                  backgroundColor: StyleSheet.btnBackground,
+                  textColor: StyleSheet.btnText,
                   icon: Icons.login,
                 ),
               ],

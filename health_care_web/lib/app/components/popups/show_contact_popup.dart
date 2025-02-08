@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:health_care_web/constants/consts.dart';
+import 'package:health_care_web/models/contact_profile_model.dart';
+import 'package:health_care_web/models/style_sheet.dart';
 import 'package:iconly/iconly.dart';
 
 class ShowContactPopup extends StatelessWidget {
-  final ContactProfile profile;
+  final ContactProfileModel profile;
   const ShowContactPopup({super.key, required this.profile});
 
   @override
@@ -11,17 +12,17 @@ class ShowContactPopup extends StatelessWidget {
     return AlertDialog(
       icon: Icon(
         IconlyLight.profile,
-        color: StyleSheet().doctorDetailsPopPrimary,
+        color: StyleSheet.doctorDetailsPopPrimary,
       ),
-      backgroundColor: StyleSheet().uiBackground,
+      backgroundColor: StyleSheet.uiBackground,
       title: Text(
         profile.name,
         textAlign: TextAlign.center,
         style: TextStyle(
-          backgroundColor: StyleSheet().uiBackground,
+          backgroundColor: StyleSheet.uiBackground,
           fontSize: 25,
           fontWeight: FontWeight.bold,
-          color: StyleSheet().doctorDetailsPopPrimary,
+          color: StyleSheet.doctorDetailsPopPrimary,
         ),
       ),
       content: SingleChildScrollView(
@@ -31,16 +32,16 @@ class ShowContactPopup extends StatelessWidget {
           children: [
             Text("Mobile:",
                 style: TextStyle(
-                  backgroundColor: StyleSheet().uiBackground,
+                  backgroundColor: StyleSheet.uiBackground,
                   fontSize: 18,
-                  color: StyleSheet().doctorDetailsPopPSecondary,
+                  color: StyleSheet.doctorDetailsPopPSecondary,
                 )),
             Text(profile.mobile,
                 style: TextStyle(
-                  backgroundColor: StyleSheet().uiBackground,
+                  backgroundColor: StyleSheet.uiBackground,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: StyleSheet().doctorDetailsPopPSecondary,
+                  color: StyleSheet.doctorDetailsPopPSecondary,
                 )),
           ],
         ),
@@ -53,9 +54,9 @@ class ShowContactPopup extends StatelessWidget {
           child: Text(
             "Cancel",
             style: TextStyle(
-              backgroundColor: StyleSheet().uiBackground,
+              backgroundColor: StyleSheet.uiBackground,
               fontSize: 20,
-              color: StyleSheet().doctorDetailsPopPrimary,
+              color: StyleSheet.doctorDetailsPopPrimary,
             ),
           ),
         ),

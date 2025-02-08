@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:health_care_web/models/style_sheet.dart';
 
 class MedicalReportHeader extends StatelessWidget {
   final String doctorName;
@@ -37,7 +38,7 @@ class MedicalReportHeader extends StatelessWidget {
             ),
             Text("Smart Care - Health Report",
                 style: TextStyle(
-                  color: StyleSheet().titleText,
+                  color: StyleSheet.titleText,
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
                 )),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
+import 'package:health_care_web/models/style_sheet.dart';
 
 class AddContactPopup extends StatelessWidget {
   final TextEditingController nameController;
@@ -16,15 +17,15 @@ class AddContactPopup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: StyleSheet().uiBackground,
+      backgroundColor: StyleSheet.uiBackground,
       title: Text(
         "Add Emergency Contact",
         textAlign: TextAlign.center,
         style: TextStyle(
-          backgroundColor: StyleSheet().uiBackground,
+          backgroundColor: StyleSheet.uiBackground,
           fontSize: 25,
           fontWeight: FontWeight.bold,
-          color: StyleSheet().doctorDetailsPopPrimary,
+          color: StyleSheet.doctorDetailsPopPrimary,
         ),
       ),
       content: SingleChildScrollView(
@@ -33,18 +34,18 @@ class AddContactPopup extends StatelessWidget {
           children: [
             TextField(
               style: TextStyle(
-                backgroundColor: StyleSheet().uiBackground,
+                backgroundColor: StyleSheet.uiBackground,
                 fontSize: 20,
-                color: StyleSheet().doctorDetailsPopPrimary,
+                color: StyleSheet.doctorDetailsPopPrimary,
               ),
               controller: nameController,
               decoration: const InputDecoration(labelText: "Name"),
             ),
             TextField(
               style: TextStyle(
-                backgroundColor: StyleSheet().uiBackground,
+                backgroundColor: StyleSheet.uiBackground,
                 fontSize: 20,
-                color: StyleSheet().doctorDetailsPopPrimary,
+                color: StyleSheet.doctorDetailsPopPrimary,
               ),
               controller: mobileController,
               decoration: const InputDecoration(labelText: "Mobile"),
@@ -62,17 +63,17 @@ class AddContactPopup extends StatelessWidget {
           child: Text(
             "Cancel",
             style: TextStyle(
-              backgroundColor: StyleSheet().uiBackground,
+              backgroundColor: StyleSheet.uiBackground,
               fontSize: 20,
-              color: StyleSheet().doctorDetailsPopPrimary,
+              color: StyleSheet.doctorDetailsPopPrimary,
             ),
           ),
         ),
         CustomButton(
           label: "Add Contact",
           onPressed: onSubmit,
-          backgroundColor: StyleSheet().btnBackground,
-          textColor: StyleSheet().btnText,
+          backgroundColor: StyleSheet.btnBackground,
+          textColor: StyleSheet.btnText,
           icon: Icons.person_add,
         ),
       ],

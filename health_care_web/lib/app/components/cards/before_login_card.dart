@@ -1,5 +1,7 @@
 import 'package:health_care_web/components/buttons/custom_text_button/custom_text_button.dart';
 import 'package:flutter/material.dart';
+import 'package:health_care_web/models/app_sizes.dart';
+import 'package:health_care_web/models/style_sheet.dart';
 
 class BeforeLoginCard extends StatelessWidget {
   const BeforeLoginCard({super.key});
@@ -12,7 +14,7 @@ class BeforeLoginCard extends StatelessWidget {
         height: AppSizes().getBlockSizeVertical(80),
         child: Container(
           decoration: BoxDecoration(
-              color: StyleSheet().uiBackground,
+              color: StyleSheet.uiBackground,
               borderRadius: BorderRadius.all(Radius.circular(20)),
               boxShadow: List.of([
                 BoxShadow(
@@ -35,7 +37,7 @@ class BeforeLoginCard extends StatelessWidget {
                 ),
                 Text("Smart Care",
                     style: TextStyle(
-                      color: StyleSheet().titleText,
+                      color: StyleSheet.titleText,
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
                     )),
@@ -53,7 +55,7 @@ class BeforeLoginCard extends StatelessWidget {
                   "Login to stay healthy and fit",
                   style: TextStyle(
                     fontSize: 17,
-                    color: StyleSheet().titleSupport,
+                    color: StyleSheet.titleSupport,
                   ),
                 ),
                 SizedBox(
@@ -64,8 +66,8 @@ class BeforeLoginCard extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushNamed(context, '/login');
                   },
-                  backgroundColor: StyleSheet().btnBackground,
-                  textColor: StyleSheet().btnText,
+                  backgroundColor: StyleSheet.btnBackground,
+                  textColor: StyleSheet.btnText,
                 ),
                 // SizedBox(
                 //   height: AppSizes().getBlockSizeVertical(1),

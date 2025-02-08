@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
 import 'package:health_care_web/components/dropdown/CustomDropDown.dart';
-import 'package:health_care_web/constants/consts.dart';
+import 'package:health_care_web/models/patient_profile_model.dart';
+import 'package:health_care_web/models/style_sheet.dart';
 
-typedef DeviceSubmitCallback = void Function(UserProfile? profile);
+typedef DeviceSubmitCallback = void Function(PatientProfileModel? profile);
 
 class ConnectDevicePatientPopup extends StatefulWidget {
   final String id;
-  final List<UserProfile> profiles;
+  final List<PatientProfileModel> profiles;
   final DeviceSubmitCallback onSubmit;
   final VoidCallback onClose;
 
@@ -23,20 +24,20 @@ class ConnectDevicePatientPopup extends StatefulWidget {
 
 class _StateConnectDevicePatientPopup extends State<ConnectDevicePatientPopup> {
   String device = "";
-  UserProfile? selectedPatient;
+  PatientProfileModel? selectedPatient;
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: StyleSheet().uiBackground,
+      backgroundColor: StyleSheet.uiBackground,
       title: Text(
         "Connect Device",
         textAlign: TextAlign.center,
         style: TextStyle(
-          backgroundColor: StyleSheet().uiBackground,
+          backgroundColor: StyleSheet.uiBackground,
           fontSize: 25,
           fontWeight: FontWeight.bold,
-          color: StyleSheet().doctorDetailsPopPrimary,
+          color: StyleSheet.doctorDetailsPopPrimary,
         ),
       ),
       content: SingleChildScrollView(
@@ -66,17 +67,17 @@ class _StateConnectDevicePatientPopup extends State<ConnectDevicePatientPopup> {
           child: Text(
             "Cancel",
             style: TextStyle(
-              backgroundColor: StyleSheet().uiBackground,
+              backgroundColor: StyleSheet.uiBackground,
               fontSize: 20,
-              color: StyleSheet().doctorDetailsPopPrimary,
+              color: StyleSheet.doctorDetailsPopPrimary,
             ),
           ),
         ),
         CustomButton(
           label: "Add",
           onPressed: () => widget.onSubmit(selectedPatient),
-          backgroundColor: StyleSheet().btnBackground,
-          textColor: StyleSheet().btnText,
+          backgroundColor: StyleSheet.btnBackground,
+          textColor: StyleSheet.btnText,
           icon: Icons.add,
         ),
       ],

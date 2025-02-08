@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:health_care_web/constants/consts.dart';
+import 'package:health_care_web/models/patient_profile_model.dart';
+import 'package:health_care_web/models/style_sheet.dart';
 
 class ProfileCard extends StatefulWidget {
-  final UserProfile profile;
+  final PatientProfileModel profile;
   final VoidCallback onClick;
   const ProfileCard({super.key, required this.profile, required this.onClick});
 
@@ -29,8 +30,8 @@ class _ProfileCardState extends State<ProfileCard> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  StyleSheet().bottomNavigationBase,
-                  StyleSheet().bottomNavigationShadow,
+                  StyleSheet.bottomNavigationBase,
+                  StyleSheet.bottomNavigationShadow,
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,

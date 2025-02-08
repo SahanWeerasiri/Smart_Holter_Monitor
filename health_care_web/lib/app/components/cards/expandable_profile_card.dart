@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:health_care_web/app/components/popups/contacts_popup.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
-import 'package:health_care_web/pages/additional/popups/contacts_popup.dart';
+import 'package:health_care_web/models/app_sizes.dart';
+import 'package:health_care_web/models/contact_profile_model.dart';
+import 'package:health_care_web/models/style_sheet.dart';
 
 class ExpandableProfileCard extends StatefulWidget {
   final String name;
@@ -10,7 +13,7 @@ class ExpandableProfileCard extends StatefulWidget {
   final String mobile;
   final String device;
   final bool isDone;
-  final List<ContactProfile> contactProfiles;
+  final List<ContactProfileModel> contactProfiles;
   final VoidCallback onCreateReport;
   final VoidCallback onViewReport;
   final VoidCallback onRemoveDevice;
@@ -40,10 +43,10 @@ class _ExpandableProfileCardState extends State<ExpandableProfileCard> {
   bool _isExpanded = false;
   double _cardHeight = 70;
   final List<Color> _stateColors = [
-    StyleSheet().step1,
-    StyleSheet().step2,
-    StyleSheet().step3,
-    StyleSheet().step4,
+    StyleSheet.step1,
+    StyleSheet.step2,
+    StyleSheet.step3,
+    StyleSheet.step4,
   ];
 
   void showContacts() {
@@ -122,8 +125,8 @@ class _ExpandableProfileCardState extends State<ExpandableProfileCard> {
                         CustomButton(
                             label: "View Contacts",
                             icon: Icons.contact_emergency,
-                            backgroundColor: StyleSheet().btnBackground,
-                            textColor: StyleSheet().btnText,
+                            backgroundColor: StyleSheet.btnBackground,
+                            textColor: StyleSheet.btnText,
                             onPressed: () {
                               showContacts();
                             }),
@@ -131,8 +134,8 @@ class _ExpandableProfileCardState extends State<ExpandableProfileCard> {
                         CustomButton(
                             label: "View Reports",
                             icon: Icons.history,
-                            backgroundColor: StyleSheet().btnBackground,
-                            textColor: StyleSheet().btnText,
+                            backgroundColor: StyleSheet.btnBackground,
+                            textColor: StyleSheet.btnText,
                             onPressed: () {
                               widget.onViewReport();
                             })
@@ -164,8 +167,8 @@ class _ExpandableProfileCardState extends State<ExpandableProfileCard> {
                               CustomButton(
                                   label: "Create the report",
                                   icon: Icons.create,
-                                  backgroundColor: StyleSheet().btnBackground,
-                                  textColor: StyleSheet().btnText,
+                                  backgroundColor: StyleSheet.btnBackground,
+                                  textColor: StyleSheet.btnText,
                                   onPressed: () {
                                     widget.onCreateReport();
                                   })
@@ -178,8 +181,8 @@ class _ExpandableProfileCardState extends State<ExpandableProfileCard> {
                                       label: "Remove the device",
                                       icon: Icons.remove_circle,
                                       backgroundColor:
-                                          StyleSheet().patientsDelete,
-                                      textColor: StyleSheet().btnText,
+                                          StyleSheet.patientsDelete,
+                                      textColor: StyleSheet.btnText,
                                       onPressed: () {
                                         widget.onRemoveDevice();
                                       })
@@ -193,8 +196,8 @@ class _ExpandableProfileCardState extends State<ExpandableProfileCard> {
                                         label: "Pending...",
                                         icon: Icons.pending_actions,
                                         backgroundColor:
-                                            StyleSheet().btnBackground,
-                                        textColor: StyleSheet().btnText,
+                                            StyleSheet.btnBackground,
+                                        textColor: StyleSheet.btnText,
                                         onPressed: () {
                                           widget.onPending();
                                         },

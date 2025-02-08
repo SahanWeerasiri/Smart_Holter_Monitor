@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:health_care_web/models/app_sizes.dart';
+import 'package:health_care_web/models/style_sheet.dart';
 
 class ChatBubble extends StatelessWidget {
   final ChatModel chatModel;
@@ -21,8 +23,8 @@ class ChatBubble extends StatelessWidget {
                   decoration: BoxDecoration(
                       borderRadius: const BorderRadius.all(Radius.circular(10)),
                       color: chatModel.isSender
-                          ? StyleSheet().sendChatBuble1
-                          : StyleSheet().recieveChatBuble1,
+                          ? StyleSheet.sendChatBuble1
+                          : StyleSheet.recieveChatBuble1,
                       boxShadow: const [
                         BoxShadow(
                             blurRadius: 6,
@@ -44,8 +46,8 @@ class ChatBubble extends StatelessWidget {
                               chatModel.name,
                               style: TextStyle(
                                   color: chatModel.isSender
-                                      ? StyleSheet().sendChatBuble2
-                                      : StyleSheet().recieveChatBuble2,
+                                      ? StyleSheet.sendChatBuble2
+                                      : StyleSheet.recieveChatBuble2,
                                   fontWeight: FontWeight.bold),
                             ),
                             Container(
@@ -54,8 +56,8 @@ class ChatBubble extends StatelessWidget {
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(10)),
                                   color: chatModel.isSender
-                                      ? StyleSheet().sendChatBuble2
-                                      : StyleSheet().recieveChatBuble2,
+                                      ? StyleSheet.sendChatBuble2
+                                      : StyleSheet.recieveChatBuble2,
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(5),
@@ -69,8 +71,8 @@ class ChatBubble extends StatelessWidget {
                                         chatModel.msg,
                                         style: TextStyle(
                                             color: chatModel.isSender
-                                                ? StyleSheet().sendChatBuble1
-                                                : StyleSheet()
+                                                ? StyleSheet.sendChatBuble1
+                                                : StyleSheet
                                                     .recieveChatBuble1,
                                             fontWeight: FontWeight.w500,
                                             fontSize: AppSizes()

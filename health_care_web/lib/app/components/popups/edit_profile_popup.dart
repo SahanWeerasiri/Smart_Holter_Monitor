@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
+import 'package:health_care_web/models/style_sheet.dart';
 import 'package:iconly/iconly.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -45,15 +46,15 @@ class _StateEditProfile extends State<EditProfilePopup> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: StyleSheet().uiBackground,
+      backgroundColor: StyleSheet.uiBackground,
       title: Text(
         "Edit Profile",
         textAlign: TextAlign.center,
         style: TextStyle(
-          backgroundColor: StyleSheet().uiBackground,
+          backgroundColor: StyleSheet.uiBackground,
           fontSize: 25,
           fontWeight: FontWeight.bold,
-          color: StyleSheet().doctorDetailsPopPrimary,
+          color: StyleSheet.doctorDetailsPopPrimary,
         ),
       ),
       content: SingleChildScrollView(
@@ -65,7 +66,7 @@ class _StateEditProfile extends State<EditProfilePopup> {
               width: 200,
               height: 200,
               decoration: BoxDecoration(
-                  color: StyleSheet().btnBackground,
+                  color: StyleSheet.btnBackground,
                   borderRadius: BorderRadius.circular(60)),
               child: widget.picController.text.isNotEmpty
                   ? Image.memory(
@@ -81,27 +82,27 @@ class _StateEditProfile extends State<EditProfilePopup> {
             ),
             TextField(
               style: TextStyle(
-                backgroundColor: StyleSheet().uiBackground,
+                backgroundColor: StyleSheet.uiBackground,
                 fontSize: 20,
-                color: StyleSheet().doctorDetailsPopPrimary,
+                color: StyleSheet.doctorDetailsPopPrimary,
               ),
               controller: widget.mobileController,
               decoration: const InputDecoration(labelText: "Mobile"),
             ),
             TextField(
               style: TextStyle(
-                backgroundColor: StyleSheet().uiBackground,
+                backgroundColor: StyleSheet.uiBackground,
                 fontSize: 20,
-                color: StyleSheet().doctorDetailsPopPrimary,
+                color: StyleSheet.doctorDetailsPopPrimary,
               ),
               controller: widget.addressController,
               decoration: const InputDecoration(labelText: "Address"),
             ),
             TextField(
               style: TextStyle(
-                backgroundColor: StyleSheet().uiBackground,
+                backgroundColor: StyleSheet.uiBackground,
                 fontSize: 20,
-                color: StyleSheet().doctorDetailsPopPrimary,
+                color: StyleSheet.doctorDetailsPopPrimary,
               ),
               controller: widget.languageController,
               decoration: const InputDecoration(labelText: "Language"),
@@ -112,8 +113,8 @@ class _StateEditProfile extends State<EditProfilePopup> {
               onPressed: () {
                 onPick();
               },
-              backgroundColor: StyleSheet().btnBackground,
-              textColor: StyleSheet().btnText,
+              backgroundColor: StyleSheet.btnBackground,
+              textColor: StyleSheet.btnText,
               icon: IconlyLight.image,
             ),
           ],
@@ -130,17 +131,17 @@ class _StateEditProfile extends State<EditProfilePopup> {
           child: Text(
             "Cancel",
             style: TextStyle(
-              backgroundColor: StyleSheet().uiBackground,
+              backgroundColor: StyleSheet.uiBackground,
               fontSize: 20,
-              color: StyleSheet().doctorDetailsPopPrimary,
+              color: StyleSheet.doctorDetailsPopPrimary,
             ),
           ),
         ),
         CustomButton(
           label: "Update",
           onPressed: widget.onSubmit,
-          backgroundColor: StyleSheet().btnBackground,
-          textColor: StyleSheet().btnText,
+          backgroundColor: StyleSheet.btnBackground,
+          textColor: StyleSheet.btnText,
           icon: Icons.update,
         ),
       ],

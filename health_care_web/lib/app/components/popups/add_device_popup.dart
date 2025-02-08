@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
+import 'package:health_care_web/models/style_sheet.dart';
 
 typedef DeviceSubmitCallback = void Function(String code, String details);
 
@@ -25,15 +26,15 @@ class _StateAddDevicePopup extends State<AddDevicePopup> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: StyleSheet().uiBackground,
+      backgroundColor: StyleSheet.uiBackground,
       title: Text(
         "Add Device",
         textAlign: TextAlign.center,
         style: TextStyle(
-          backgroundColor: StyleSheet().uiBackground,
+          backgroundColor: StyleSheet.uiBackground,
           fontSize: 25,
           fontWeight: FontWeight.bold,
-          color: StyleSheet().doctorDetailsPopPrimary,
+          color: StyleSheet.doctorDetailsPopPrimary,
         ),
       ),
       content: SingleChildScrollView(
@@ -45,9 +46,9 @@ class _StateAddDevicePopup extends State<AddDevicePopup> {
                 code = widget.deviceCode.text;
               }),
               style: TextStyle(
-                backgroundColor: StyleSheet().uiBackground,
+                backgroundColor: StyleSheet.uiBackground,
                 fontSize: 20,
-                color: StyleSheet().doctorDetailsPopPrimary,
+                color: StyleSheet.doctorDetailsPopPrimary,
               ),
               controller: widget.deviceCode,
               decoration: const InputDecoration(labelText: "Device Code"),
@@ -57,9 +58,9 @@ class _StateAddDevicePopup extends State<AddDevicePopup> {
                 details = widget.otherDetails.text;
               }),
               style: TextStyle(
-                backgroundColor: StyleSheet().uiBackground,
+                backgroundColor: StyleSheet.uiBackground,
                 fontSize: 20,
-                color: StyleSheet().doctorDetailsPopPrimary,
+                color: StyleSheet.doctorDetailsPopPrimary,
               ),
               controller: widget.otherDetails,
               decoration: const InputDecoration(labelText: "Other Details"),
@@ -77,17 +78,17 @@ class _StateAddDevicePopup extends State<AddDevicePopup> {
           child: Text(
             "Cancel",
             style: TextStyle(
-              backgroundColor: StyleSheet().uiBackground,
+              backgroundColor: StyleSheet.uiBackground,
               fontSize: 20,
-              color: StyleSheet().doctorDetailsPopPrimary,
+              color: StyleSheet.doctorDetailsPopPrimary,
             ),
           ),
         ),
         CustomButton(
           label: "Add",
           onPressed: () => widget.onSubmit(code, details),
-          backgroundColor: StyleSheet().btnBackground,
-          textColor: StyleSheet().btnText,
+          backgroundColor: StyleSheet.btnBackground,
+          textColor: StyleSheet.btnText,
           icon: Icons.add,
         ),
       ],

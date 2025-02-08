@@ -1,10 +1,13 @@
 import 'package:health_care_web/components/buttons/custom_text_button/custom_text_button.dart';
 import 'package:health_care_web/components/dropdown/CustomDropDown.dart';
 import 'package:health_care_web/components/text_input/text_input_with_leading_icon.dart';
-import 'package:health_care_web/constants/consts.dart';
 import 'package:health_care_web/controllers/textController.dart';
 import 'package:flutter/material.dart';
-import 'package:health_care_web/pages/services/auth_service.dart';
+import 'package:health_care_web/models/app_sizes.dart';
+import 'package:health_care_web/models/custom_text_input_types.dart';
+import 'package:health_care_web/models/return_model.dart';
+import 'package:health_care_web/models/style_sheet.dart';
+import 'package:health_care_web/services/auth_service.dart';
 
 class LoginCard extends StatefulWidget {
   const LoginCard({super.key});
@@ -26,27 +29,27 @@ class _LoginCardState extends State<LoginCard> {
     super.initState();
     credentialController = CredentialController();
     textStyleHeading = TextStyle(
-        color: CustomColors().blue, fontSize: 30, fontWeight: FontWeight.bold);
+        color: StyleSheet.btnBackground, fontSize: 30, fontWeight: FontWeight.bold);
     textStyleTextInputTopic = const TextStyle(
         color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
     textStyleInputField = TextStyle(
-        color: CustomColors().blueDark,
+        color: StyleSheet.btnBackground,
         fontSize: 15,
         fontWeight: FontWeight.bold);
   }
 
   Future<bool> checkCredentials() async {
     AuthService auth = AuthService();
-    Map<String, dynamic> result = await auth.loginUserWithEmailAndPassword(
+    ReturnModel result = await auth.loginUserWithEmailAndPassword(
         credentialController.username, credentialController.password, role);
-    if (result["status"] == "error") {
+    if (result.state) {
       setState(() {
-        msg = result["message"];
+        msg = result.message;
       });
       return false;
     }
     setState(() {
-      msg = result["message"];
+      msg = result.message;
     });
     credentialController.clear();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -127,7 +130,7 @@ class _LoginCardState extends State<LoginCard> {
         height: AppSizes().getBlockSizeVertical(70),
         child: Container(
           decoration: BoxDecoration(
-              color: StyleSheet().uiBackground,
+              color: StyleSheet.uiBackground,
               borderRadius: BorderRadius.all(Radius.circular(20)),
               boxShadow: List.of([
                 BoxShadow(
@@ -160,12 +163,12 @@ class _LoginCardState extends State<LoginCard> {
                     inputController: credentialController,
                     hint: "Email",
                     icon: Icons.email,
-                    hintColor: StyleSheet().greyHint,
-                    textColor: StyleSheet().text,
-                    shadowColor: StyleSheet().textBackground,
-                    enableBorderColor: StyleSheet().disabledBorder,
-                    borderColor: StyleSheet().greyHint,
-                    focusedBorderColor: StyleSheet().enableBorder,
+                    hintColor: StyleSheet.greyHint,
+                    textColor: StyleSheet.text,
+                    shadowColor: StyleSheet.textBackground,
+                    enableBorderColor: StyleSheet.disabledBorder,
+                    borderColor: StyleSheet.greyHint,
+                    focusedBorderColor: StyleSheet.enableBorder,
                     typeKey: CustomTextInputTypes().username),
                 SizedBox(
                   height: AppSizes().getBlockSizeVertical(3),
@@ -181,12 +184,12 @@ class _LoginCardState extends State<LoginCard> {
                     inputController: credentialController,
                     hint: "Password",
                     icon: Icons.key,
-                    hintColor: StyleSheet().greyHint,
-                    textColor: StyleSheet().text,
-                    shadowColor: StyleSheet().textBackground,
-                    enableBorderColor: StyleSheet().disabledBorder,
-                    borderColor: StyleSheet().greyHint,
-                    focusedBorderColor: StyleSheet().enableBorder,
+                    hintColor: StyleSheet.greyHint,
+                    textColor: StyleSheet.text,
+                    shadowColor: StyleSheet.textBackground,
+                    enableBorderColor: StyleSheet.disabledBorder,
+                    borderColor: StyleSheet.greyHint,
+                    focusedBorderColor: StyleSheet.enableBorder,
                     isPassword: true,
                     typeKey: CustomTextInputTypes().password),
                 SizedBox(
@@ -208,8 +211,8 @@ class _LoginCardState extends State<LoginCard> {
                       loginError();
                     }
                   },
-                  backgroundColor: StyleSheet().btnBackground,
-                  textColor: StyleSheet().btnText,
+                  backgroundColor: StyleSheet.btnBackground,
+                  textColor: StyleSheet.btnText,
                   icon: Icons.login,
                 ),
                 CustomTextButton(
@@ -233,8 +236,8 @@ class _LoginCardState extends State<LoginCard> {
                       loginError();
                     }
                   },
-                  backgroundColor: StyleSheet().btnBackground,
-                  textColor: StyleSheet().btnText,
+                  backgroundColor: StyleSheet.btnBackground,
+                  textColor: StyleSheet.btnText,
                   icon: Icons.login,
                 ),
                 // Row(
@@ -250,7 +253,7 @@ class _LoginCardState extends State<LoginCard> {
                 //           "Sign up",
                 //           style: TextStyle(
                 //               fontSize: 15,
-                //               color: StyleSheet().btnBackground,
+                //               color: StyleSheet.btnBackground,
                 //               fontWeight: FontWeight.w900),
                 //         ),
                 //         onPressed: () {
@@ -265,7 +268,7 @@ class _LoginCardState extends State<LoginCard> {
                   height: AppSizes().getBlockSizeVertical(5),
                 ),
                 // Divider(
-                //   color: StyleSheet().divider,
+                //   color: StyleSheet.divider,
                 //   endIndent: 5,
                 //   height: 2,
                 //   thickness: 2,
@@ -286,10 +289,10 @@ class _LoginCardState extends State<LoginCard> {
                 //       loginError();
                 //     }
                 //   },
-                //   borderColor: StyleSheet().elebtnBorder,
+                //   borderColor: StyleSheet.elebtnBorder,
                 //   img: 'assetes/icons/google.png',
-                //   textColor: StyleSheet().elebtnText,
-                //   backgroundColor: StyleSheet().uiBackground,
+                //   textColor: StyleSheet.elebtnText,
+                //   backgroundColor: StyleSheet.uiBackground,
                 // ),
                 CustomDropdown(
                     label: 'Role',

@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:health_care_web/app/components/popups/connect_device_patient_popup.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
-import 'package:health_care_web/pages/additional/popups/connect_device_patient_popup.dart';
-import 'package:health_care_web/pages/services/firestore_db_service.dart';
-import 'package:health_care_web/pages/services/real_db_service.dart';
+import 'package:health_care_web/models/app_sizes.dart';
+import 'package:health_care_web/models/patient_profile_model.dart';
+import 'package:health_care_web/models/return_model.dart';
+import 'package:health_care_web/models/style_sheet.dart';
+import 'package:health_care_web/services/firestore_db_service.dart';
+import 'package:health_care_web/services/real_db_service.dart';
+import 'package:health_care_web/services/util.dart';
 
 class ExpandableProfileCardUpdatedDevices extends StatefulWidget {
   final String code;
@@ -29,12 +34,12 @@ class _ExpandableProfileCardUpdatedDevicesState
     extends State<ExpandableProfileCardUpdatedDevices> {
   bool _isExpanded = false;
   bool isLoading = false;
-  List<UserProfile> patients = [];
+  List<PatientProfileModel> patients = [];
   double _cardHeight = 70;
   final List<Color> _stateColors = [
-    StyleSheet().availableDevices,
-    StyleSheet().unavailableDevices,
-    StyleSheet().pendingDevices,
+    StyleSheet.availableDevices,
+    StyleSheet.unavailableDevices,
+    StyleSheet.pendingDevices,
   ];
 
   Future<void> showPatients(String device, String detail) async {
@@ -42,12 +47,12 @@ class _ExpandableProfileCardUpdatedDevicesState
       isLoading = true;
     });
     await fetchPatients();
-    Map<String, dynamic> res =
+    ReturnModel res =
         await RealDbService().connectDevicePending(device);
     setState(() {
       isLoading = false;
     });
-    if (res['success']) {
+    if (res.state) {
       // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Device is in pending state')));
       showDialog(
           context: context,
@@ -91,15 +96,14 @@ class _ExpandableProfileCardUpdatedDevicesState
     setState(() {
       patients = [];
     });
-    Map<String, dynamic> res = await FirestoreDbService().fetchPatient();
-    if (res['success']) {
-      final pl = res['data'] as List<UserProfile>;
+    ReturnModel res = await FirestoreDbService().fetchPatients();
+    if (res.state) {
+      final pl = res.patients;
       setState(() {
         patients = pl;
       });
     } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: res['message']));
+      showMessages(res.state, res.message, context);
     }
   }
 
@@ -109,7 +113,7 @@ class _ExpandableProfileCardUpdatedDevicesState
 
     if (isLoading) {
       return Center(
-        child: CircularProgressIndicator(color: StyleSheet().btnBackground),
+        child: CircularProgressIndicator(color: StyleSheet.btnBackground),
       );
     }
     return Container(
@@ -137,8 +141,8 @@ class _ExpandableProfileCardUpdatedDevicesState
                   CustomButton(
                     label: "Add Patient",
                     icon: Icons.add,
-                    textColor: StyleSheet().uiBackground,
-                    backgroundColor: StyleSheet().btnBackground,
+                    textColor: StyleSheet.uiBackground,
+                    backgroundColor: StyleSheet.btnBackground,
                     onPressed: () {
                       showPatients(widget.code, widget.detail);
                     },

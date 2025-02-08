@@ -1,11 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:health_care_web/app/components/cards/expandable_profile_card_updated_devices.dart';
+import 'package:health_care_web/app/components/popups/add_device_popup.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
-import 'package:health_care_web/pages/additional/popups/add_device_popup.dart';
-import 'package:health_care_web/pages/cards/expandable_profile_card_updated_devices.dart';
-import 'package:health_care_web/pages/services/firestore_db_service.dart';
-import 'package:health_care_web/pages/services/real_db_service.dart';
+import 'package:health_care_web/models/admin_tabs.dart';
+import 'package:health_care_web/models/app_sizes.dart';
+import 'package:health_care_web/models/device_profile_model.dart';
+import 'package:health_care_web/models/style_sheet.dart';
 import 'package:iconly/iconly.dart';
 
 class DeviceAssignmentSection extends StatefulWidget {
@@ -20,7 +22,7 @@ class _DeviceAssignmentSectionState extends State<DeviceAssignmentSection> {
   final TextEditingController controller = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
-  List<DeviceProfile> profiles = [];
+  List<DeviceProfileModel> profiles = [];
   bool isLoading = true;
   bool isOpen = false;
 
@@ -30,28 +32,8 @@ class _DeviceAssignmentSectionState extends State<DeviceAssignmentSection> {
     fetcheDevices();
   }
 
-  Future<void> removePatients(id) async {
-    Map<String, dynamic> res = await FirestoreDbService().removePatiet(id);
-    if (res['success']) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Patient removed successfully')));
-      refresh();
-    } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Failed to remove patient')));
-    }
-  }
-
-  Future<void> addDevices(code, detail) async {
-    Map<String, dynamic> res = await RealDbService().addDevice(code, detail);
-    if (res['success']) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Device added successfully')));
-      refresh();
-    } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Failed to add device')));
-    }
+  Future<void> addDevices(code, details) async {
+    await AdminTabs().addNewDevice(code, details, context);
   }
 
   void refresh() {
@@ -81,7 +63,7 @@ class _DeviceAssignmentSectionState extends State<DeviceAssignmentSection> {
           final data = event.snapshot.value;
 
           if (data != null && data is Map) {
-            List<DeviceProfile> devices = [];
+            List<DeviceProfileModel> devices = [];
 
             data.forEach((key, value) {
               if (value is Map) {
@@ -91,7 +73,9 @@ class _DeviceAssignmentSectionState extends State<DeviceAssignmentSection> {
                 final useData = (value)['use'] as String?;
 
                 if (other != null && state != null) {
-                  devices.add(DeviceProfile(
+                  devices.add(DeviceProfileModel(
+                      avgValue: "",
+                      latestValue: "",
                       deadline: deadline.toString(),
                       code: key,
                       detail: other,
@@ -155,7 +139,7 @@ class _DeviceAssignmentSectionState extends State<DeviceAssignmentSection> {
           final data = event.snapshot.value;
 
           if (data != null && data is Map) {
-            List<DeviceProfile> devices = [];
+            List<DeviceProfileModel> devices = [];
 
             data.forEach((key, v) {
               if (v is Map) {
@@ -170,8 +154,10 @@ class _DeviceAssignmentSectionState extends State<DeviceAssignmentSection> {
                       .toLowerCase()
                       .contains(value.toLowerCase())) // Search by detail
                   {
-                    devices.add(DeviceProfile(
+                    devices.add(DeviceProfileModel(
                         code: key,
+                        latestValue: "",
+                        avgValue: "",
                         detail: other,
                         deadline: deadline.toString(),
                         state: state,
@@ -251,8 +237,8 @@ class _DeviceAssignmentSectionState extends State<DeviceAssignmentSection> {
               CustomButton(
                 label: "Add Device",
                 icon: Icons.add,
-                textColor: StyleSheet().uiBackground,
-                backgroundColor: StyleSheet().btnBackground,
+                textColor: StyleSheet.uiBackground,
+                backgroundColor: StyleSheet.btnBackground,
                 onPressed: () {
                   setState(() {
                     isOpen = true;
@@ -281,7 +267,7 @@ class _DeviceAssignmentSectionState extends State<DeviceAssignmentSection> {
                     borderRadius: BorderRadius.all(
                       Radius.circular(12),
                     ),
-                    color: StyleSheet().availableDevices),
+                    color: StyleSheet.availableDevices),
                 child: Row(
                   spacing: 3,
                   children: [Icon(Icons.devices), Text("Available Devices")],
@@ -294,7 +280,7 @@ class _DeviceAssignmentSectionState extends State<DeviceAssignmentSection> {
                     borderRadius: BorderRadius.all(
                       Radius.circular(12),
                     ),
-                    color: StyleSheet().pendingDevices),
+                    color: StyleSheet.pendingDevices),
                 child: Row(
                   spacing: 3,
                   children: [
@@ -310,7 +296,7 @@ class _DeviceAssignmentSectionState extends State<DeviceAssignmentSection> {
                     borderRadius: BorderRadius.all(
                       Radius.circular(12),
                     ),
-                    color: StyleSheet().unavailableDevices),
+                    color: StyleSheet.unavailableDevices),
                 child: Row(
                   spacing: 3,
                   children: [
