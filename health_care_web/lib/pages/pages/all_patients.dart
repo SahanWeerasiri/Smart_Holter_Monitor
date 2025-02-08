@@ -2,9 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care_web/app/components/cards/expandable_profile_card_updated.dart';
 import 'package:health_care_web/models/app_sizes.dart';
+import 'package:health_care_web/models/doctor_profile_model.dart';
+import 'package:health_care_web/models/patient_profile_model.dart';
 import 'package:health_care_web/models/style_sheet.dart';
-import 'package:health_care_web/models/user_profile_model.dart';
-import 'package:health_care_web/services/firestore_db_service.dart';
 import 'package:iconly/iconly.dart';
 
 class AllPatients extends StatefulWidget {
@@ -15,38 +15,16 @@ class AllPatients extends StatefulWidget {
 }
 
 class _AllPatientsState extends State<AllPatients> {
+  DoctorProfileModel? _userProfile =
+      DoctorProfileModel(id: "", name: "Name", email: "Email", age:"0");
   final TextEditingController controller = TextEditingController();
-  List<UserProfileModel> profiles = [];
+  List<PatientProfileModel> profiles = [];
   bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
     fetchPatients();
-  }
-
-  Future<void> removePatients(id) async {
-    Map<String, dynamic> res = await FirestoreDbService().removePatiet(id);
-    if (res['success']) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Patient removed successfully')));
-      refresh();
-    } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Failed to remove patient')));
-    }
-  }
-
-  Future<void> addPatients(id, docId) async {
-    Map<String, dynamic> res = await FirestoreDbService().addPatiet(id, docId);
-    if (res['success']) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Patient added successfully')));
-      refresh();
-    } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Failed to add patient')));
-    }
   }
 
   void refresh() {
@@ -62,39 +40,14 @@ class _AllPatientsState extends State<AllPatients> {
       isLoading = true;
       profiles = [];
     });
+    _userProfile = await _userProfile!.initDoctor(context);
+    final List<PatientProfileModel> patients = await _userProfile!.fetchAllPatients(context);
+    setState(() {
+      profiles = patients;
+    });
 
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        throw Exception("User is not logged in.");
-      }
-
-      Map<String, dynamic> res = await FirestoreDbService().fetchPatient();
-
-      if (res['success']) {
-        setState(() {
-          profiles = res['data'] as List<UserProfileModel>;
-        });
-      } else {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('An error occurred: ${res["error"]}'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        });
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('An error occurred: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } finally {
-      setState(() => isLoading = false);
-    }
+    setState(() => isLoading = false);
+    
   }
 
   Future<void> fetchSearch(String name) async {
@@ -102,34 +55,12 @@ class _AllPatientsState extends State<AllPatients> {
       profiles = [];
       isLoading = true;
     });
-    try {
-      Map<String, dynamic> res =
-          await FirestoreDbService().fetchSearch(name.toLowerCase());
-
-      if (res['success']) {
-        setState(() {
-          profiles = res['data'] as List<UserProfileModel>;
-        });
-      } else {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('An error occurred: ${res["error"]}'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        });
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('An error occurred: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } finally {
+    final List<PatientProfileModel> patients = await _userProfile!.fetchSearchPatients(name, context);
+      setState(() {
+        profiles = patients;
+      });
       setState(() => isLoading = false);
-    }
+  
   }
 
   @override
@@ -188,12 +119,12 @@ class _AllPatientsState extends State<AllPatients> {
                       email: p.email,
                       address: p.address,
                       mobile: p.mobile,
-                      device: p.device,
-                      docId: p.doctorId,
+                      device: p.device!.code,
+                      docId: p.doctorProfileModel!.id,
                       myId: FirebaseAuth.instance.currentUser!.uid,
-                      onRemove: () => removePatients(p.id),
-                      onAdd: () => addPatients(
-                          p.id, FirebaseAuth.instance.currentUser!.uid),
+                      onRemove: () => p.doctorProfileModel!.removePatients(p.id,context),
+                      onAdd: () => p.doctorProfileModel!.addPatients(
+                          p.id, p.doctorProfileModel!.id,context),
                     );
                   }).toList(),
                 ),

@@ -56,18 +56,18 @@ class DoctorProfileModel {
   }
 
 
-  Future<void> saveReport(String uid,ReportModel selectedReport, BuildContext context)async{
+  Future<void> saveReport(ReportModel selectedReport, BuildContext context)async{
     ReturnModel res =
-        await FirestoreDbService().saveReport(uid, selectedReport);
+        await FirestoreDbService().saveReport(selectedReport);
     if (res.state) {
       Navigator.pop(context);
     }
     showMessages(res.state,res.message,context);
   }
 
-  Future<void> saveDraftReport(String uid, ReportModel selectedReport, BuildContext context)async{
+  Future<void> saveDraftReport(ReportModel selectedReport, BuildContext context)async{
     ReturnModel res =
-        await FirestoreDbService().saveReportData(uid, selectedReport);
+        await FirestoreDbService().saveReportData(selectedReport);
     if (res.state) {
       Navigator.pop(context);
     }
@@ -163,6 +163,17 @@ class DoctorProfileModel {
     showMessages(res.state, res.message, context);
   }
 
+
+  Future<void> removePatients(String id, BuildContext context) async {
+    ReturnModel res = await FirestoreDbService().removePatient(id);
+    showMessages(res.state, res.message, context);
+  }
+
+  Future<void> addPatients(String id,String docId,BuildContext context ) async {
+    ReturnModel res = await FirestoreDbService().addPatient(id, docId);
+    showMessages(res.state, res.message, context);
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -200,6 +211,52 @@ class DoctorProfileModel {
 
   DoctorReportModel toDoctorReportModel (){
     return DoctorReportModel(id: id, name: name, email: email, address: address,mobile: mobile);
+  }
+
+  Future<List<PatientProfileModel>> fetchAllPatients(BuildContext context) async{
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception("User is not logged in.");
+      }
+
+      ReturnModel res = await FirestoreDbService().fetchPatients();
+
+      if (res.state) {
+        
+        return res.patients;
+        
+      } else {
+        showMessages(res.state, res.message, context);
+        return [];
+      }
+    } catch (e) {
+      showMessages(false, e.toString(), context);
+        return [];
+    }
+  }
+
+  Future<List<PatientProfileModel>> fetchSearchPatients(String name, BuildContext context) async{
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception("User is not logged in.");
+      }
+
+      ReturnModel res = await FirestoreDbService().fetchSearchPatients(name.toLowerCase());
+
+      if (res.state) {
+        
+        return res.patients;
+        
+      } else {
+        showMessages(res.state, res.message, context);
+        return [];
+      }
+    } catch (e) {
+      showMessages(false, e.toString(), context);
+        return [];
+    }
   }
 }
 

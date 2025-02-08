@@ -4,20 +4,15 @@ import 'package:health_care_web/app/components/report/header.dart';
 import 'package:health_care_web/app/components/report/section.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
 import 'package:health_care_web/models/doctor_profile_model.dart';
-import 'package:health_care_web/models/patient_profile_model.dart';
 import 'package:health_care_web/models/report_model.dart';
-import 'package:health_care_web/models/return_model.dart';
 import 'package:health_care_web/models/style_sheet.dart';
-import 'package:health_care_web/services/firestore_db_service.dart';
 
 class MedicalReport extends StatefulWidget {
-  final PatientProfileModel profile;
   final DoctorProfileModel doctor;
   final ReportModel? report;
   final List<ReportModel> reportsList;
   const MedicalReport(
       {super.key,
-      required this.profile,
       required this.doctor,
       required this.report,
       required this.reportsList});
@@ -35,17 +30,6 @@ class _MedicalReportState extends State<MedicalReport> {
   final TextEditingController anomaliesController = TextEditingController();
   final TextEditingController suggestionsController = TextEditingController();
   final TextEditingController aiOpinionController = TextEditingController();
-
-  Future<void> saveReport(String uid) async {
-    configReportData(false);
-    await widget.doctor.saveReport(uid, selectedReport!, context);
-  }
-
-  Future<void> saveDraftReport(String uid) async {
-    configReportData(true);
-    await widget.doctor.saveDraftReport(uid, selectedReport!, context);
-    
-  }
 
   void configReportData(bool isEditing){
     // Handle saving logic
@@ -161,12 +145,12 @@ class _MedicalReportState extends State<MedicalReport> {
                 children: selectedReport != null && selectedReport!.isEditing
                     ? [
                         MedicalReportHeader(
-                            doctorName: selectedReport!.docName,
-                            doctorSpecialization: selectedReport!.docEmail,
-                            patientName: widget.profile.name,
-                            patientAge: selectedReport!.patientProfileModel.age,
-                            avgHeartRate: widget.report!.avgHeart,
-                            patientId: widget.profile.id,
+                            doctorName: selectedReport!.patientProfileModel!.doctorProfileModel!.name,
+                            doctorSpecialization: selectedReport!.patientProfileModel!.doctorProfileModel!.email,
+                            patientName: selectedReport!.patientProfileModel!.name,
+                            patientAge: selectedReport!.patientProfileModel!.age,
+                            avgHeartRate: selectedReport!.patientProfileModel!.device!.avgValue,
+                            patientId: selectedReport!.patientProfileModel!.id,
                             reportDate: DateTime.now()),
                         ReportSection(
                             title: "Overall Summary",
@@ -194,7 +178,8 @@ class _MedicalReportState extends State<MedicalReport> {
                             CustomButton(
                               label: "Save Report",
                               onPressed: () async {
-                                await saveReport(widget.profile.id);
+                                configReportData(false);
+                                await widget.doctor.saveReport(selectedReport!, context);
                               },
                               backgroundColor: StyleSheet.btnBackground,
                               textColor: StyleSheet.btnText,
@@ -203,7 +188,8 @@ class _MedicalReportState extends State<MedicalReport> {
                             CustomButton(
                               label: "Save Darft",
                               onPressed: () async {
-                                await saveDraftReport(widget.profile.id);
+                                configReportData(true);
+                                await widget.doctor.saveDraftReport(selectedReport!, context);
                               },
                               backgroundColor: StyleSheet.btnBackground,
                               textColor: StyleSheet.btnText,
@@ -215,12 +201,12 @@ class _MedicalReportState extends State<MedicalReport> {
                     : selectedReport != null && !selectedReport!.isEditing
                         ? [
                             MedicalReportHeader(
-                                doctorName: selectedReport!.docName,
-                                doctorSpecialization: selectedReport!.docEmail,
-                                patientName: widget.profile.name,
-                                patientAge: selectedReport!.age,
-                                avgHeartRate: selectedReport!.avgHeart,
-                                patientId: widget.profile.id,
+                                doctorName: selectedReport!.patientProfileModel!.doctorProfileModel!.name,
+                                doctorSpecialization: selectedReport!.patientProfileModel!.doctorProfileModel!.email,
+                                patientName: selectedReport!.patientProfileModel!.name,
+                                patientAge: selectedReport!.patientProfileModel!.age,
+                                avgHeartRate: selectedReport!.patientProfileModel!.device!.avgValue,
+                                patientId: selectedReport!.patientProfileModel!.id,
                                 reportDate: DateTime.now()),
                             FixedSection(
                                 title: "Overall Summary",

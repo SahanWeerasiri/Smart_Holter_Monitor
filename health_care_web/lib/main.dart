@@ -39,7 +39,6 @@ class MyApp extends StatelessWidget {
         '/medical_report': (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Map;
           return MedicalReport(
-            profile: args['profile'],
             doctor: args['doctor'],
             report: args['report'],
             reportsList: args['reportsList'],

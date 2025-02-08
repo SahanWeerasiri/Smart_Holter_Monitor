@@ -314,12 +314,12 @@ class FirestoreDbService {
     }
   }
 
-  Future<ReturnModel> saveReportData(String uid, ReportModel report) async {
+  Future<ReturnModel> saveReportData(ReportModel report) async {
     try {
       // Add or update the report data
       await _firestore
           .collection('user_accounts')
-          .doc(uid)
+          .doc(report.patientProfileModel!.doctorProfileModel!.id)
           .collection('data')
           .doc(report.reportId)
           .set(report.toMap()); // Use toMap()
@@ -329,16 +329,16 @@ class FirestoreDbService {
     }
   }
 
-  Future<ReturnModel> saveReport(String uid, ReportModel report) async {
+  Future<ReturnModel> saveReport(ReportModel report) async {
     try {
       await _firestore
           .collection('user_accounts')
-          .doc(uid)
+          .doc(report.patientProfileModel!.id)
           .collection('reports')
           .add(report.toMap()); //Use toMap()
       await _firestore
           .collection('user_accounts')
-          .doc(uid)
+          .doc(report.patientProfileModel!.id)
           .update({'is_done': false});
       return ReturnModel(state: true, message: 'Report saved successfully');
     } catch (e) {
