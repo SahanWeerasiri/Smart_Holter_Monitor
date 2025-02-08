@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:health_care_web/pages/cards/login_card.dart';
+import 'package:health_care_web/app/components/cards/login_card.dart';
+import 'package:health_care_web/models/app_sizes.dart';
+import 'package:health_care_web/models/style_sheet.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,7 +15,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     AppSizes().initSizes(context);
     return Scaffold(
-        backgroundColor: StyleSheet().uiBackground,
+        backgroundColor: StyleSheet.uiBackground,
         body: Container(
             decoration: BoxDecoration(
                 image: DecorationImage(
