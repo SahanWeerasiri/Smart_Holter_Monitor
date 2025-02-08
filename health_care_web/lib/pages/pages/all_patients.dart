@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care_web/app/components/cards/expandable_profile_card_updated.dart';
 import 'package:health_care_web/models/app_sizes.dart';
@@ -42,9 +41,13 @@ class _AllPatientsState extends State<AllPatients> {
     });
     _userProfile = await _userProfile!.initDoctor(context);
     final List<PatientProfileModel> patients = await _userProfile!.fetchAllPatients(context);
+        // showMessages(false, patients.length.toString(), context);
+
     setState(() {
       profiles = patients;
     });
+
+    // showMessages(true, profiles[0].doctorProfileModel!.id, context);
 
     setState(() => isLoading = false);
     
@@ -56,6 +59,7 @@ class _AllPatientsState extends State<AllPatients> {
       isLoading = true;
     });
     final List<PatientProfileModel> patients = await _userProfile!.fetchSearchPatients(name, context);
+    // showMessages(false, patients.length.toString(), context);
       setState(() {
         profiles = patients;
       });
@@ -113,15 +117,8 @@ class _AllPatientsState extends State<AllPatients> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: profiles.map((p) {
                     return ExpandableProfileCardUpdated(
-                      id: p.id,
-                      name: p.name,
-                      profilePic: p.pic,
-                      email: p.email,
-                      address: p.address,
-                      mobile: p.mobile,
-                      device: p.device!.code,
-                      docId: p.doctorProfileModel!.id,
-                      myId: FirebaseAuth.instance.currentUser!.uid,
+                      patientProfileModel: p,
+                      myId: _userProfile!.id,
                       onRemove: () => p.doctorProfileModel!.removePatients(p.id,context),
                       onAdd: () => p.doctorProfileModel!.addPatients(
                           p.id, p.doctorProfileModel!.id,context),

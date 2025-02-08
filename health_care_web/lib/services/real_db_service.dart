@@ -19,13 +19,14 @@ class RealDbService {
         final otherSnapshot = await ref.child('other').once();
         final useSnapshot = await ref.child('use').once();
         final deadlineSnapshot = await ref.child('deadline').once();
+        final assignedSnapshot = await ref.child('assigned').once(); 
 
         final deviceProfileModel = DeviceProfileModel(
           code: device,
           detail: otherSnapshot.snapshot.value?.toString() ?? "",
           use: useSnapshot.snapshot.value?.toString() ?? "",
-          state: DeviceProfileModel
-              .notAssigned, // Needs better state handling - consider using enum
+          state: assignedSnapshot.snapshot.value as int? ??
+              DeviceProfileModel.notAssigned, // Needs better state handling - consider using enum
           deadline: deadlineSnapshot.snapshot.value?.toString() ?? "",
           latestValue: latestValue.toString(),
           avgValue: fetchDeviceDataAvg(device).toString(),

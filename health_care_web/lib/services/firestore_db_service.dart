@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:health_care_web/models/contact_profile_model.dart';
 import 'package:health_care_web/models/device_profile_model.dart';
 import 'package:health_care_web/models/doctor_profile_model.dart';
 import 'package:health_care_web/models/patient_profile_model.dart';
@@ -72,6 +73,28 @@ class FirestoreDbService {
     }
   }
 
+  Future<ReturnModel> fetchContacts(String uid) async {
+    try {
+      final snapshot = await _firestore.collection('user_accounts').doc(uid).collection('emergency').get();
+      final List<ContactProfileModel> contacts = [];
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final ContactProfileModel contact = ContactProfileModel(
+          name: data['name'].toString(), 
+          mobile: data['mobile'].toString()
+        );
+        contacts.add(contact);
+      }
+      return ReturnModel(
+          state: true,
+          message: 'Patients fetched successfully',
+          contacts: contacts
+          );
+    } catch (e) {
+      return ReturnModel(state: false, message: 'Error fetching patients: $e');
+    }
+  }
+
   Future<PatientProfileModel?> fetchPatientOne(String uid) async {
     try {
       final doc = await _firestore.collection('user_accounts').doc(uid).get();
@@ -91,7 +114,7 @@ class FirestoreDbService {
       final doc = await _firestore.collection('doctor_accounts').doc(uid).get();
       if (doc.exists) {
         final data = doc.data()!;
-        final doctor = DoctorProfileModel.fromMap(data as Map<String, String>, FirebaseAuth.instance.currentUser!.uid);
+        final doctor = DoctorProfileModel.fromMap(data, uid);
         return doctor;
       } else {
         return null;

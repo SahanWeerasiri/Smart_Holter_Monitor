@@ -5,6 +5,7 @@ import 'package:health_care_web/models/patient_profile_model.dart';
 import 'package:health_care_web/models/report_model.dart';
 import 'package:health_care_web/models/return_model.dart';
 import 'package:health_care_web/services/firestore_db_service.dart';
+import 'package:health_care_web/services/real_db_service.dart';
 import 'package:health_care_web/services/util.dart';
 
 class DoctorProfileModel {
@@ -221,6 +222,18 @@ class DoctorProfileModel {
       ReturnModel res = await FirestoreDbService().fetchPatients();
 
       if (res.state) {
+        for(PatientProfileModel patient in res.patients){
+          if(patient.docId!=""){
+            patient.doctorProfileModel = (await FirestoreDbService().fetchDoctorOne(patient.docId))!;
+            // showMessages(true, "${patient.id} | ${patient.doctorProfileModel!.email} | ${patient.docId}", context);
+          }
+          ReturnModel res = await RealDbService().fetchDeviceData(patient.deviceId);
+          if(res.state){
+            patient.device = res.deviceProfileModel;
+            // showMessages(true, "${patient.id} | ${patient.device!.deadline} | ${patient.docId}", context);
+          }
+
+        }
         
         return res.patients;
         
@@ -244,6 +257,18 @@ class DoctorProfileModel {
       ReturnModel res = await FirestoreDbService().fetchSearchPatients(name.toLowerCase());
 
       if (res.state) {
+        for(PatientProfileModel patient in res.patients){
+          if(patient.docId!=""){
+            patient.doctorProfileModel = (await FirestoreDbService().fetchDoctorOne(patient.docId))!;
+            // showMessages(true, "${patient.id} | ${patient.doctorProfileModel!.email} | ${patient.docId}", context);
+          }
+          ReturnModel res = await RealDbService().fetchDeviceData(patient.deviceId);
+          if(res.state){
+            patient.device = res.deviceProfileModel;
+            // showMessages(true, "${patient.id} | ${patient.device!.deadline} | ${patient.docId}", context);
+          }
+
+        }
         
         return res.patients;
         

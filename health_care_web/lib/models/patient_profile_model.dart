@@ -1,6 +1,8 @@
 import 'package:health_care_web/models/contact_profile_model.dart';
 import 'package:health_care_web/models/device_profile_model.dart';
 import 'package:health_care_web/models/doctor_profile_model.dart';
+import 'package:health_care_web/models/return_model.dart';
+import 'package:health_care_web/services/firestore_db_service.dart';
 
 class PatientProfileModel{
   bool isDone;
@@ -53,18 +55,9 @@ class PatientProfileModel{
         color: map['color'] ?? '',
         language: map['language'] ?? '',
         isDone: map['isDone'] ?? false,
-        device: map['device'] != null
-            ? DeviceProfileModel.fromMap(map['device'])
-            : null,
-        doctorProfileModel: DoctorProfileModel(
-            id: "",
-            name: "",
-            email: "",
-            pic: "",
-            address: "",
-            mobile: "",
-            color: "",
-            patients: []));
+        device: null,
+        doctorProfileModel: null,
+        contacts: []);
   }
 
   Map<String, dynamic> toMap() {
@@ -100,7 +93,14 @@ class PatientProfileModel{
     );
   }
 
-
+  Future<void> addContacts()async{
+    ReturnModel res = await FirestoreDbService().fetchContacts(id);
+    if(res.state){
+      contacts = res.contacts;
+    }else{
+      contacts = [];
+    }
+  }
 }
 
 class PatientReportModel {
