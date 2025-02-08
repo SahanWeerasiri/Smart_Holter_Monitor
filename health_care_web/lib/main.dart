@@ -5,7 +5,6 @@ import 'package:health_care_web/pages/navigations/before_login_page.dart';
 import 'package:health_care_web/pages/navigations/home.dart';
 import 'package:health_care_web/pages/navigations/login_page.dart';
 import 'package:health_care_web/pages/pages/medical_report.dart';
-import 'package:health_care_web/pages/navigations/signup_page.dart';
 import 'package:health_care_web/services/firebase_init.dart';
 
 // import 'package:health_care_web/pages/app/splash.dart';
@@ -34,7 +33,6 @@ class MyApp extends StatelessWidget {
       routes: {
         // Sample routes
         '/login': (context) => const LoginPage(),
-        '/signup': (context) => const SignupPage(),
         '/before_login': (context) => const BeforeLoginPage(),
         '/home': (context) => const Home(),
         '/admin_dashboard': (context) => const AdminDashboard(),
