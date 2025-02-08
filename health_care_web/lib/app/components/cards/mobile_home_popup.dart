@@ -1,5 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:health_care_web/models/style_sheet.dart';
 
 class MobileHomePopup extends StatefulWidget {
   final String device;
@@ -12,7 +13,7 @@ class MobileHomePopup extends StatefulWidget {
 class _MobileHomePopupState extends State<MobileHomePopup> {
   int currentHeartRate = 0;
   num avgHeartRate = 0.0;
-  Color stateBoxColor = StyleSheet().stateHeartBoxBad;
+  Color stateBoxColor = StyleSheet.stateHeartBoxBad;
 
   @override
   void initState() {
@@ -47,9 +48,9 @@ class _MobileHomePopupState extends State<MobileHomePopup> {
           currentHeartRate = latestEntry.value;
           avgHeartRate = avgValue;
           if (60 <= currentHeartRate && currentHeartRate <= 100) {
-            stateBoxColor = StyleSheet().stateHeartBoxGood;
+            stateBoxColor = StyleSheet.stateHeartBoxGood;
           } else {
-            stateBoxColor = StyleSheet().stateHeartBoxBad;
+            stateBoxColor = StyleSheet.stateHeartBoxBad;
           }
         });
       } else {
@@ -76,7 +77,7 @@ class _MobileHomePopupState extends State<MobileHomePopup> {
           borderRadius: BorderRadius.circular(8),
         ),
         child: Container(
-          color: StyleSheet().uiBackground,
+          color: StyleSheet.uiBackground,
           padding: EdgeInsets.all(8),
           width: width,
           height: height,
@@ -87,7 +88,7 @@ class _MobileHomePopupState extends State<MobileHomePopup> {
               Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
-                    color: StyleSheet().currentHeartBox,
+                    color: StyleSheet.currentHeartBox,
                   ),
                   width: width * 0.9,
                   height: height * 0.4,
@@ -141,7 +142,7 @@ class _MobileHomePopupState extends State<MobileHomePopup> {
                           width: width * 0.4,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(10)),
-                            color: StyleSheet().avgHeartBox,
+                            color: StyleSheet.avgHeartBox,
                           ),
                           height: height * 0.4,
                           child: Padding(

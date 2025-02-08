@@ -1,24 +1,34 @@
 import 'package:health_care_web/models/device_profile_model.dart';
 import 'package:health_care_web/models/doctor_profile_model.dart';
-import 'package:health_care_web/models/user_profile_model.dart';
 
-class PatientProfileModel extends UserProfileModel {
-  final bool isDone;
-  final DeviceProfileModel? device;
-  final DoctorProfileModel doctorProfileModel;
+class PatientProfileModel{
+  bool isDone;
+  DeviceProfileModel? device;
+  DoctorProfileModel doctorProfileModel;
+  String id;
+  String address;
+  String name;
+  String email;
+  String age;
+  String pic;
+  String mobile;
+  String color;
+  String language;
+  List<String> contacts;
+
 
   PatientProfileModel({
-    required super.id,
-    required super.name,
-    required super.age,
-    required super.email,
-    super.pic = "",
-    super.address = "",
-    super.mobile = "",
-    super.color = "",
-    super.language = "",
+    required this.id,
+    required this.name,
+    required this.age,
+    required this.email,
+    this.pic = "",
+    this.address = "",
+    this.mobile = "",
+    this.color = "",
+    this.language = "",
     required this.isDone,
-    super.contacts = const [],
+    this.contacts = const [],
     required this.device,
     required this.doctorProfileModel,
   });
@@ -51,7 +61,6 @@ class PatientProfileModel extends UserProfileModel {
             patients: []));
   }
 
-  @override
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -68,27 +77,51 @@ class PatientProfileModel extends UserProfileModel {
       'doctorProfileModel': doctorProfileModel.toMap(),
     };
   }
+
+  PatientReportModel toPatientReportModel() {
+    return PatientReportModel(
+      id: id,
+      name: name,
+      email: email,
+      mobile: mobile,
+      address: address,
+      age: age,
+      device: null,
+      doctorProfileModel: null,
+
+    );
+  }
+
+
 }
 
-class PatientReportModel extends UserProfileModel {
-  final bool isDone;
-  final DeviceReportModel device;
-  final DoctorReportModel doctorProfileModel;
+class PatientReportModel {
+  DeviceReportModel? device;
+  DoctorReportModel? doctorProfileModel;
+  String id;
+  String address;
+  String name;
+  String email;
+  String age;
+  String pic;
+  String mobile;
+  String color;
+  String language;
+  List<String> contacts;
 
   PatientReportModel({
-    required super.id,
-    required super.name,
-    required super.age,
-    required super.email,
-    super.pic = "",
-    super.address = "",
-    super.mobile = "",
-    super.color = "",
-    super.language = "",
-    required this.isDone,
-    super.contacts = const [],
-    required this.device,
-    required this.doctorProfileModel,
+    required this.id,
+    required this.name,
+    required this.age,
+    required this.email,
+    this.pic = "",
+    this.address = "",
+    this.mobile = "",
+    this.color = "",
+    this.language = "",
+    this.contacts = const [],
+    this.device,
+    this.doctorProfileModel,
   });
 
   factory PatientReportModel.fromMap(Map<String, dynamic> map) {
@@ -102,14 +135,12 @@ class PatientReportModel extends UserProfileModel {
       mobile: map['mobile'] ?? '',
       color: map['color'] ?? '',
       language: map['language'] ?? '',
-      isDone: map['isDone'] ?? false,
       device: DeviceReportModel.fromMap(map), //Assuming a fromMap method exists
       doctorProfileModel:
           DoctorReportModel.fromMap(map), //Assuming a fromMap method exists
     );
   }
 
-  @override
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -121,9 +152,8 @@ class PatientReportModel extends UserProfileModel {
       'mobile': mobile,
       'color': color,
       'language': language,
-      'isDone': isDone,
-      'device': device.toMap(),
-      'doctorProfileModel': doctorProfileModel.toMap(),
+      'device': device!.toMap(),
+      'doctorProfileModel': doctorProfileModel!.toMap(),
     };
   }
 }

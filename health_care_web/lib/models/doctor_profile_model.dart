@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care_web/models/patient_profile_model.dart';
 import 'package:health_care_web/models/report_model.dart';
 import 'package:health_care_web/models/return_model.dart';
 import 'package:health_care_web/services/firestore_db_service.dart';
+import 'package:health_care_web/services/util.dart';
 
 class DoctorProfileModel {
   final String id;
@@ -41,25 +43,25 @@ class DoctorProfileModel {
     );
   }
 
+  Future<DoctorProfileModel> initDoctor(BuildContext context) async {
+    ReturnModel res = await FirestoreDbService().fetchAccount();
+    if(res.state){
+      showMessages(res.state, res.message, context);
+    }else{
+      showMessages(res.state, res.message, context);
+    }
+
+    return res.doctorProfileModel!;
+  }
+
+
   Future<void> saveReport(String uid,ReportModel selectedReport, BuildContext context)async{
     ReturnModel res =
         await FirestoreDbService().saveReport(uid, selectedReport);
     if (res.state) {
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(res.message),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(res.message),
-          backgroundColor: Colors.red,
-        ),
-      );
     }
+    showMessages(res.state,res.message,context);
   }
 
   Future<void> saveDraftReport(String uid, ReportModel selectedReport, BuildContext context)async{
@@ -67,20 +69,97 @@ class DoctorProfileModel {
         await FirestoreDbService().saveReportData(uid, selectedReport);
     if (res.state) {
       Navigator.pop(context);
+    }
+    showMessages(res.state,res.message,context);
+  
+  }
+
+  Future<ReturnModel> fetchCurrentPatient(BuildContext context) async{
+    ReturnModel res = ReturnModel(state: false, message: "");
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception("User is not logged in.");
+      }
+
+      ReturnModel res =
+          await FirestoreDbService().fetchCurrentPatients(user.uid);
+
+      showMessages(res.state, res.message, context);
+    } catch (e) {
+      showMessages(false, e.toString(), context);
+    }
+    return res;
+  }
+
+  Future<ReportModel?> fetchAIReport(String uid, BuildContext context) async {
+    // Fetching ai report
+
+    try {
+      ReturnModel res =
+          await FirestoreDbService().getLatestDeviceReadings(uid);
+
+      if (res.state) {
+
+        /*
+        
+        Add AI integration here
+        
+        */
+
+
+        return res.reportModel;
+      } else {
+        showMessages(res.state, res.message, context);
+        return null;
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(res.message),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(res.message),
+          content: Text('An error occurred: $e'),
           backgroundColor: Colors.red,
         ),
       );
+      return null;
     }
+  }
+
+  Future<List<dynamic>?> createReport(PatientProfileModel profile, BuildContext context) async {
+
+    final ReportModel? reportModel = await fetchAIReport(profile.id,context);
+    final ReturnModel reports =
+        await FirestoreDbService().fetchReports(profile.id);
+
+    if (reportModel == null) {
+      showMessages(false, "No data found for the new report", context);
+      return null;
+    }
+
+    if (!reports.state) {
+      showMessages(reports.state, reports.message, context);
+      return null;
+    }
+
+    return [reportModel, reports];
+  }
+
+  Future<List<ReportModel>?> viewReports(PatientProfileModel profile, BuildContext context) async {
+    
+    final ReturnModel reports =
+        await FirestoreDbService().fetchReports(profile.id);
+
+    if (!reports.state) {
+      showMessages(reports.state, reports.message, context);
+      return null;
+    }
+    return reports.reports;
+  }
+
+  Future<void> removeDevice(String uid, String deviceId, BuildContext context) async {
+    
+    ReturnModel res =
+        await FirestoreDbService().removeDeviceFromPatient(uid, deviceId);
+    showMessages(res.state, res.message, context);
   }
 
   Map<String, dynamic> toMap() {
@@ -95,15 +174,21 @@ class DoctorProfileModel {
       'color': color,
     };
   }
+
+  DoctorReportModel toDoctorReportModel (){
+    return DoctorReportModel(id: id, name: name, email: email, address: address,mobile: mobile);
+  }
 }
 
 class DoctorReportModel {
+  final String id;
   final String name;
   final String email;
   final String address;
   final String mobile;
 
   DoctorReportModel({
+    required this.id,
     required this.name,
     required this.email,
     this.address = "",
@@ -112,6 +197,7 @@ class DoctorReportModel {
   //Add factory constructor and toMap method
   factory DoctorReportModel.fromMap(Map<String, dynamic> map) {
     return DoctorReportModel(
+      id: map['id'],
       name: map['name'] ?? '',
       email: map['email'] ?? '',
       address: map['address'],
@@ -121,6 +207,7 @@ class DoctorReportModel {
 
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'name': name,
       'email': email,
       'address': address,

@@ -1,9 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:health_care_web/constants/consts.dart';
-import 'package:health_care_web/pages/cards/expandable_profile_card.dart';
-import 'package:health_care_web/pages/cards/mobile_home_popup.dart';
-import 'package:health_care_web/pages/services/firestore_db_service.dart';
+import 'package:health_care_web/app/components/cards/expandable_profile_card.dart';
+import 'package:health_care_web/app/components/cards/mobile_home_popup.dart';
+import 'package:health_care_web/models/app_sizes.dart';
+import 'package:health_care_web/models/doctor_profile_model.dart';
+import 'package:health_care_web/models/patient_profile_model.dart';
+import 'package:health_care_web/models/return_model.dart';
+import 'package:health_care_web/models/style_sheet.dart';
 import 'package:iconly/iconly.dart';
 
 class Summary extends StatefulWidget {
@@ -14,8 +16,9 @@ class Summary extends StatefulWidget {
 }
 
 class _SummaryState extends State<Summary> {
-  List<UserProfile> currentProfiles = [];
+  List<PatientProfileModel> currentProfiles = [];
   bool isLoading = false;
+  late DoctorProfileModel doctor;
 
   @override
   void initState() {
@@ -23,42 +26,24 @@ class _SummaryState extends State<Summary> {
     fetchCurrentPatients();
   }
 
+  
+
   Future<void> fetchCurrentPatients() async {
     setState(() => isLoading = true);
 
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        throw Exception("User is not logged in.");
-      }
+    doctor = await DoctorProfileModel(id: "", name: "", age: "", email: "").initDoctor(context);
 
-      Map<String, dynamic> res =
-          await FirestoreDbService().fetchCurrentPatient(user.uid);
+    ReturnModel res = await doctor.fetchCurrentPatient(context);
 
-      if (res['success']) {
-        setState(() {
-          currentProfiles = res['data'] as List<UserProfile>;
-        });
-      } else {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(res['error'] ?? 'Unknown error occurred'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        });
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('An error occurred: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } finally {
-      setState(() => isLoading = false);
+    if(res.state){
+      setState(() {
+        currentProfiles = res.patients;
+      });
+    }else{
+      currentProfiles = [];
     }
+
+    setState(() => isLoading = false);    
   }
 
   void refresh() {
@@ -69,189 +54,9 @@ class _SummaryState extends State<Summary> {
     fetchCurrentPatients();
   }
 
-  Future<ReportModel?> fetchAIReport(String uid) async {
-    // Fetching ai report
 
-    try {
-      Map<String, dynamic> res =
-          await FirestoreDbService().getLatestDeviceReadings(uid);
 
-      if (res['success']) {
-        final ReportModel reportModel = ReportModel(
-            timestamp: res['data']['timestamp'].toString(),
-            brief: res['data']['brief'] ?? "Brief about the report",
-            description:
-                res['data']['description'] ?? "Description about the report",
-            aiSuggestions:
-                res['data']['ai_suggestions'] ?? "Suggestion1\nsuggestion2",
-            avgHeart: res['data']['avg_heart'] ?? "120 bpm",
-            docSuggestions: res['data']['doc_suggestions'] ??
-                "docsuggestion1\ndocsuggestion2",
-            graph: res['data']['graph'] ?? "",
-            anomalies: res['data']['anomalies'] ?? "anomaly1\nanomaly2",
-            isEditing: true,
-            age: res['data']['age'],
-            docName: res['name'] ?? "",
-            docEmail: res['email'] ?? "",
-            reportId: res['data_id']);
-        return reportModel;
-      } else {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(res['error'] ?? 'Unknown error occurred'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        });
-        return null;
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('An error occurred: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return null;
-    }
-  }
-
-  Future<void> createReport(UserProfile profile) async {
-    setState(() {
-      isLoading = true;
-    });
-    Map<String, dynamic> res = await FirestoreDbService()
-        .fetchAccount(FirebaseAuth.instance.currentUser!.uid);
-
-    final ReportModel? reportModel = await fetchAIReport(profile.id);
-    final Map<String, dynamic> reports =
-        await FirestoreDbService().fetchReports(profile.id);
-
-    if (reportModel == null) {
-      setState(() {
-        isLoading = false;
-      });
-      return;
-    }
-
-    if (!res['success']) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(res['error'] ?? 'Unknown error occurred'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      });
-      setState(() {
-        isLoading = false;
-      });
-      return;
-    }
-
-    if (!reports['success']) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(reports['error'] ?? 'Unknown error occurred'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      });
-      setState(() {
-        isLoading = false;
-      });
-      return;
-    }
-
-    final doctor = UserProfile(
-      id: "",
-      name: reportModel.docName.isEmpty
-          ? res['data']['name']
-          : reportModel.docName,
-      email: reportModel.docEmail.isEmpty
-          ? res['data']['email']
-          : reportModel.docEmail,
-      age: "0",
-    );
-    setState(() {
-      isLoading = false;
-    });
-    Navigator.pushNamed(context, '/medical_report', arguments: {
-      'profile': profile,
-      'doctor': doctor,
-      'report': reportModel,
-      'reportsList': reports['data'] as List<ReportModel>,
-    }).then((value) {
-      refresh();
-    });
-  }
-
-  Future<void> viewReports(UserProfile profile) async {
-    setState(() {
-      isLoading = true;
-    });
-    final Map<String, dynamic> reports =
-        await FirestoreDbService().fetchReports(profile.id);
-
-    if (!reports['success']) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(reports['error'] ?? 'Unknown error occurred'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      });
-      setState(() {
-        isLoading = false;
-      });
-      return;
-    }
-
-    final doctor = UserProfile(id: "", name: "", email: "", age: "");
-    Navigator.pushNamed(context, '/medical_report', arguments: {
-      'profile': profile,
-      'doctor': doctor,
-      'report': null,
-      'reportsList': reports['data'] as List<ReportModel>,
-    }).then((value) {
-      refresh();
-    });
-
-    setState(() {
-      isLoading = false;
-    });
-  }
-
-  Future<void> removeDevice(String uid, String deviceId) async {
-    setState(() {
-      isLoading = true;
-    });
-    Map<String, dynamic> res =
-        await FirestoreDbService().removeDeviceFromPatient(uid, deviceId);
-    if (res['success']) {
-      refresh();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('done'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(res['error'] ?? 'Unknown error occurred'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-    setState(() {
-      isLoading = false;
-    });
-  }
+  
 
   Future<void> pendingData(String device) async {
     showDialog(
@@ -291,7 +96,7 @@ class _SummaryState extends State<Summary> {
                               borderRadius: BorderRadius.all(
                                 Radius.circular(12),
                               ),
-                              color: StyleSheet().step4),
+                              color: StyleSheet.step4),
                           child: Row(
                             spacing: 3,
                             children: [
@@ -306,7 +111,7 @@ class _SummaryState extends State<Summary> {
                               borderRadius: BorderRadius.all(
                                 Radius.circular(12),
                               ),
-                              color: StyleSheet().step3),
+                              color: StyleSheet.step3),
                           child: Row(
                             spacing: 3,
                             children: [
@@ -321,7 +126,7 @@ class _SummaryState extends State<Summary> {
                               borderRadius: BorderRadius.all(
                                 Radius.circular(12),
                               ),
-                              color: StyleSheet().step2),
+                              color: StyleSheet.step2),
                           child: Row(
                             spacing: 3,
                             children: [
@@ -336,7 +141,7 @@ class _SummaryState extends State<Summary> {
                               borderRadius: BorderRadius.all(
                                 Radius.circular(12),
                               ),
-                              color: StyleSheet().step1),
+                              color: StyleSheet.step1),
                           child: Row(
                             spacing: 3,
                             children: [
@@ -357,22 +162,22 @@ class _SummaryState extends State<Summary> {
                           email: p.email,
                           address: p.address,
                           mobile: p.mobile,
-                          device: p.device,
+                          device: p.device!.code,
                           isDone: p.isDone,
                           contactProfiles: p.contacts,
                           onViewReport: () {
-                            viewReports(p);
+                            doctor.viewReports(p,context);
                           },
                           onCreateReport: () {
-                            createReport(
-                              p,
+                            doctor.createReport(
+                              p,context
                             );
                           },
                           onPending: () {
-                            pendingData(p.device);
+                            pendingData(p.device!.code);
                           },
                           onRemoveDevice: () {
-                            removeDevice(p.id, p.device);
+                            doctor.removeDevice(p.id, p.device!.code, context);
                           },
                         );
                       }).toList(),

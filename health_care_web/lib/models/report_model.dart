@@ -10,7 +10,8 @@ class ReportModel {
   String reportId;
   String anomalies;
   bool isEditing;
-  PatientReportModel patientProfileModel;
+  String docId;
+  PatientReportModel? patientProfileModel;
 
   ReportModel({
     required this.timestamp,
@@ -20,6 +21,7 @@ class ReportModel {
     required this.docSuggestions,
     required this.graph,
     required this.reportId,
+    required this.docId,
     required this.isEditing,
     required this.patientProfileModel,
     required this.anomalies,
@@ -34,10 +36,10 @@ class ReportModel {
       aiSuggestions: map['aiSuggestions'] ?? '',
       graph: map['graph'] ?? '',
       reportId: map['reportId'] ?? '',
+      docId: map['docId'] ?? '',
       isEditing: map['isEditing'] ?? false,
       anomalies: map['anomalies'] ?? '',
-      patientProfileModel: PatientReportModel.fromMap(
-          map), // Assuming PatientReportModel has a fromMap method
+      patientProfileModel: null,
     );
   }
 
@@ -50,10 +52,10 @@ class ReportModel {
       'aiSuggestions': aiSuggestions,
       'graph': graph,
       'reportId': reportId,
+      'docId': docId,
       'anomalies': anomalies,
       'isEditing': isEditing,
-      'patientProfileModel': patientProfileModel
-          .toMap(), // Assuming PatientReportModel has a toMap method
+      'patientProfileModel': patientProfileModel,
     };
   }
 }

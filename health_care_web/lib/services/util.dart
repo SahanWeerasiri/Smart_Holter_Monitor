@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 List<String> generateTags(String name) {
   // Convert the name to lowercase to make all tags simple
   String lowerCaseName = name.toLowerCase();
@@ -25,4 +27,16 @@ String getAge(String birthday) {
     age--;
   }
   return age.toString();
+}
+
+
+void showMessages(bool state, String message, BuildContext context){
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(message),
+              backgroundColor: state? Colors.green :Colors.red,
+            ),
+          );
+        });
 }
