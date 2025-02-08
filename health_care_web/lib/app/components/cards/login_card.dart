@@ -42,7 +42,7 @@ class _LoginCardState extends State<LoginCard> {
     AuthService auth = AuthService();
     ReturnModel result = await auth.loginUserWithEmailAndPassword(
         credentialController.username, credentialController.password, role);
-    if (result.state) {
+    if (!result.state) {
       setState(() {
         msg = result.message;
       });
@@ -62,34 +62,6 @@ class _LoginCardState extends State<LoginCard> {
     });
     return true;
   }
-
-  // Future<bool> checkGoogleCredentials() async {
-  //   AuthService auth = AuthService();
-
-  //   Map<String, dynamic> result = await auth.signWithGoogle();
-  //   if (result["status"] == "error") {
-  //     setState(() {
-  //       msg = result["message"];
-  //     });
-  //     return false;
-  //   }
-  //   setState(() {
-  //     msg = result["message"];
-  //   });
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text(msg),
-  //         backgroundColor: Colors.green,
-  //       ),
-  //     );
-  //   });
-  //   return true;
-  // }
-
-  // bool checkFacebookCredentials() {
-  //   return true;
-  // }
 
   void loginError() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -240,60 +212,9 @@ class _LoginCardState extends State<LoginCard> {
                   textColor: StyleSheet.btnText,
                   icon: Icons.login,
                 ),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.center,
-                //   crossAxisAlignment: CrossAxisAlignment.center,
-                //   children: [
-                //     const Text("Don't you have an account?",
-                //         style: TextStyle(
-                //           fontSize: 15,
-                //         )),
-                //     TextButton(
-                //         child: Text(
-                //           "Sign up",
-                //           style: TextStyle(
-                //               fontSize: 15,
-                //               color: StyleSheet.btnBackground,
-                //               fontWeight: FontWeight.w900),
-                //         ),
-                //         onPressed: () {
-                //           setState(() {
-                //             credentialController.clear();
-                //           });
-                //           navigateToSignUp();
-                //         }),
-                //   ],
-                // ),
                 SizedBox(
                   height: AppSizes().getBlockSizeVertical(5),
                 ),
-                // Divider(
-                //   color: StyleSheet.divider,
-                //   endIndent: 5,
-                //   height: 2,
-                //   thickness: 2,
-                // ),
-                // SizedBox(
-                //   height: AppSizes().getBlockSizeVertical(5),
-                // ),
-                // CustomTextButton(
-                //   label: "Sign in with Google",
-                //   borderRadius: 5,
-                //   onPressed: () async {
-                //     if (await checkGoogleCredentials()) {
-                //       setState(() {
-                //         credentialController.clear();
-                //       });
-                //       navigateToHome();
-                //     } else {
-                //       loginError();
-                //     }
-                //   },
-                //   borderColor: StyleSheet.elebtnBorder,
-                //   img: 'assetes/icons/google.png',
-                //   textColor: StyleSheet.elebtnText,
-                //   backgroundColor: StyleSheet.uiBackground,
-                // ),
                 CustomDropdown(
                     label: 'Role',
                     options: ['Doctor', 'Admin'],
