@@ -19,7 +19,7 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   DoctorProfileModel? _userProfile =
-      DoctorProfileModel(id: "", name: "Name", email: "Email", age:"0");
+      DoctorProfileModel(id: "", name: "Name", email: "Email");
   late final ProfileController profileController = ProfileController();
   bool _isLoading = false; // Loading state
 
@@ -101,7 +101,6 @@ class _ProfileState extends State<Profile> {
                   builder: (context) => EditProfilePopup(
                     mobileController: profileController.mobile,
                     addressController: profileController.address,
-                    languageController: profileController.language,
                     picController: profileController.pic,
                     onSubmit: () {
                       onSubmit();

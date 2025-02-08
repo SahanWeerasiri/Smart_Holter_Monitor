@@ -10,7 +10,6 @@ import 'package:health_care_web/services/util.dart';
 class DoctorProfileModel {
   final String id;
   final String name;
-  final String age;
   final String email;
   final String pic;
   final String address;
@@ -21,7 +20,6 @@ class DoctorProfileModel {
   DoctorProfileModel({
     required this.id,
     required this.name,
-    required this.age,
     required this.email,
     this.pic = "",
     this.address = "",
@@ -30,11 +28,10 @@ class DoctorProfileModel {
     this.patients = const [],
   });
 
-  factory DoctorProfileModel.fromMap(Map<String, dynamic> map) {
+  factory DoctorProfileModel.fromMap(Map<String, dynamic> map, String id) {
     return DoctorProfileModel(
-      id: map['id'],
+      id: id,
       name: map['name'] ?? '',
-      age: map['age'] ?? '',
       email: map['email'] ?? '',
       pic: map['pic'] ?? '',
       address: map['address'] ?? '',
@@ -80,6 +77,7 @@ class DoctorProfileModel {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
+        showMessages(true, "Wave01", context);
         throw Exception("User is not logged in.");
       }
 
@@ -88,6 +86,7 @@ class DoctorProfileModel {
 
       showMessages(res.state, res.message, context);
     } catch (e) {
+      showMessages(true, "Wave02", context);
       showMessages(false, e.toString(), context);
     }
     return res;
@@ -178,7 +177,6 @@ class DoctorProfileModel {
     return {
       'id': id,
       'name': name,
-      'age': age,
       'email': email,
       'pic': pic,
       'address': address,

@@ -31,7 +31,7 @@ class _SummaryState extends State<Summary> {
   Future<void> fetchCurrentPatients() async {
     setState(() => isLoading = true);
 
-    doctor = await DoctorProfileModel(id: "", name: "", age: "", email: "").initDoctor(context);
+    doctor = await DoctorProfileModel(id: "", name: "",  email: "").initDoctor(context);
 
     ReturnModel res = await doctor.fetchCurrentPatient(context);
 

@@ -9,7 +9,6 @@ import 'package:image_picker/image_picker.dart';
 class EditProfilePopup extends StatefulWidget {
   final TextEditingController mobileController;
   final TextEditingController addressController;
-  final TextEditingController languageController;
   final TextEditingController picController;
   final VoidCallback onSubmit;
 
@@ -17,7 +16,6 @@ class EditProfilePopup extends StatefulWidget {
     super.key,
     required this.mobileController,
     required this.addressController,
-    required this.languageController,
     required this.picController,
     required this.onSubmit,
   });
@@ -98,15 +96,6 @@ class _StateEditProfile extends State<EditProfilePopup> {
               controller: widget.addressController,
               decoration: const InputDecoration(labelText: "Address"),
             ),
-            TextField(
-              style: TextStyle(
-                backgroundColor: StyleSheet.uiBackground,
-                fontSize: 20,
-                color: StyleSheet.doctorDetailsPopPrimary,
-              ),
-              controller: widget.languageController,
-              decoration: const InputDecoration(labelText: "Language"),
-            ),
             const SizedBox(height: 10),
             CustomButton(
               label: "Change Picture",
@@ -125,7 +114,6 @@ class _StateEditProfile extends State<EditProfilePopup> {
           onPressed: () {
             widget.mobileController.clear();
             widget.addressController.clear();
-            widget.languageController.clear();
             Navigator.pop(context);
           },
           child: Text(

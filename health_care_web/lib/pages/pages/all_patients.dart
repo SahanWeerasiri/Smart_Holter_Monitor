@@ -16,7 +16,7 @@ class AllPatients extends StatefulWidget {
 
 class _AllPatientsState extends State<AllPatients> {
   DoctorProfileModel? _userProfile =
-      DoctorProfileModel(id: "", name: "Name", email: "Email", age:"0");
+      DoctorProfileModel(id: "", name: "Name", email: "Email");
   final TextEditingController controller = TextEditingController();
   List<PatientProfileModel> profiles = [];
   bool isLoading = false;

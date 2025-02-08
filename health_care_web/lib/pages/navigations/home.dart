@@ -23,7 +23,7 @@ class _HomeState extends State<Home> {
   final List<Widget> pages = [
     const Summary(),
     const AllPatients(),
-    const Text('Test Drawer 4'),
+    const Text('Test Drawer 3'),
     const Profile(),
   ];
   @override
@@ -59,7 +59,7 @@ class _HomeState extends State<Home> {
                 icon: Icons.search,
                 onTap: () {
                   setState(() {
-                    drawerIndexController.setSelectedIndex(3);
+                    drawerIndexController.setSelectedIndex(2);
                   });
                 }),
             DrawerItems(
@@ -68,7 +68,7 @@ class _HomeState extends State<Home> {
                 icon: Icons.person,
                 onTap: () {
                   setState(() {
-                    drawerIndexController.setSelectedIndex(4);
+                    drawerIndexController.setSelectedIndex(3);
                   });
                 }),
           ],

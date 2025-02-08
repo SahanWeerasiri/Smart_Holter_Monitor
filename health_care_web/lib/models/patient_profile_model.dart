@@ -6,6 +6,8 @@ class PatientProfileModel{
   bool isDone;
   DeviceProfileModel? device;
   DoctorProfileModel? doctorProfileModel;
+  String docId;
+  String deviceId;
   String id;
   String address;
   String name;
@@ -23,6 +25,8 @@ class PatientProfileModel{
     required this.name,
     required this.age,
     required this.email,
+    required this.docId,
+    required this.deviceId,
     this.pic = "",
     this.address = "",
     this.mobile = "",
@@ -41,6 +45,8 @@ class PatientProfileModel{
         name: map['name'] ?? '',
         age: map['age'] ?? '',
         email: map['email'] ?? '',
+        docId: map['docId'] ?? '',
+        deviceId: map['deviceId'] ?? '',
         pic: map['pic'] ?? '',
         address: map['address'] ?? '',
         mobile: map['mobile'] ?? '',
@@ -53,7 +59,6 @@ class PatientProfileModel{
         doctorProfileModel: DoctorProfileModel(
             id: "",
             name: "",
-            age: "",
             email: "",
             pic: "",
             address: "",
@@ -69,6 +74,8 @@ class PatientProfileModel{
       'age': age,
       'email': email,
       'pic': pic,
+      'docId': docId,
+      'deviceId': deviceId,
       'address': address,
       'mobile': mobile,
       'color': color,

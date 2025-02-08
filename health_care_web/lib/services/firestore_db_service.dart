@@ -39,7 +39,7 @@ class FirestoreDbService {
       final doc = await _firestore.collection('doctor_accounts').doc(FirebaseAuth.instance.currentUser!.uid).get();
       if (doc.exists) {
         final data = doc.data()!;
-        final doctor = DoctorProfileModel.fromMap(data as Map<String, String>);
+        final doctor = DoctorProfileModel.fromMap(data, FirebaseAuth.instance.currentUser!.uid);
         return ReturnModel(
             state: true,
             message: 'Account fetched successfully',
@@ -91,7 +91,7 @@ class FirestoreDbService {
       final doc = await _firestore.collection('doctor_accounts').doc(uid).get();
       if (doc.exists) {
         final data = doc.data()!;
-        final doctor = DoctorProfileModel.fromMap(data as Map<String, String>);
+        final doctor = DoctorProfileModel.fromMap(data as Map<String, String>, FirebaseAuth.instance.currentUser!.uid);
         return doctor;
       } else {
         return null;
@@ -143,7 +143,7 @@ class FirestoreDbService {
       await _firestore
           .collection('user_accounts')
           .doc(uid)
-          .update({'doctor_id': ''});
+          .update({'docId': ''});
       return ReturnModel(state: true, message: 'Patient removed successfully');
     } catch (e) {
       return ReturnModel(state: false, message: 'Error removing patient: $e');
@@ -155,7 +155,7 @@ class FirestoreDbService {
       await _firestore
           .collection('user_accounts')
           .doc(uid)
-          .update({'doctor_id': doctorId});
+          .update({'docId': doctorId});
       return ReturnModel(state: true, message: 'Patient added successfully');
     } catch (e) {
       return ReturnModel(state: false, message: 'Error adding patient: $e');
@@ -166,7 +166,7 @@ class FirestoreDbService {
     try {
       final snapshot = await _firestore
           .collection('user_accounts')
-          .where('doctor_id', isEqualTo: doctorId)
+          .where('docId', isEqualTo: doctorId)
           .get();
       final List<PatientProfileModel> patients = snapshot.docs
           .map((doc) => PatientProfileModel.fromMap(doc.data(), doc.id))
