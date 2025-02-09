@@ -277,7 +277,7 @@ class FirestoreDbService {
       await _firestore
           .collection('user_accounts')
           .doc(uid)
-          .update({'device': device});
+          .update({'deviceId': device});
       return ReturnModel(
           state: true, message: 'Device added to patient successfully');
     } catch (e) {

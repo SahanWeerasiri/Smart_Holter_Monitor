@@ -245,7 +245,7 @@ class RealDbService {
       await _database
           .ref('devices')
           .child(code)
-          .update({'assigned': 0, 'use': ""});
+          .update({'assigned': 0, 'use': "", 'deadline': ''});
       return ReturnModel(state: true, message: 'Data removed successfully.');
     } catch (e) {
       return ReturnModel(state: false, message: 'Error removing data: $e');
