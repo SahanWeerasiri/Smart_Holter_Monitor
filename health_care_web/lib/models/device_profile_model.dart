@@ -42,7 +42,7 @@ class DeviceProfileModel {
       'state': deviceProfileModel.state,
       'deadline': deviceProfileModel.deadline,
       'latestValue': deviceProfileModel.latestValue,
-      'avgValue': deviceProfileModel.avgValue,
+      'avgHeart': deviceProfileModel.avgValue,
       'data': deviceProfileModel.data,
     };
   }
@@ -73,7 +73,7 @@ class DeviceReportModel {
       code: map['code'] ?? '',
       detail: map['detail'],
       deadline: map['deadline'],
-      avgValue: map['avgValue'],
+      avgValue: map['avgHeart'],
       data: map['data'],
     );
   }
@@ -83,7 +83,7 @@ class DeviceReportModel {
       'code': code,
       'detail': detail,
       'deadline': deadline,
-      'avgValue': avgValue,
+      'avgHeart': avgValue,
       'data': data,
     };
   }

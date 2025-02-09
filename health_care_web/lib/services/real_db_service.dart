@@ -84,8 +84,28 @@ class RealDbService {
             code: snapshot.key.toString(),
             detail: snapshot.child('other').value?.toString() ?? "",
             deadline: snapshot.child('deadline').value?.toString() ?? "",
-            data: snapshot.child('data').value as Map<String, String>,
-            avgValue: fetchDeviceDataAvg(uid).toString()
+            avgValue: (await fetchDeviceDataAvg(uid)).toString()
+          );
+        
+      } else {
+        return null;  
+        }
+      
+    } catch (e) {
+      return null;
+    }
+  }
+  Future<DeviceReportModel?> fetchDeviceOneViewReport(String uid) async {
+    try {
+      final ref = _database.ref('devices').child(uid);
+      final snapshot = await ref.get();
+      if (snapshot.exists) {
+
+          return DeviceReportModel(
+            code: snapshot.key.toString(),
+            detail: snapshot.child('other').value?.toString() ?? "",
+            deadline: snapshot.child('deadline').value?.toString() ?? "",
+            avgValue: ""
           );
         
       } else {
@@ -116,7 +136,7 @@ class RealDbService {
                 latestValue: latestValue,
             deadline: snapshot.child('deadline').value?.toString() ?? "",
             data: snapshot.child('data').value as Map<String, String>,
-            avgValue: fetchDeviceDataAvg(uid).toString()
+            avgValue: (await fetchDeviceDataAvg(uid)).toString()
           );
         
       } else {

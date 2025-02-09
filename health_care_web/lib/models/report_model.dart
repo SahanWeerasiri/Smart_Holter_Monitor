@@ -3,6 +3,7 @@ import 'package:health_care_web/models/patient_profile_model.dart';
 class ReportModel {
   String timestamp;
   String description;
+  String age;
   String brief;
   String docSuggestions;
   String aiSuggestions;
@@ -21,6 +22,7 @@ class ReportModel {
     required this.aiSuggestions,
     required this.docSuggestions,
     required this.graph,
+    required this.age,
     required this.reportId,
     required this.docId,
     required this.deviceId,
@@ -37,7 +39,8 @@ class ReportModel {
       docSuggestions: map['docSuggestions'] ?? '',
       aiSuggestions: map['aiSuggestions'] ?? '',
       graph: map['graph'] ?? '',
-      deviceId: map['device'] ?? '',
+      age: map['age'] ?? '',
+      deviceId: map['deviceId'] ?? '',
       reportId: map['reportId'] ?? '',
       docId: map['docId'] ?? '',
       isEditing: map['isEditing'] ?? false,
@@ -54,6 +57,21 @@ class ReportModel {
       'docSuggestions': docSuggestions,
       'aiSuggestions': aiSuggestions,
       'graph': graph,
+      'anomalies': anomalies,
+      'isEditing': isEditing,
+    };
+  }
+
+  Map<String, dynamic> toMapWithDocId() {
+    return {
+      'timestamp': timestamp,
+      'description': description,
+      'brief': brief,
+      'age': age,
+      'docSuggestions': docSuggestions,
+      'aiSuggestions': aiSuggestions,
+      'graph': graph,
+      'docId':docId,
       'anomalies': anomalies,
       'isEditing': isEditing,
     };

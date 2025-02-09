@@ -191,9 +191,9 @@ class _LoginCardState extends State<LoginCard> {
                   label: "Test",
                   onPressed: () async {
                     setState(() {
-                      credentialController.username = "admin@smartcare.com";
-                      credentialController.password = "admin123";
-                      role = "Admin";
+                      credentialController.username = "doctor@smartcare.com";
+                      credentialController.password = "doctor123";
+                      role = "Doctor";
                     });
                     if (await checkCredentials()) {
                       setState(() {

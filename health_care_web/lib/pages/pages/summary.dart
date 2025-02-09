@@ -6,6 +6,7 @@ import 'package:health_care_web/models/doctor_profile_model.dart';
 import 'package:health_care_web/models/patient_profile_model.dart';
 import 'package:health_care_web/models/report_model.dart';
 import 'package:health_care_web/models/style_sheet.dart';
+import 'package:health_care_web/services/util.dart';
 import 'package:iconly/iconly.dart';
 
 class Summary extends StatefulWidget {
@@ -159,26 +160,58 @@ class _SummaryState extends State<Summary> {
                           email: p.email,
                           address: p.address,
                           mobile: p.mobile,
-                          device: p.device!.code,
+                          device: p.deviceId,
                           isDone: p.isDone,
                           contactProfiles: p.contacts,
                           onViewReport: () async{
+                            setState(() {
+                              isLoading = true;
+                            });
                             List<ReportModel>? res = await doctor.viewReports(p,context);
-                            Navigator.pushNamed(context, '/medical_report', arguments: {'doctor': doctor, 'report': null, 'reportsList': res});
-                          },
-                          onCreateReport: () async{
-                            List<dynamic>? res = await doctor.createReport(p,context);
+                            if(res==null){
+                              showMessages(false, "No reports found", context);
+                            }
+                            setState(() {
+                              isLoading = false;
+                            });
                             if(res!=null){
-                              ReportModel currentReport = res[0] as ReportModel;
-                              List<ReportModel> reports = res[1] as List<ReportModel>;
-                              Navigator.pushNamed(context, '/medical_report', arguments: {'doctor': doctor, 'report': currentReport, 'reportsList': reports});
+                              Navigator.pushNamed(context, '/medical_report', arguments: {'doctor': doctor, 'report': null, 'reportsList': res});
                             }
                           },
-                          onPending: () {
-                            pendingData(p.device!.code);
+                          onCreateReport: () async{
+                            setState(() {
+                              isLoading = true;
+                            });
+                            AiReport res = await doctor.createReport(p,context);
+                            if(!res.state){
+                              setState(() {
+                                isLoading = false;
+                              });
+                            }
+                            if(res.state){
+                              setState(() {
+                                isLoading = false;
+                              });
+                              Navigator.pushNamed(context, '/medical_report', arguments: {'doctor': doctor, 'report': res.report, 'reportsList': res.reports});
+                            }
                           },
-                          onRemoveDevice: () {
-                            doctor.removeDevice(p.toPatientReportModel(), p.device!.code, context);
+                          onPending: ()async {
+                            setState(() {
+                              isLoading = true;
+                            });
+                            await pendingData(p.device!.code);
+                            setState(() {
+                              isLoading = false;
+                            });
+                          },
+                          onRemoveDevice: () async{
+                            setState(() {
+                              isLoading = true;
+                            });
+                            await doctor.removeDevice(p.toPatientReportModel(), p.device!.code, context);
+                            setState(() {
+                              isLoading = false;
+                            });
                           },
                         );
                       }).toList(),

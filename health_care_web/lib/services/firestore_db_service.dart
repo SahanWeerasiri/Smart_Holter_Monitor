@@ -206,33 +206,47 @@ class FirestoreDbService {
 
   Future<ReturnModel> fetchReports(String uid) async {
     try {
-      
       final PatientProfileModel? patientProfileModel = await fetchPatientOne(uid);
 
-      if(patientProfileModel == null){
+      if (patientProfileModel == null) {
         return ReturnModel(state: false, message: 'Patient not found');
       }
-      
-      final PatientReportModel patientReportModel = patientProfileModel.toPatientReportModel();
-
       final snapshot = await _firestore
           .collection('user_accounts')
           .doc(uid)
           .collection('reports')
           .orderBy('timestamp', descending: true)
           .get();
-      
-      final List<ReportModel> reports =
-          snapshot.docs.map((doc) => ReportModel.fromMap(doc.data())).toList();
 
-      for(ReportModel reportModel in reports){
-        reportModel.patientProfileModel = patientReportModel;
-        final DoctorReportModel doctorReportModel = (await fetchDoctorOne(reportModel.docId))!.toDoctorReportModel();
-        reportModel.patientProfileModel!.doctorProfileModel = doctorReportModel;   
+      final List<ReportModel> reports = [];
 
-        final DeviceReportModel? deviceReportModel = (await RealDbService().fetchDeviceOneReport(reportModel.deviceId));
-        reportModel.patientProfileModel!.device = deviceReportModel;               
+      for (DocumentSnapshot doc in snapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        final reportModel = ReportModel.fromMap(data);
+        reportModel.patientProfileModel = patientProfileModel.toPatientReportModel();
+
+        final DoctorReportModel? doctorReportModel =
+            (await fetchDoctorOne(reportModel.docId))?.toDoctorReportModel();
+
+        if (doctorReportModel == null) {
+          return ReturnModel(state: false, message: "No doctor found for report ${reportModel.docId}");
+        }
+
+        reportModel.patientProfileModel!.doctorProfileModel = doctorReportModel;
+
+        final DeviceReportModel? deviceReportModel =
+            await RealDbService().fetchDeviceOneReport(reportModel.deviceId);
+
+        if (deviceReportModel == null) {
+          return ReturnModel(state: false, message: "No device found for report ${reportModel.docId}");
+        }
+
+        deviceReportModel.avgValue = data['avgHeart'] as String;
+        reportModel.patientProfileModel!.device = deviceReportModel;
+
+        reports.add(reportModel);
       }
+
       return ReturnModel(
           state: true,
           message: 'Reports fetched successfully',
@@ -241,6 +255,7 @@ class FirestoreDbService {
       return ReturnModel(state: false, message: 'Error fetching reports: $e');
     }
   }
+
 
   Future<ReturnModel> updateProfile(String uid, String mobile, String language,
       String address, String pic) async {
@@ -280,7 +295,7 @@ class FirestoreDbService {
       await _firestore
           .collection('user_accounts')
           .doc(uid)
-          .update({'device': ''}); //Removing device ref from the patient
+          .update({'device': '','deviceId':'Device'}); //Removing device ref from the patient
       return ReturnModel(
           state: true, message: 'Device removed from patient successfully');
     } catch (e) {
@@ -318,12 +333,17 @@ class FirestoreDbService {
         if (doctorReportModel != null) {
           reportModel.patientProfileModel!.doctorProfileModel =
               doctorReportModel;
+        }else{
+          return ReturnModel(state: false, message: "No doctor");
         }
 
-        final DeviceReportModel? deviceReportModel = (await RealDbService().fetchDeviceOneReport(data['deviceId']));
+        final DeviceReportModel? deviceReportModel = (await RealDbService().fetchDeviceOneReport(reportModel.deviceId));
 
         if (deviceReportModel != null) {
+          deviceReportModel.avgValue = data['avgHeart'] as String;
           reportModel.patientProfileModel!.device = deviceReportModel;
+        }else{
+          return ReturnModel(state: false, message: "No device");
         }
 
 
@@ -332,7 +352,7 @@ class FirestoreDbService {
             message: 'Report fetched successfully',
             reportModel: reportModel);
       } else {
-        return ReturnModel(state: false, message: 'No reports found');
+        return ReturnModel(state: false, message: "No data found");
       }
     } catch (e) {
       return ReturnModel(
@@ -348,7 +368,7 @@ class FirestoreDbService {
           .doc(report.patientProfileModel!.id)
           .collection('data')
           .doc(report.reportId)
-          .set(report.toMap()); // Use toMap()
+          .update(report.toMap()); // Use toMap()
       return ReturnModel(state: true, message: 'Draft saved successfully');
     } catch (e) {
       return ReturnModel(state: false, message: 'Error saving report data: $e');
@@ -362,7 +382,7 @@ class FirestoreDbService {
           .collection('user_accounts')
           .doc(report.patientProfileModel!.id)
           .collection('data')
-          .add(report.toMap()); // Use toMap()
+          .add(report.toMapWithDocId()); // Use toMap()
       await _firestore
           .collection('user_accounts')
           .doc(report.patientProfileModel!.id)
@@ -373,7 +393,8 @@ class FirestoreDbService {
                 'deviceId': deviceReportModel.code,
                 'avgHeart': deviceReportModel.avgValue,
                 'timestamp': DateTime.now().toString()}); // Use toMap())
-      // await RealDbService().deleteDeviceData(deviceReportModel.code);
+      await RealDbService().deleteDeviceData(deviceReportModel.code);
+      await removeDeviceFromPatient(report.patientProfileModel!.id, deviceReportModel.code);
       return ReturnModel(state: true, message: 'Device Removed Successfully');
     } catch (e) {
       return ReturnModel(state: false, message: 'Error saving report data: $e');
@@ -381,26 +402,50 @@ class FirestoreDbService {
   }
 
   Future<ReturnModel> saveReport(ReportModel report) async {
-    try {
-      await _firestore
+     try {
+    ReturnModel res = await saveReportData(report);
+    if (res.state) {
+      DocumentSnapshot doc = await _firestore
           .collection('user_accounts')
           .doc(report.patientProfileModel!.id)
-          .collection('reports')
-          .add(report.toMap()); //Use toMap()
-      await _firestore
+          .collection('data')
+          .doc(report.reportId)
+          .get();
+
+      if (doc.exists) {
+        await _firestore
+            .collection('user_accounts')
+            .doc(report.patientProfileModel!.id)
+            .collection('reports')
+            .doc(report.reportId)
+            .set({
+              'age': doc['age'],
+              'aiSuggestions': doc['aiSuggestions'],
+              'anomalies': doc['anomalies'],
+              'avgHeart': doc['avgHeart'],
+              'brief': doc['brief'],
+              'description': doc['description'],
+              'deviceId': doc['deviceId'],
+              'docId': doc['docId'],
+              'docSuggestions': doc['docSuggestions'],
+              'graph': doc['graph'],
+              'isEditing': doc['isEditing'],
+              'reportId': doc['reportId'],
+              'timestamp': doc['timestamp'],
+            });
+        await _firestore
           .collection('user_accounts')
           .doc(report.patientProfileModel!.id)
-          .collection('reports')
-          .add({
-            'reportId': report.reportId,
-            'device': report.patientProfileModel!.device!.code,
-            'avgHeart': report.patientProfileModel!.device!.avgValue,
-            'timestamp': DateTime.now().toString()
-          }); 
-      await _firestore
-          .collection('user_accounts')
-          .doc(report.patientProfileModel!.id)
-          .update({'is_done': false});
+          .update({'isDone': false});
+      }else{
+        return ReturnModel(state: false, message: 'Report not found');
+      }
+    } else {
+      return res;
+    }
+
+    
+     
       return ReturnModel(state: true, message: 'Report saved successfully');
     } catch (e) {
       return ReturnModel(state: false, message: 'Error saving report: $e');

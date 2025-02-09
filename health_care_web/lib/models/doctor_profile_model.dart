@@ -129,7 +129,6 @@ class DoctorProfileModel {
         
         */
 
-
         return res.reportModel;
       } else {
         showMessages(res.state, res.message, context);
@@ -146,7 +145,7 @@ class DoctorProfileModel {
     }
   }
 
-  Future<List<dynamic>?> createReport(PatientProfileModel profile, BuildContext context) async {
+  Future<AiReport> createReport(PatientProfileModel profile, BuildContext context) async {
 
     final ReportModel? reportModel = await fetchAIReport(profile.id,context);
     final ReturnModel reports =
@@ -154,15 +153,15 @@ class DoctorProfileModel {
 
     if (reportModel == null) {
       showMessages(false, "No data found for the new report", context);
-      return null;
+      return AiReport(state: false);
     }
 
     if (!reports.state) {
       showMessages(reports.state, reports.message, context);
-      return null;
+      return AiReport(state: false);
     }
 
-    return [reportModel, reports];
+    return AiReport(state:true, report: reportModel, reports: reports.reports);
   }
 
   Future<List<ReportModel>?> viewReports(PatientProfileModel profile, BuildContext context) async {
@@ -174,6 +173,7 @@ class DoctorProfileModel {
       showMessages(reports.state, reports.message, context);
       return null;
     }
+
     return reports.reports;
   }
 
@@ -188,6 +188,7 @@ class DoctorProfileModel {
                                                                                               docSuggestions: "", 
                                                                                               graph: "", 
                                                                                               reportId: "", 
+                                                                                              age: patientReportModel.age,
                                                                                               docId: id, 
                                                                                               deviceId: deviceId,
                                                                                               isEditing: true, 
@@ -361,4 +362,12 @@ class DoctorReportModel {
       'mobile': mobile,
     };
   }
+}
+
+class AiReport{
+  final ReportModel? report;
+  final bool state;
+  final List<ReportModel>? reports;
+
+  AiReport({this.report, this.reports, required this.state});
 }

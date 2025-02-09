@@ -3,6 +3,7 @@ import 'package:health_care_web/models/device_profile_model.dart';
 import 'package:health_care_web/models/doctor_profile_model.dart';
 import 'package:health_care_web/models/return_model.dart';
 import 'package:health_care_web/services/firestore_db_service.dart';
+import 'package:health_care_web/services/util.dart';
 
 class PatientProfileModel{
   bool isDone;
@@ -45,7 +46,7 @@ class PatientProfileModel{
     return PatientProfileModel(
         id: id,
         name: map['name'] ?? '',
-        age: map['age'] ?? '',
+        age: getAge(map['birthday']),
         email: map['email'] ?? '',
         docId: map['docId'] ?? '',
         deviceId: map['deviceId'] ?? '',
@@ -136,7 +137,7 @@ class PatientReportModel {
     return PatientReportModel(
       id: map['id'] ?? '',
       name: map['name'] ?? '',
-      age: map['age'] ?? '',
+      age: getAge(map['birthday']),
       email: map['email'] ?? '',
       pic: map['pic'] ?? '',
       address: map['address'] ?? '',
