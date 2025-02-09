@@ -8,6 +8,7 @@ class ReportModel {
   String aiSuggestions;
   String graph;
   String reportId;
+  String deviceId;
   String anomalies;
   bool isEditing;
   String docId;
@@ -22,6 +23,7 @@ class ReportModel {
     required this.graph,
     required this.reportId,
     required this.docId,
+    required this.deviceId,
     required this.isEditing,
     required this.patientProfileModel,
     required this.anomalies,
@@ -35,6 +37,7 @@ class ReportModel {
       docSuggestions: map['docSuggestions'] ?? '',
       aiSuggestions: map['aiSuggestions'] ?? '',
       graph: map['graph'] ?? '',
+      deviceId: map['device'] ?? '',
       reportId: map['reportId'] ?? '',
       docId: map['docId'] ?? '',
       isEditing: map['isEditing'] ?? false,
@@ -51,11 +54,8 @@ class ReportModel {
       'docSuggestions': docSuggestions,
       'aiSuggestions': aiSuggestions,
       'graph': graph,
-      'reportId': reportId,
-      'docId': docId,
       'anomalies': anomalies,
       'isEditing': isEditing,
-      'patientProfileModel': patientProfileModel,
     };
   }
 }

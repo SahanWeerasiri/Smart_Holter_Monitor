@@ -182,23 +182,32 @@ class RealDbService {
   }
 
   Future<ReturnModel> transferDeviceData(String code) async {
-    final ref = _database.ref('devices').child(code).child('data');
+    final ref = _database.ref('devices').child(code);
     try {
       final snapshot = await ref.get();
       if (snapshot.exists) {
+        final dataFromSnapshot = (snapshot.value as Map)['data'];
+
+        // Convert the LinkedMap to a Map<String, String>
+        Map<String, String> data = {};
+        if (dataFromSnapshot != null) {  // Handle the case where 'data' might be null
+          (dataFromSnapshot as Map).forEach((key, value) {
+            data[key.toString()] = value.toString();
+          });
+        }
+
         return ReturnModel(
           state: true,
           message: 'Data retrieved successfully',
           deviceProfileModel: DeviceProfileModel(
             code: code, // Explicitly cast
-            detail: (snapshot.value as Map)['detail'] as String,
+            detail: (snapshot.value as Map)['other'] as String,
             use: (snapshot.value as Map)['use'] as String,
             state: (snapshot.value as Map)['assigned'] as int,
             deadline: (snapshot.value as Map)['deadline'] as String,
             latestValue: "",
-            avgValue: fetchDeviceDataAvg(code).toString(),
-            data: ((snapshot.value as Map)['data']) as Map<String,
-                String>, // Assuming you have these fields in the data
+            avgValue: (await fetchDeviceDataAvg(code)).toString(),
+            data: data, // Assuming you have these fields in the data
           ),
         );
       } else {

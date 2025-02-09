@@ -220,7 +220,7 @@ class FirestoreDbService {
           .doc(uid)
           .collection('reports')
           .orderBy('timestamp', descending: true)
-          .get(); 
+          .get();
       
       final List<ReportModel> reports =
           snapshot.docs.map((doc) => ReportModel.fromMap(doc.data())).toList();
@@ -228,7 +228,10 @@ class FirestoreDbService {
       for(ReportModel reportModel in reports){
         reportModel.patientProfileModel = patientReportModel;
         final DoctorReportModel doctorReportModel = (await fetchDoctorOne(reportModel.docId))!.toDoctorReportModel();
-        reportModel.patientProfileModel!.doctorProfileModel = doctorReportModel;               
+        reportModel.patientProfileModel!.doctorProfileModel = doctorReportModel;   
+
+        final DeviceReportModel? deviceReportModel = (await RealDbService().fetchDeviceOneReport(reportModel.deviceId));
+        reportModel.patientProfileModel!.device = deviceReportModel;               
       }
       return ReturnModel(
           state: true,
@@ -317,7 +320,7 @@ class FirestoreDbService {
               doctorReportModel;
         }
 
-        final DeviceReportModel? deviceReportModel = (await RealDbService().fetchDeviceOneReport(data['device']));
+        final DeviceReportModel? deviceReportModel = (await RealDbService().fetchDeviceOneReport(data['deviceId']));
 
         if (deviceReportModel != null) {
           reportModel.patientProfileModel!.device = deviceReportModel;
@@ -342,11 +345,36 @@ class FirestoreDbService {
       // Add or update the report data
       await _firestore
           .collection('user_accounts')
-          .doc(report.patientProfileModel!.doctorProfileModel!.id)
+          .doc(report.patientProfileModel!.id)
           .collection('data')
           .doc(report.reportId)
           .set(report.toMap()); // Use toMap()
       return ReturnModel(state: true, message: 'Draft saved successfully');
+    } catch (e) {
+      return ReturnModel(state: false, message: 'Error saving report data: $e');
+    }
+  }
+
+  Future<ReturnModel> saveReportDataOnce(ReportModel report, DeviceReportModel deviceReportModel) async {
+    try {
+      // Add or update the report data
+      final snapshot = await _firestore
+          .collection('user_accounts')
+          .doc(report.patientProfileModel!.id)
+          .collection('data')
+          .add(report.toMap()); // Use toMap()
+      await _firestore
+          .collection('user_accounts')
+          .doc(report.patientProfileModel!.id)
+          .collection('data')
+          .doc(snapshot.id)
+          .update({'data':deviceReportModel.data,
+                'reportId': snapshot.id,
+                'deviceId': deviceReportModel.code,
+                'avgHeart': deviceReportModel.avgValue,
+                'timestamp': DateTime.now().toString()}); // Use toMap())
+      // await RealDbService().deleteDeviceData(deviceReportModel.code);
+      return ReturnModel(state: true, message: 'Device Removed Successfully');
     } catch (e) {
       return ReturnModel(state: false, message: 'Error saving report data: $e');
     }
@@ -359,6 +387,16 @@ class FirestoreDbService {
           .doc(report.patientProfileModel!.id)
           .collection('reports')
           .add(report.toMap()); //Use toMap()
+      await _firestore
+          .collection('user_accounts')
+          .doc(report.patientProfileModel!.id)
+          .collection('reports')
+          .add({
+            'reportId': report.reportId,
+            'device': report.patientProfileModel!.device!.code,
+            'avgHeart': report.patientProfileModel!.device!.avgValue,
+            'timestamp': DateTime.now().toString()
+          }); 
       await _firestore
           .collection('user_accounts')
           .doc(report.patientProfileModel!.id)

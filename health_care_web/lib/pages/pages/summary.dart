@@ -4,6 +4,7 @@ import 'package:health_care_web/app/components/cards/mobile_home_popup.dart';
 import 'package:health_care_web/models/app_sizes.dart';
 import 'package:health_care_web/models/doctor_profile_model.dart';
 import 'package:health_care_web/models/patient_profile_model.dart';
+import 'package:health_care_web/models/report_model.dart';
 import 'package:health_care_web/models/style_sheet.dart';
 import 'package:iconly/iconly.dart';
 
@@ -161,19 +162,23 @@ class _SummaryState extends State<Summary> {
                           device: p.device!.code,
                           isDone: p.isDone,
                           contactProfiles: p.contacts,
-                          onViewReport: () {
-                            doctor.viewReports(p,context);
+                          onViewReport: () async{
+                            List<ReportModel>? res = await doctor.viewReports(p,context);
+                            Navigator.pushNamed(context, '/medical_report', arguments: {'doctor': doctor, 'report': null, 'reportsList': res});
                           },
-                          onCreateReport: () {
-                            doctor.createReport(
-                              p,context
-                            );
+                          onCreateReport: () async{
+                            List<dynamic>? res = await doctor.createReport(p,context);
+                            if(res!=null){
+                              ReportModel currentReport = res[0] as ReportModel;
+                              List<ReportModel> reports = res[1] as List<ReportModel>;
+                              Navigator.pushNamed(context, '/medical_report', arguments: {'doctor': doctor, 'report': currentReport, 'reportsList': reports});
+                            }
                           },
                           onPending: () {
                             pendingData(p.device!.code);
                           },
                           onRemoveDevice: () {
-                            doctor.removeDevice(p.id, p.device!.code, context);
+                            doctor.removeDevice(p.toPatientReportModel(), p.device!.code, context);
                           },
                         );
                       }).toList(),

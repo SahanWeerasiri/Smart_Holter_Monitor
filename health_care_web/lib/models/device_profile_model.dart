@@ -46,6 +46,9 @@ class DeviceProfileModel {
       'data': deviceProfileModel.data,
     };
   }
+  DeviceReportModel toDeviceReportModel(){
+    return DeviceReportModel(code: code, detail: detail, deadline: deadline, avgValue: avgValue, data: data);
+  }
 }
 
 class DeviceReportModel {

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care_web/controllers/profileController.dart';
+import 'package:health_care_web/models/device_profile_model.dart';
 import 'package:health_care_web/models/patient_profile_model.dart';
 import 'package:health_care_web/models/report_model.dart';
 import 'package:health_care_web/models/return_model.dart';
@@ -176,10 +177,33 @@ class DoctorProfileModel {
     return reports.reports;
   }
 
-  Future<void> removeDevice(String uid, String deviceId, BuildContext context) async {
+  Future<void> removeDevice(PatientReportModel patientReportModel, String deviceId, BuildContext context) async {
+    ReturnModel transferDataResult = await RealDbService().transferDeviceData(deviceId);
+    if (transferDataResult.state) {
+      DeviceProfileModel deviceProfileModel = transferDataResult.deviceProfileModel!;
+      ReturnModel saveDataResult = await FirestoreDbService().saveReportDataOnce(ReportModel(timestamp: DateTime.now().toString(), 
+                                                                                              brief: "", 
+                                                                                              description: "", 
+                                                                                              aiSuggestions: "", 
+                                                                                              docSuggestions: "", 
+                                                                                              graph: "", 
+                                                                                              reportId: "", 
+                                                                                              docId: id, 
+                                                                                              deviceId: deviceId,
+                                                                                              isEditing: true, 
+                                                                                              patientProfileModel: patientReportModel, 
+                                                                                              anomalies: ""),
+                                                                                    deviceProfileModel.toDeviceReportModel()
+                                                                                  );
+      showMessages(saveDataResult.state, saveDataResult.message, context);
+    } else {
+      showMessages(transferDataResult.state, transferDataResult.message, context);
+    }
+
+
     
     ReturnModel res =
-        await FirestoreDbService().removeDeviceFromPatient(uid, deviceId);
+        await FirestoreDbService().removeDeviceFromPatient(patientReportModel.id, deviceId);
     showMessages(res.state, res.message, context);
   }
 
