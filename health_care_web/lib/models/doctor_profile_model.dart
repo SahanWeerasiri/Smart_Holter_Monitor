@@ -94,6 +94,7 @@ class DoctorProfileModel {
             patient.device = res2.deviceProfileModel;
             // showMessages(true, "${patient.id} | ${patient.device!.deadline} | ${patient.docId}", context);
           }
+          await patient.addContacts();
           profiles.add(patient);
 
         }
