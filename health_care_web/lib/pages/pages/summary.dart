@@ -199,15 +199,8 @@ class _SummaryState extends State<Summary> {
                               );
                             }
                           },
-                          onPending: ()async {
-                            setState(() {
-                              isLoading = true;
-                            });
-                            await pendingData(p.device!.code);
-                            setState(() {
-                              isLoading = false;
-                              refresh();
-                            });
+                          onPending: (){
+                            pendingData(p.deviceId);
                           },
                           onRemoveDevice: () async{
                             setState(() {
