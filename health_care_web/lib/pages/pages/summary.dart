@@ -175,7 +175,9 @@ class _SummaryState extends State<Summary> {
                               isLoading = false;
                             });
                             if(res!=null){
-                              Navigator.pushNamed(context, '/medical_report', arguments: {'doctor': doctor, 'report': null, 'reportsList': res});
+                              Navigator.pushNamed(context, '/medical_report', arguments: {'doctor': doctor, 'report': null, 'reportsList': res}).then(
+                                (value) => refresh(),
+                              );
                             }
                           },
                           onCreateReport: () async{
@@ -192,7 +194,9 @@ class _SummaryState extends State<Summary> {
                               setState(() {
                                 isLoading = false;
                               });
-                              Navigator.pushNamed(context, '/medical_report', arguments: {'doctor': doctor, 'report': res.report, 'reportsList': res.reports});
+                              Navigator.pushNamed(context, '/medical_report', arguments: {'doctor': doctor, 'report': res.report, 'reportsList': res.reports}).then(
+                                (value) => refresh(),
+                              );
                             }
                           },
                           onPending: ()async {
@@ -202,6 +206,7 @@ class _SummaryState extends State<Summary> {
                             await pendingData(p.device!.code);
                             setState(() {
                               isLoading = false;
+                              refresh();
                             });
                           },
                           onRemoveDevice: () async{
@@ -211,6 +216,7 @@ class _SummaryState extends State<Summary> {
                             await doctor.removeDevice(p.toPatientReportModel(), p.device!.code, context);
                             setState(() {
                               isLoading = false;
+                              refresh();
                             });
                           },
                         );

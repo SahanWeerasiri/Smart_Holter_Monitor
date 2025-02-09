@@ -46,6 +46,7 @@ class _ProfileState extends State<Profile> {
     await _userProfile?.updateProfile(context, profileController);
     setState(() {
       _isLoading = false;
+      fetchProfileData();
     });
   }
 
