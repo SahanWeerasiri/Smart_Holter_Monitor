@@ -257,7 +257,24 @@ class RealDbService {
       await _database.ref('devices').child(code).update({
         'assigned': DeviceProfileModel.assigned,
         'use': other,
-        'deadline': (DateTime.now().add(Duration(hours: period))).toString()
+        'deadline': (DateTime.now().add(Duration(hours: period))).toString(),
+        'data' = {
+          '2025-02-11 19:58:00': 3092,
+          '2025-02-11 19:58:01': 1874,
+          '2025-02-11 19:58:02': 395,
+          '2025-02-11 19:58:03': 2781,
+          '2025-02-11 19:58:04': 1420,
+          '2025-02-11 19:58:05': 3689,
+          '2025-02-11 19:58:06': 2034,
+          '2025-02-11 19:58:07': 412,
+          '2025-02-11 19:58:08': 3748,
+          '2025-02-11 19:58:09': 2560,
+          '2025-02-11 19:58:10': 981,
+          '2025-02-11 19:58:11': 3175,
+          '2025-02-11 19:58:12': 145,
+          '2025-02-11 19:58:13': 2934,
+          '2025-02-11 19:58:14': 2217
+        }
       });
       return ReturnModel(
           state: true, message: 'Device connected successfully.');
