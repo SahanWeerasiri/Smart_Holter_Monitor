@@ -258,7 +258,7 @@ class RealDbService {
         'assigned': DeviceProfileModel.assigned,
         'use': other,
         'deadline': (DateTime.now().add(Duration(hours: period))).toString(),
-        'data' = {
+        'data' : {
           '2025-02-11 19:58:00': 3092,
           '2025-02-11 19:58:01': 1874,
           '2025-02-11 19:58:02': 395,
