@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:health_care_web/app/components/report/fixed_section.dart';
 import 'package:health_care_web/app/components/report/header.dart';
+import 'package:health_care_web/app/components/report/holter_graph.dart';
 import 'package:health_care_web/app/components/report/section.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
 import 'package:health_care_web/models/doctor_profile_model.dart';
@@ -172,6 +173,12 @@ class _MedicalReportState extends State<MedicalReport> {
                             title: "AI Second Opinion",
                             inputType: "numbered",
                             controller: aiOpinionController),
+                        Container(
+                          height: 300, // Adjust as needed
+                          width: double.infinity,
+                          padding: EdgeInsets.all(16),
+                          child: HolterGraph(data: selectedReport!.patientProfileModel!.device!.convertToHolterData()),
+                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [

@@ -1,3 +1,5 @@
+import 'package:health_care_web/models/holter_data.dart';
+
 class DeviceProfileModel {
   String code;
   String use;
@@ -77,6 +79,20 @@ class DeviceReportModel {
       data: map['data'],
     );
   }
+
+  List<HolterData> convertToHolterData() {
+  List<HolterData> dataHolter = [];
+
+  data.forEach((date, value) {
+    DateTime parsedDate = DateTime.parse(date);  // Convert date string to DateTime
+    int parsedValue = int.tryParse(value) ?? 0;  // Convert value string to int, default to 0 if invalid
+
+    dataHolter.add(HolterData(parsedDate, parsedValue));
+  });
+
+  return dataHolter;
+}
+
 
   Map<String, dynamic> toMap() {
     return {
