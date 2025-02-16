@@ -29,14 +29,21 @@ String getAge(String birthday) {
   return age.toString();
 }
 
-
-void showMessages(bool state, String message, BuildContext context){
+void showMessages(bool state, String message, BuildContext context) {
   WidgetsBinding.instance.addPostFrameCallback((_) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(message),
-              backgroundColor: state? Colors.green :Colors.red,
-            ),
-          );
-        });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: state ? Colors.green : Colors.red,
+      ),
+    );
+  });
+}
+
+bool listEquals(List<dynamic> list1, List<dynamic> list2) {
+  if (list1.length != list2.length) return false;
+  for (int i = 0; i < list1.length; i++) {
+    if (list1[i] != list2[i]) return false;
+  }
+  return true;
 }

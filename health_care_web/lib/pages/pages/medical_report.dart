@@ -4,6 +4,7 @@ import 'package:health_care_web/app/components/report/header.dart';
 import 'package:health_care_web/app/components/report/holter_graph.dart';
 import 'package:health_care_web/app/components/report/section.dart';
 import 'package:health_care_web/components/buttons/custom_button_1/custom_button.dart';
+import 'package:health_care_web/models/app_sizes.dart';
 import 'package:health_care_web/models/doctor_profile_model.dart';
 import 'package:health_care_web/models/report_model.dart';
 import 'package:health_care_web/models/style_sheet.dart';
@@ -12,11 +13,13 @@ class MedicalReport extends StatefulWidget {
   final DoctorProfileModel doctor;
   final ReportModel? report;
   final List<ReportModel> reportsList;
-  const MedicalReport(
-      {super.key,
-      required this.doctor,
-      required this.report,
-      required this.reportsList});
+
+  const MedicalReport({
+    super.key,
+    required this.doctor,
+    required this.report,
+    required this.reportsList,
+  });
 
   @override
   State<MedicalReport> createState() => _MedicalReportState();
@@ -32,16 +35,18 @@ class _MedicalReportState extends State<MedicalReport> {
   final TextEditingController suggestionsController = TextEditingController();
   final TextEditingController aiOpinionController = TextEditingController();
 
-  void configReportData(bool isEditing){
+  void configReportData(bool isEditing) {
     // Handle saving logic
-    selectedReport!.aiSuggestions = aiOpinionController.text;
-    selectedReport!.brief = summaryController.text;
-    selectedReport!.description = descriptionController.text;
-    selectedReport!.docSuggestions = suggestionsController.text;
-    selectedReport!.anomalies = anomaliesController.text;
-    selectedReport!.isEditing = isEditing;
-    selectedReport!.graph = "";
-    selectedReport!.timestamp = DateTime.now().toString();
+    if (selectedReport != null) {
+      selectedReport!.aiSuggestions = aiOpinionController.text;
+      selectedReport!.brief = summaryController.text;
+      selectedReport!.description = descriptionController.text;
+      selectedReport!.docSuggestions = suggestionsController.text;
+      selectedReport!.anomalies = anomaliesController.text;
+      selectedReport!.isEditing = isEditing;
+      selectedReport!.graph = ""; // Placeholder, adjust as needed
+      selectedReport!.timestamp = DateTime.now().toString();
+    }
   }
 
   @override
@@ -60,15 +65,20 @@ class _MedicalReportState extends State<MedicalReport> {
 
   @override
   Widget build(BuildContext context) {
+    AppSizes().initSizes(context);
     return Scaffold(
       appBar: AppBar(title: Text("Health Report Editor")),
-      body: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Container(
+      body: SingleChildScrollView(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 5,
+          children: [
+            Container(
+              width: AppSizes().getBlockSizeHorizontal(20),
+              padding: const EdgeInsets.all(16.0),
               color: StyleSheet.uiBackground,
               child: ListView(
+                shrinkWrap: true,
                 children: widget.reportsList.isNotEmpty
                     ? widget.reportsList.map((r) {
                         return Container(
@@ -137,22 +147,40 @@ class _MedicalReportState extends State<MedicalReport> {
                     : [Text("No reports available")],
               ),
             ),
-          ),
-          Expanded(
-            flex: 6,
-            child: Padding(
+            Container(
+              width: AppSizes().getBlockSizeHorizontal(70),
               padding: const EdgeInsets.all(16.0),
               child: ListView(
+                shrinkWrap: true, // Added shrinkWrap to handle nested ListViews
                 children: selectedReport != null && selectedReport!.isEditing
                     ? [
                         MedicalReportHeader(
-                            doctorName: selectedReport!.patientProfileModel!.doctorProfileModel!.name,
-                            doctorSpecialization: selectedReport!.patientProfileModel!.doctorProfileModel!.email,
-                            patientName: selectedReport!.patientProfileModel!.name,
-                            patientAge: selectedReport!.patientProfileModel!.age,
-                            avgHeartRate: selectedReport!.patientProfileModel!.device!.avgValue,
-                            patientId: selectedReport!.patientProfileModel!.id,
-                            reportDate: DateTime.now()),
+                          doctorName: selectedReport!
+                              .patientProfileModel!.doctorProfileModel!.name,
+                          doctorSpecialization: selectedReport!
+                              .patientProfileModel!.doctorProfileModel!.email,
+                          patientName:
+                              selectedReport!.patientProfileModel!.name,
+                          patientAge: selectedReport!.patientProfileModel!.age,
+                          avgHeartRate: selectedReport!
+                              .patientProfileModel!.device!.avgValue,
+                          patientId: selectedReport!.patientProfileModel!.id,
+                          reportDate: DateTime.now(),
+                        ),
+                        Container(
+                          height:
+                              400, // Or whatever appropriate height for your chart
+                          padding: EdgeInsets.all(16),
+                          child: selectedReport!
+                                  .patientProfileModel!.device!.data.isNotEmpty
+                              ? HolterGraph(
+                                  data: selectedReport!
+                                      .patientProfileModel!.device!
+                                      .convertToInt(),
+                                )
+                              : Text(
+                                  "No graphs"), // Fallback when data is empty
+                        ),
                         ReportSection(
                             title: "Overall Summary",
                             inputType: "text",
@@ -173,12 +201,6 @@ class _MedicalReportState extends State<MedicalReport> {
                             title: "AI Second Opinion",
                             inputType: "numbered",
                             controller: aiOpinionController),
-                        Container(
-                          height: 300, // Adjust as needed
-                          width: double.infinity,
-                          padding: EdgeInsets.all(16),
-                          child: HolterGraph(data: selectedReport!.patientProfileModel!.device!.convertToHolterData()),
-                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -186,17 +208,19 @@ class _MedicalReportState extends State<MedicalReport> {
                               label: "Save Report",
                               onPressed: () async {
                                 configReportData(false);
-                                await widget.doctor.saveReport(selectedReport!, context);
+                                await widget.doctor
+                                    .saveReport(selectedReport!, context);
                               },
                               backgroundColor: StyleSheet.btnBackground,
                               textColor: StyleSheet.btnText,
                               icon: Icons.save,
                             ),
                             CustomButton(
-                              label: "Save Darft",
+                              label: "Save Draft",
                               onPressed: () async {
                                 configReportData(true);
-                                await widget.doctor.saveDraftReport(selectedReport!, context);
+                                await widget.doctor
+                                    .saveDraftReport(selectedReport!, context);
                               },
                               backgroundColor: StyleSheet.btnBackground,
                               textColor: StyleSheet.btnText,
@@ -208,13 +232,22 @@ class _MedicalReportState extends State<MedicalReport> {
                     : selectedReport != null && !selectedReport!.isEditing
                         ? [
                             MedicalReportHeader(
-                                doctorName: selectedReport!.patientProfileModel!.doctorProfileModel!.name,
-                                doctorSpecialization: selectedReport!.patientProfileModel!.doctorProfileModel!.email,
-                                patientName: selectedReport!.patientProfileModel!.name,
-                                patientAge: selectedReport!.patientProfileModel!.age,
-                                avgHeartRate: selectedReport!.patientProfileModel!.device!.avgValue,
-                                patientId: selectedReport!.patientProfileModel!.id,
-                                reportDate: DateTime.now()),
+                              doctorName: selectedReport!.patientProfileModel!
+                                  .doctorProfileModel!.name,
+                              doctorSpecialization: selectedReport!
+                                  .patientProfileModel!
+                                  .doctorProfileModel!
+                                  .email,
+                              patientName:
+                                  selectedReport!.patientProfileModel!.name,
+                              patientAge:
+                                  selectedReport!.patientProfileModel!.age,
+                              avgHeartRate: selectedReport!
+                                  .patientProfileModel!.device!.avgValue,
+                              patientId:
+                                  selectedReport!.patientProfileModel!.id,
+                              reportDate: DateTime.now(),
+                            ),
                             FixedSection(
                                 title: "Overall Summary",
                                 text: selectedReport!.brief),
@@ -234,8 +267,8 @@ class _MedicalReportState extends State<MedicalReport> {
                         : [Text("Select a Report")],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

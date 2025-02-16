@@ -1,78 +1,126 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:health_care_web/models/holter_data.dart' as model;
+import 'package:health_care_web/app/components/report/date_time_range_picker.dart';
+import 'package:health_care_web/app/components/report/time_series_chart.dart';
 
-class HolterGraph extends StatelessWidget {
-  final List<model.HolterData> data;
+class HolterGraph extends StatefulWidget {
+  final Map<String, int> data;
 
   const HolterGraph({super.key, required this.data});
 
   @override
+  State<HolterGraph> createState() => _HolterGraphState();
+}
+
+class _HolterGraphState extends State<HolterGraph> {
+  Map<String, int> selectedData = {};
+  late DateTime firstTimestamp;
+  late DateTime lastTimestamp;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeTimestamps();
+    _setInitialSelectedData();
+  }
+
+  void _initializeTimestamps() {
+    if (widget.data.isEmpty) {
+      firstTimestamp = DateTime.now();
+      lastTimestamp = DateTime.now();
+      return;
+    }
+
+    List<DateTime> timestamps = [];
+    for (var key in widget.data.keys) {
+      try {
+        timestamps.add(DateTime.parse(key));
+      } catch (e) {
+        print('Error parsing date: $key, Error: $e');
+      }
+    }
+
+    if (timestamps.isEmpty) {
+      firstTimestamp = DateTime.now();
+      lastTimestamp = DateTime.now();
+      return;
+    }
+
+    timestamps.sort();
+    firstTimestamp = timestamps.first;
+    lastTimestamp = timestamps.last;
+  }
+
+  void _setInitialSelectedData() {
+    final endTime = lastTimestamp.add(const Duration(seconds: 30));
+
+    setState(() {
+      selectedData = Map.fromEntries(widget.data.entries.where((entry) {
+        try {
+          final timestamp = DateTime.parse(entry.key);
+          return timestamp.isAfter(firstTimestamp) &&
+              timestamp.isBefore(endTime);
+        } catch (e) {
+          return false;
+        }
+      }));
+    });
+
+    // Debug prints to see what data we have
+    print('Total data points: ${widget.data.length}');
+    print('Selected data points: ${selectedData.length}');
+    print('Start time: $firstTimestamp');
+    print('End time: $endTime');
+  }
+
+  void _onDateTimeRangeSelected(DateTime start, DateTime end) {
+    print('New date range selected: $start to $end');
+
+    final newSelectedData = Map.fromEntries(widget.data.entries.where((entry) {
+      try {
+        final timestamp = DateTime.parse(entry.key);
+        return timestamp.isAfter(start) && timestamp.isBefore(end);
+      } catch (e) {
+        return false;
+      }
+    }));
+
+    print('New selected data points: ${newSelectedData.length}');
+
+    // Always update the state to ensure the UI refreshes
+    setState(() {
+      selectedData = newSelectedData;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final minX = data.first.timestamp.millisecondsSinceEpoch.toDouble();
-    final maxX = data.last.timestamp.millisecondsSinceEpoch.toDouble();
-    final interval = (maxX - minX) / 4; // Divide into 4 sections
+    if (widget.data.isEmpty) {
+      return const Center(child: Text('No data available'));
+    }
 
-    // Generate 4 midpoints for time labels
-    final List<double> timePoints = List.generate(
-      4,
-      (index) => minX + interval * index,
-    );
+    // Key forces the chart to rebuild when data changes
+    final chartKey =
+        ValueKey(selectedData.length.toString() + selectedData.keys.join());
 
-    return LineChart(
-      LineChartData(
-        minX: minX,
-        maxX: maxX,
-        minY: 0,
-        maxY: 4095,
-        titlesData: FlTitlesData(
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: 35,
-              getTitlesWidget: (value, meta) {
-                if (timePoints.contains(value)) {
-                  DateTime date =
-                      DateTime.fromMillisecondsSinceEpoch(value.toInt());
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
-                    child: Transform.rotate(
-                      angle: -0.5, // Slight rotation for better fit
-                      child: Text(
-                        DateFormat.Hms().format(date),
-                        style: TextStyle(fontSize: 10),
-                      ),
-                    ),
-                  );
-                }
-                return Container();
-              },
-              interval: interval,
+    return Column(
+      children: [
+        Row(
+          children: [
+            DateTimeRangePicker(
+              initialStart: firstTimestamp,
+              initialEnd: lastTimestamp.add(const Duration(seconds: 30)),
+              onDateTimeRangeSelected: _onDateTimeRangeSelected,
             ),
-          ),
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(showTitles: false), // Hide Y-axis values
-          ),
-          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          ],
         ),
-        gridData: FlGridData(show: true),
-        borderData: FlBorderData(show: true),
-        lineBarsData: [
-          LineChartBarData(
-            spots: data
-                .map((e) => FlSpot(
-                    e.timestamp.millisecondsSinceEpoch.toDouble(),
-                    e.value.toDouble()))
-                .toList(),
-            isCurved: true,
-            color: Colors.blue,
-            barWidth: 2,
-            dotData: FlDotData(show: false),
+        const SizedBox(height: 16),
+        Expanded(
+          child: TimeSeriesChart(
+            key: chartKey,
+            rawData: selectedData,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

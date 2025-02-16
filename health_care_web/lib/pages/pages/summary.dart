@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:health_care_web/app/components/cards/expandable_profile_card.dart';
 import 'package:health_care_web/app/components/cards/mobile_home_popup.dart';
-import 'package:health_care_web/app/components/report/holter_graph.dart';
 import 'package:health_care_web/models/app_sizes.dart';
 import 'package:health_care_web/models/doctor_profile_model.dart';
-import 'package:health_care_web/models/holter_data.dart';
 import 'package:health_care_web/models/patient_profile_model.dart';
 import 'package:health_care_web/models/report_model.dart';
 import 'package:health_care_web/models/style_sheet.dart';
@@ -151,30 +149,6 @@ class _SummaryState extends State<Summary> {
                           ),
                         ),
                       ],
-                    ),
-                    Container(
-                      height: 300,
-                      width: double.infinity,
-                      padding: EdgeInsets.all(16),
-                      child: HolterGraph(
-                        data: {
-                          '2025-02-11 19:58:00': 3092,
-                          '2025-02-11 19:58:01': 1874,
-                          '2025-02-11 19:58:02': 395,
-                          '2025-02-11 19:58:03': 2781,
-                          '2025-02-11 19:58:04': 1420,
-                          '2025-02-11 19:58:05': 3689,
-                          '2025-02-11 19:58:06': 2034,
-                          '2025-02-11 19:58:07': 412,
-                          '2025-02-11 19:58:08': 3748,
-                          '2025-02-11 19:58:09': 2560,
-                          '2025-02-11 19:58:10': 981,
-                          '2025-02-11 19:58:11': 3175,
-                          '2025-02-11 19:58:12': 145,
-                          '2025-02-11 19:58:13': 2934,
-                          '2025-02-11 19:58:14': 2217,
-                        }.entries.map((entry) => HolterData(DateTime.parse(entry.key), entry.value)).toList(),
-                      ),
                     ),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.start,
