@@ -49,7 +49,7 @@ class _SummaryState extends State<Summary> {
         _userProfile.mobile = res['data']['mobile'];
         _userProfile.pic = res['data']['pic'];
         _userProfile.birthday = res['data']['birthday'] ?? "";
-        _userProfile.doctorId = res['data']['doctorId'];
+        _userProfile.doctorId = res['data']['docId'];
       });
       if (res['data']['device'] != "Device") {
         fetchDeviceData(res['data']['device']);
@@ -61,7 +61,7 @@ class _SummaryState extends State<Summary> {
       }
       if (res['data']['doctor_id'] != "") {
         Map<String, dynamic> resDoc =
-            await FirestoreDbService().fetchDoctor(res['data']['doctor_id']);
+            await FirestoreDbService().fetchDoctor(res['data']['docId']);
         if (resDoc['success']) {
           setState(() {
             doctorProfile.name = resDoc['data']['name'];
