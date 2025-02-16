@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:health_care/components/buttons/custom_button_1/custom_button.dart';
 import 'package:health_care/components/dialogues/simple_dialogue_profile.dart';
 import 'package:health_care/components/list/design1/list1.dart';
 import 'package:health_care/components/list/design1/list_item_data.dart';
@@ -328,7 +329,27 @@ class _SummaryState extends State<Summary> {
                             title: "No Doctor has assigned",
                             icon: Icons.hourglass_empty,
                             onPressed: () {}),
-                  ])))
+                  ]))),
+          SizedBox(
+            height: AppSizes().getBlockSizeVertical(3),
+          ),
+          CustomButton(
+            backgroundColor: StyleSheet().btnBackground,
+            textColor: StyleSheet().uiBackground,
+            icon: IconData(Icons.health_and_safety.codePoint,
+                fontFamily: Icons.health_and_safety.fontFamily),
+            label: "Insuarance",
+            onPressed: () {
+              // Navigator.pushNamed(context, '/insurance');
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text("Insuarance"),
+                  content: Text("Coming Soon"),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
