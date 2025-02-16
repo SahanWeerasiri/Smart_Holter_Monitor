@@ -143,18 +143,12 @@ class _SummaryState extends State<Summary> {
     showDialog(
       context: context,
       builder: (context) => ProfileDialogue(
-        text: doctorProfile.name,
+        name: doctorProfile.name,
         email: doctorProfile.email,
         phone: doctorProfile.mobile,
         address: doctorProfile.address,
-        basicColor: StyleSheet().uiBackground,
-        fontColor: StyleSheet().doctorDetailsPopPrimary,
-        subTextFontColor: StyleSheet().doctorDetailsPopPSecondary,
-        btnText: "Close",
-        icon: IconlyLight.profile,
-        onPressed: () => {
-          Navigator.of(context).pop(),
-        },
+        imageUrl: doctorProfile.pic,
+        specialization: "",
       ),
     );
   }
