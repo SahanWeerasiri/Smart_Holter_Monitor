@@ -16,50 +16,84 @@ class ReportList extends StatefulWidget {
 }
 
 class _ReportListState extends State<ReportList> {
-  final List<ReportModel> _oldReportList = [];
-  final List<ReportModel> _newReportList = [];
+  final List<Map<String, dynamic>> _oldReportList = [];
+  final List<Map<String, dynamic>> _newReportList = [];
   bool isLoading = true;
 
-  Future<void> showReport(ReportModel report) async {
+  Future<void> showReport(Map<String, dynamic> dataModel) async {
     showDialog(
         context: context,
         builder: (context) => DialogReport(
-              text: "Report",
-              reportModel: report,
-              basicColor: StyleSheet().uiBackground,
-              fontColor: StyleSheet().doctorDetailsPopPrimary,
-              subTextFontColor: StyleSheet().doctorDetailsPopPSecondary,
-              onPressed: () {
-                FirestoreDbService()
-                    .updateReportSeen(widget.user!.uid, report.reportId);
-                setState(() {
-                  _newReportList.clear();
-                  _oldReportList.clear();
-                });
-                fetchReports();
-                Navigator.pop(context);
-              },
-              btnText: "Mark As Read",
-              btnBackColor: StyleSheet().btnBackground,
-              btnTextColor: StyleSheet().btnText,
-            ));
+              reportId: dataModel['report']['reportId'],
+              aiSuggestions: dataModel['report']['aiSuggestions'],
+              anomalyDetails: dataModel['report']['anomalies'],
+              overallSummary: dataModel['report']['brief'],
+              description: dataModel['report']['description'],
+              doctorName: dataModel['doctor']['doctorName'],
+              doctorSpecialization: dataModel['doctor']['doctorEmail'],
+              patientAge: dataModel['patient']['age'],
+              patientId: dataModel['patient']['id'],
+              patientName: dataModel['patient']['name'],
+              avgHeartRate: dataModel['report']['avgHeart'],
+              doctorSuggestions: dataModel['report']['docSuggestions'],
+              reportDate: dataModel['report']['timestamp'],
+              graphData: dataModel['data'],
+              isNew: true,
+            )
+        //
+        // text: "Report",
+        // reportModel: report,
+        // basicColor: StyleSheet().uiBackground,
+        // fontColor: StyleSheet().doctorDetailsPopPrimary,
+        // subTextFontColor: StyleSheet().doctorDetailsPopPSecondary,
+        // onPressed: () {
+        //   FirestoreDbService()
+        //       .updateReportSeen(widget.user!.uid, report.reportId);
+        //   setState(() {
+        //     _newReportList.clear();
+        //     _oldReportList.clear();
+        //   });
+        //   fetchReports();
+        //   Navigator.pop(context);
+        // },
+        // btnText: "Mark As Read",
+        // btnBackColor: StyleSheet().btnBackground,
+        // btnTextColor: StyleSheet().btnText,
+
+        );
   }
 
-  Future<void> showOldReport(ReportModel report) async {
+  Future<void> showOldReport(Map<String, dynamic> dataModel) async {
     showDialog(
         context: context,
         builder: (context) => DialogReport(
-              text: "Report",
-              reportModel: report,
-              basicColor: StyleSheet().uiBackground,
-              fontColor: StyleSheet().doctorDetailsPopPrimary,
-              subTextFontColor: StyleSheet().doctorDetailsPopPSecondary,
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              btnBackColor: StyleSheet().btnBackground,
-              btnTextColor: StyleSheet().btnText,
-            ));
+              reportId: dataModel['report']['reportId'],
+              aiSuggestions: dataModel['report']['aiSuggestions'],
+              anomalyDetails: dataModel['report']['anomalies'],
+              overallSummary: dataModel['report']['brief'],
+              description: dataModel['report']['description'],
+              doctorName: dataModel['doctor']['doctorName'],
+              doctorSpecialization: dataModel['doctor']['doctorEmail'],
+              patientAge: dataModel['patient']['age'],
+              patientId: dataModel['patient']['id'],
+              patientName: dataModel['patient']['name'],
+              avgHeartRate: dataModel['report']['avgHeart'],
+              doctorSuggestions: dataModel['report']['docSuggestions'],
+              reportDate: dataModel['report']['timestamp'],
+              graphData: dataModel['data'],
+              isNew: false,
+            )
+        // text: "Report",
+        // reportModel: report,
+        // basicColor: StyleSheet().uiBackground,
+        // fontColor: StyleSheet().doctorDetailsPopPrimary,
+        // subTextFontColor: StyleSheet().doctorDetailsPopPSecondary,
+        // onPressed: () {
+        //   Navigator.pop(context);
+        // },
+        // btnBackColor: StyleSheet().btnBackground,
+        // btnTextColor: StyleSheet().btnText,
+        );
   }
 
   @override
@@ -73,14 +107,16 @@ class _ReportListState extends State<ReportList> {
       isLoading = true;
     });
     Map<String, dynamic> res =
-        await FirestoreDbService().fetchReports(widget.user!.uid);
+        await FirestoreDbService().fetchReportsV2(widget.user!.uid);
     if (res['success']) {
       setState(() {
-        for (ReportModel reportModel in res['data_new']) {
-          _newReportList.add(reportModel);
+        for (Map<String, dynamic> dataModel
+            in res['data_new'] as List<Map<String, dynamic>>) {
+          _newReportList.add(dataModel);
         }
-        for (ReportModel reportModel in res['data_old']) {
-          _oldReportList.add(reportModel);
+        for (Map<String, dynamic> dataModel
+            in res['data_old'] as List<Map<String, dynamic>>) {
+          _oldReportList.add(dataModel);
         }
       });
     } else {
@@ -141,7 +177,7 @@ class _ReportListState extends State<ReportList> {
                         color: StyleSheet().uiBackground,
                         data: _newReportList.map((report) {
                           return ListItem1Data(
-                              title: truncateString(report.brief),
+                              title: truncateString(report['report']['brief']),
                               icon: IconlyLight.document,
                               onPressed: () {
                                 showReport(report);
@@ -168,7 +204,7 @@ class _ReportListState extends State<ReportList> {
                         color: StyleSheet().uiBackground,
                         data: _oldReportList.map((report) {
                           return ListItem1Data(
-                              title: truncateString(report.brief),
+                              title: truncateString(report['report']['brief']),
                               icon: IconlyLight.document,
                               onPressed: () {
                                 showOldReport(report);

@@ -39,4 +39,14 @@ class RealDbService {
       'timestamp': key,
     };
   }
+
+  Future<Map<String, dynamic>> fetchDeviceDetails(String device) async {
+    // Reference to the device's data
+    final ref = _database.ref('devices').child(device);
+
+    return {
+      'success': true,
+      'other': ref.child('other').get(),
+    };
+  }
 }
