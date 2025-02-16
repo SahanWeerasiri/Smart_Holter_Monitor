@@ -22,12 +22,12 @@ class FirestoreDbService {
         'name': name,
         'address': "Address",
         'mobile': "Mobile",
-        'is_done': false,
+        'isDone': false,
         'language': 'Language',
         'device': 'Device',
         'color': 'Color',
         'pic': '',
-        'doctor_id': '',
+        'docId': '',
         'birthday': birthday,
       };
 
@@ -186,21 +186,21 @@ class FirestoreDbService {
           }
           if (doc.get("isSeen")) {
             reportsOld.add(ReportModel(
-                aiSuggestions: doc.get("ai_suggestions"),
+                aiSuggestions: doc.get("aiSuggestions"),
                 brief: doc.get("brief"),
-                avgHeart: doc.get("avg_heart"),
+                avgHeart: doc.get("avgHeart"),
                 timestamp: doc.get("timestamp"),
-                docSuggestions: doc.get("suggestions"),
+                docSuggestions: doc.get("docSuggestions"),
                 description: doc.get("description"),
                 graph: doc.get("graph"),
                 reportId: doc.id));
           } else {
             reportsNew.add(ReportModel(
                 brief: doc.get("brief"),
-                aiSuggestions: doc.get("ai_suggestions"),
-                avgHeart: doc.get("avg_heart"),
+                aiSuggestions: doc.get("aiSuggestions"),
+                avgHeart: doc.get("avgHeart"),
                 timestamp: doc.get("timestamp"),
-                docSuggestions: doc.get("suggestions"),
+                docSuggestions: doc.get("docSuggestions"),
                 description: doc.get("description"),
                 graph: doc.get("graph"),
                 reportId: doc.id));
@@ -232,7 +232,7 @@ class FirestoreDbService {
 
       await usersCollection
           .doc(uid)
-          .collection("reports")
+          .collection("data")
           .doc(reportId)
           .update({'isSeen': true});
       return {'success': true, 'message': "updation successful"};

@@ -53,12 +53,12 @@ class _ProfileState extends State<Profile> {
         _userProfile.address = res['data']['address'];
         _userProfile.color = res['data']['color'];
         _userProfile.device = res['data']['device'];
-        _userProfile.isDone = res['data']['is_done'];
+        _userProfile.isDone = res['data']['isDone'];
         _userProfile.language = res['data']['language'];
         _userProfile.mobile = res['data']['mobile'];
         _userProfile.pic = res['data']['pic'];
         _userProfile.birthday = res['data']['birthday'] ?? "";
-        _userProfile.doctorId = res['data']['doctor_id'];
+        _userProfile.doctorId = res['data']['docId'];
       });
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
