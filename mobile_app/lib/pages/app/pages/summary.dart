@@ -8,6 +8,7 @@ import 'package:health_care/constants/consts.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care/pages/app/services/firestore_db_service.dart';
 import 'package:iconly/iconly.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Summary extends StatefulWidget {
   final User? user;
@@ -339,15 +340,20 @@ class _SummaryState extends State<Summary> {
             icon: IconData(Icons.health_and_safety.codePoint,
                 fontFamily: Icons.health_and_safety.fontFamily),
             label: "Insuarance",
-            onPressed: () {
+            onPressed: () async {
               // Navigator.pushNamed(context, '/insurance');
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text("Insuarance"),
-                  content: Text("Coming Soon"),
-                ),
-              );
+              // showDialog(
+              //   context: context,
+              //   builder: (context) => AlertDialog(
+              //     title: Text("Insuarance"),
+              //     content: Text("Coming Soon"),
+              //   ),
+              // );
+              final Uri url = Uri.parse(
+                  'https://www.careinsurance.com/health-insurance/heart-health-insurance/');
+              if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+                throw Exception('Could not launch $url');
+              }
             },
           ),
         ],
