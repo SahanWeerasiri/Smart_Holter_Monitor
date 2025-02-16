@@ -168,7 +168,7 @@ class FirestoreDbService {
     try {
       // Fetch the document snapshot
       final QuerySnapshot<Object?> snapshot =
-          await usersCollection.doc(uid).collection("reports").get();
+          await usersCollection.doc(uid).collection("data").get();
 
       final docs = snapshot.docs;
 
@@ -181,7 +181,10 @@ class FirestoreDbService {
       for (final DocumentSnapshot<Object?> doc in docs) {
         // Check if the document exists
         if (doc.exists) {
-          if (doc.get("is_seen")) {
+          if (doc.get("isEditing")) {
+            continue;
+          }
+          if (doc.get("isSeen")) {
             reportsOld.add(ReportModel(
                 aiSuggestions: doc.get("ai_suggestions"),
                 brief: doc.get("brief"),
@@ -231,7 +234,7 @@ class FirestoreDbService {
           .doc(uid)
           .collection("reports")
           .doc(reportId)
-          .update({'is_seen': true});
+          .update({'isSeen': true});
       return {'success': true, 'message': "updation successful"};
     } catch (e) {
       // Handle errors and return failure
