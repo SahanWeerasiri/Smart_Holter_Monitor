@@ -48,8 +48,14 @@ class DeviceProfileModel {
       'data': deviceProfileModel.data,
     };
   }
-  DeviceReportModel toDeviceReportModel(){
-    return DeviceReportModel(code: code, detail: detail, deadline: deadline, avgValue: avgValue, data: data);
+
+  DeviceReportModel toDeviceReportModel() {
+    return DeviceReportModel(
+        code: code,
+        detail: detail,
+        deadline: deadline,
+        avgValue: avgValue,
+        data: data);
   }
 }
 
@@ -80,19 +86,46 @@ class DeviceReportModel {
     );
   }
 
+  void addDataField(dynamic dataFromFirestore) {
+    if (dataFromFirestore is Map) {
+      Map<dynamic, dynamic> mapData = dataFromFirestore;
+      Map<String, String> temp = {};
+      for (var key in mapData.keys) {
+        temp[key.toString()] = mapData[key.toString()];
+      }
+      data = temp;
+    } else {
+      //Handle non-map cases
+      data = {};
+    }
+  }
+
   List<HolterData> convertToHolterData() {
-  List<HolterData> dataHolter = [];
+    List<HolterData> dataHolter = [];
 
-  data.forEach((date, value) {
-    DateTime parsedDate = DateTime.parse(date);  // Convert date string to DateTime
-    int parsedValue = int.tryParse(value) ?? 0;  // Convert value string to int, default to 0 if invalid
+    data.forEach((date, value) {
+      DateTime parsedDate =
+          DateTime.parse(date); // Convert date string to DateTime
+      int parsedValue = int.tryParse(value) ??
+          0; // Convert value string to int, default to 0 if invalid
 
-    dataHolter.add(HolterData(parsedDate, parsedValue));
-  });
+      dataHolter.add(HolterData(parsedDate, parsedValue));
+    });
 
-  return dataHolter;
-}
+    return dataHolter;
+  }
 
+  Map<String, int> convertToInt() {
+    Map<String, int> dataHolter = {};
+
+    data.forEach((date, value) {
+      int parsedValue = int.tryParse(value) ??
+          0; // Convert value string to int, default to 0 if invalid
+      dataHolter[date] = parsedValue; // Simple assignment works better here
+    });
+
+    return dataHolter;
+  }
 
   Map<String, dynamic> toMap() {
     return {

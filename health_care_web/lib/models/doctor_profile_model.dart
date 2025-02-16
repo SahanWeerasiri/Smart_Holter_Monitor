@@ -45,36 +45,35 @@ class DoctorProfileModel {
 
   Future<DoctorProfileModel> initDoctor(BuildContext context) async {
     ReturnModel res = await FirestoreDbService().fetchAccount();
-    if(res.state){
+    if (res.state) {
       showMessages(res.state, res.message, context);
-    }else{
+    } else {
       showMessages(res.state, res.message, context);
     }
 
     return res.doctorProfileModel!;
   }
 
-
-  Future<void> saveReport(ReportModel selectedReport, BuildContext context)async{
-    ReturnModel res =
-        await FirestoreDbService().saveReport(selectedReport);
+  Future<void> saveReport(
+      ReportModel selectedReport, BuildContext context) async {
+    ReturnModel res = await FirestoreDbService().saveReportV2(selectedReport);
     if (res.state) {
       Navigator.pop(context);
     }
-    showMessages(res.state,res.message,context);
+    showMessages(res.state, res.message, context);
   }
 
-  Future<void> saveDraftReport(ReportModel selectedReport, BuildContext context)async{
-    ReturnModel res =
-        await FirestoreDbService().saveReportData(selectedReport);
+  Future<void> saveDraftReport(
+      ReportModel selectedReport, BuildContext context) async {
+    ReturnModel res = await FirestoreDbService().saveReportData(selectedReport);
     if (res.state) {
       Navigator.pop(context);
     }
-    showMessages(res.state,res.message,context);
-  
+    showMessages(res.state, res.message, context);
   }
 
-  Future<List<PatientProfileModel>> fetchCurrentPatient(BuildContext context) async{
+  Future<List<PatientProfileModel>> fetchCurrentPatient(
+      BuildContext context) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
@@ -87,30 +86,27 @@ class DoctorProfileModel {
       List<PatientProfileModel> profiles = [];
 
       if (res.state) {
-        for(PatientProfileModel patient in res.patients){
-            patient.doctorProfileModel = this;
-            // showMessages(true, "${patient.id} | ${patient.doctorProfileModel!.email} | ${patient.docId}", context);
-          ReturnModel res2 = await RealDbService().fetchDeviceData(patient.deviceId);
-          if(res2.state){
+        for (PatientProfileModel patient in res.patients) {
+          patient.doctorProfileModel = this;
+          // showMessages(true, "${patient.id} | ${patient.doctorProfileModel!.email} | ${patient.docId}", context);
+          ReturnModel res2 =
+              await RealDbService().fetchDeviceData(patient.deviceId);
+          if (res2.state) {
             patient.device = res2.deviceProfileModel;
             // showMessages(true, "${patient.id} | ${patient.device!.deadline} | ${patient.docId}", context);
           }
           await patient.addContacts();
           profiles.add(patient);
-
         }
-        
+
         return profiles;
-        
       } else {
         showMessages(res.state, res.message, context);
         return [];
       }
-
     } catch (e) {
       showMessages(false, e.toString(), context);
       return [];
-
     }
   }
 
@@ -119,10 +115,9 @@ class DoctorProfileModel {
 
     try {
       ReturnModel res =
-          await FirestoreDbService().getLatestDeviceReadings(uid);
+          await FirestoreDbService().getLatestDeviceReadingsV2(uid);
 
       if (res.state) {
-
         /*
         
         Add AI integration here
@@ -145,9 +140,9 @@ class DoctorProfileModel {
     }
   }
 
-  Future<AiReport> createReport(PatientProfileModel profile, BuildContext context) async {
-
-    final ReportModel? reportModel = await fetchAIReport(profile.id,context);
+  Future<AiReport> createReport(
+      PatientProfileModel profile, BuildContext context) async {
+    final ReportModel? reportModel = await fetchAIReport(profile.id, context);
     final ReturnModel reports =
         await FirestoreDbService().fetchReports(profile.id);
 
@@ -161,11 +156,11 @@ class DoctorProfileModel {
       return AiReport(state: false);
     }
 
-    return AiReport(state:true, report: reportModel, reports: reports.reports);
+    return AiReport(state: true, report: reportModel, reports: reports.reports);
   }
 
-  Future<List<ReportModel>?> viewReports(PatientProfileModel profile, BuildContext context) async {
-    
+  Future<List<ReportModel>?> viewReports(
+      PatientProfileModel profile, BuildContext context) async {
     final ReturnModel reports =
         await FirestoreDbService().fetchReports(profile.id);
 
@@ -177,44 +172,48 @@ class DoctorProfileModel {
     return reports.reports;
   }
 
-  Future<void> removeDevice(PatientReportModel patientReportModel, String deviceId, BuildContext context) async {
-    ReturnModel transferDataResult = await RealDbService().transferDeviceData(deviceId);
+  Future<void> removeDevice(PatientReportModel patientReportModel,
+      String deviceId, BuildContext context) async {
+    ReturnModel transferDataResult =
+        await RealDbService().transferDeviceData(deviceId);
     if (transferDataResult.state) {
-      DeviceProfileModel deviceProfileModel = transferDataResult.deviceProfileModel!;
-      ReturnModel saveDataResult = await FirestoreDbService().saveReportDataOnce(ReportModel(timestamp: DateTime.now().toString(), 
-                                                                                              brief: "", 
-                                                                                              description: "", 
-                                                                                              aiSuggestions: "", 
-                                                                                              docSuggestions: "", 
-                                                                                              graph: "", 
-                                                                                              reportId: "", 
-                                                                                              age: patientReportModel.age,
-                                                                                              docId: id, 
-                                                                                              deviceId: deviceId,
-                                                                                              isEditing: true, 
-                                                                                              patientProfileModel: patientReportModel, 
-                                                                                              anomalies: ""),
-                                                                                    deviceProfileModel.toDeviceReportModel()
-                                                                                  );
+      DeviceProfileModel deviceProfileModel =
+          transferDataResult.deviceProfileModel!;
+      ReturnModel saveDataResult = await FirestoreDbService()
+          .saveReportDataOnce(
+              ReportModel(
+                  timestamp: DateTime.now().toString(),
+                  brief: "",
+                  description: "",
+                  aiSuggestions: "",
+                  docSuggestions: "",
+                  graph: "",
+                  reportId: "",
+                  age: patientReportModel.age,
+                  docId: id,
+                  deviceId: deviceId,
+                  isEditing: true,
+                  patientProfileModel: patientReportModel,
+                  anomalies: ""),
+              deviceProfileModel.toDeviceReportModel());
       showMessages(saveDataResult.state, saveDataResult.message, context);
     } else {
-      showMessages(transferDataResult.state, transferDataResult.message, context);
+      showMessages(
+          transferDataResult.state, transferDataResult.message, context);
     }
 
-
-    
-    ReturnModel res =
-        await FirestoreDbService().removeDeviceFromPatient(patientReportModel.id, deviceId);
+    ReturnModel res = await FirestoreDbService()
+        .removeDeviceFromPatient(patientReportModel.id, deviceId);
     showMessages(res.state, res.message, context);
   }
-
 
   Future<void> removePatients(String id, BuildContext context) async {
     ReturnModel res = await FirestoreDbService().removePatient(id);
     showMessages(res.state, res.message, context);
   }
 
-  Future<void> addPatients(String id,String docId,BuildContext context ) async {
+  Future<void> addPatients(
+      String id, String docId, BuildContext context) async {
     ReturnModel res = await FirestoreDbService().addPatient(id, docId);
     showMessages(res.state, res.message, context);
   }
@@ -232,18 +231,17 @@ class DoctorProfileModel {
   }
 
   Future<DoctorProfileModel?> fetchProfileData(BuildContext context) async {
-    ReturnModel res = await FirestoreDbService()
-        .fetchAccount();
+    ReturnModel res = await FirestoreDbService().fetchAccount();
     if (res.state) {
       return res.doctorProfileModel;
     } else {
       showMessages(res.state, res.message, context);
       return null;
     }
-    
   }
 
-  Future<void> updateProfile(BuildContext context, ProfileController profileController)async {
+  Future<void> updateProfile(
+      BuildContext context, ProfileController profileController) async {
     ReturnModel res = await FirestoreDbService().updateProfile(
         FirebaseAuth.instance.currentUser!.uid,
         profileController.mobile.text,
@@ -253,11 +251,13 @@ class DoctorProfileModel {
     showMessages(res.state, res.message, context);
   }
 
-  DoctorReportModel toDoctorReportModel (){
-    return DoctorReportModel(id: id, name: name, email: email, address: address,mobile: mobile);
+  DoctorReportModel toDoctorReportModel() {
+    return DoctorReportModel(
+        id: id, name: name, email: email, address: address, mobile: mobile);
   }
 
-  Future<List<PatientProfileModel>> fetchAllPatients(BuildContext context) async{
+  Future<List<PatientProfileModel>> fetchAllPatients(
+      BuildContext context) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
@@ -267,63 +267,65 @@ class DoctorProfileModel {
       ReturnModel res = await FirestoreDbService().fetchPatients();
 
       if (res.state) {
-        for(PatientProfileModel patient in res.patients){
-          if(patient.docId!=""){
-            patient.doctorProfileModel = (await FirestoreDbService().fetchDoctorOne(patient.docId))!;
+        for (PatientProfileModel patient in res.patients) {
+          if (patient.docId != "") {
+            patient.doctorProfileModel =
+                (await FirestoreDbService().fetchDoctorOne(patient.docId))!;
             // showMessages(true, "${patient.id} | ${patient.doctorProfileModel!.email} | ${patient.docId}", context);
           }
-          ReturnModel res = await RealDbService().fetchDeviceData(patient.deviceId);
-          if(res.state){
+          ReturnModel res =
+              await RealDbService().fetchDeviceData(patient.deviceId);
+          if (res.state) {
             patient.device = res.deviceProfileModel;
             // showMessages(true, "${patient.id} | ${patient.device!.deadline} | ${patient.docId}", context);
           }
-
         }
-        
+
         return res.patients;
-        
       } else {
         showMessages(res.state, res.message, context);
         return [];
       }
     } catch (e) {
       showMessages(false, e.toString(), context);
-        return [];
+      return [];
     }
   }
 
-  Future<List<PatientProfileModel>> fetchSearchPatients(String name, BuildContext context) async{
+  Future<List<PatientProfileModel>> fetchSearchPatients(
+      String name, BuildContext context) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         throw Exception("User is not logged in.");
       }
 
-      ReturnModel res = await FirestoreDbService().fetchSearchPatients(name.toLowerCase());
+      ReturnModel res =
+          await FirestoreDbService().fetchSearchPatients(name.toLowerCase());
 
       if (res.state) {
-        for(PatientProfileModel patient in res.patients){
-          if(patient.docId!=""){
-            patient.doctorProfileModel = (await FirestoreDbService().fetchDoctorOne(patient.docId))!;
+        for (PatientProfileModel patient in res.patients) {
+          if (patient.docId != "") {
+            patient.doctorProfileModel =
+                (await FirestoreDbService().fetchDoctorOne(patient.docId))!;
             // showMessages(true, "${patient.id} | ${patient.doctorProfileModel!.email} | ${patient.docId}", context);
           }
-          ReturnModel res = await RealDbService().fetchDeviceData(patient.deviceId);
-          if(res.state){
+          ReturnModel res =
+              await RealDbService().fetchDeviceData(patient.deviceId);
+          if (res.state) {
             patient.device = res.deviceProfileModel;
             // showMessages(true, "${patient.id} | ${patient.device!.deadline} | ${patient.docId}", context);
           }
-
         }
-        
+
         return res.patients;
-        
       } else {
         showMessages(res.state, res.message, context);
         return [];
       }
     } catch (e) {
       showMessages(false, e.toString(), context);
-        return [];
+      return [];
     }
   }
 }
@@ -364,7 +366,7 @@ class DoctorReportModel {
   }
 }
 
-class AiReport{
+class AiReport {
   final ReportModel? report;
   final bool state;
   final List<ReportModel>? reports;
