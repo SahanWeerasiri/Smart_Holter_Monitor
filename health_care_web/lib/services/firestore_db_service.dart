@@ -466,6 +466,7 @@ class FirestoreDbService {
           .doc(snapshot.id)
           .update({
         'isEditing': true,
+        'isSeen': false,
         'data': deviceReportModel.data,
         'reportId': snapshot.id,
         'deviceId': deviceReportModel.code,

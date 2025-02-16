@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flame/extensions.dart';
 import 'package:health_care/constants/consts.dart';
 import 'package:health_care/pages/app/additional/chat_bubble.dart';
+import 'package:health_care/pages/app/services/real_db_service.dart';
+import 'package:health_care/pages/app/services/util.dart';
 
 class FirestoreDbService {
   final CollectionReference usersCollection =
@@ -22,12 +24,12 @@ class FirestoreDbService {
         'name': name,
         'address': "Address",
         'mobile': "Mobile",
-        'is_done': false,
+        'isDone': false,
         'language': 'Language',
         'device': 'Device',
         'color': 'Color',
         'pic': '',
-        'doctor_id': '',
+        'docId': '',
         'birthday': birthday,
       };
 
@@ -168,7 +170,7 @@ class FirestoreDbService {
     try {
       // Fetch the document snapshot
       final QuerySnapshot<Object?> snapshot =
-          await usersCollection.doc(uid).collection("reports").get();
+          await usersCollection.doc(uid).collection("data").get();
 
       final docs = snapshot.docs;
 
@@ -181,23 +183,26 @@ class FirestoreDbService {
       for (final DocumentSnapshot<Object?> doc in docs) {
         // Check if the document exists
         if (doc.exists) {
-          if (doc.get("is_seen")) {
+          if (doc.get("isEditing")) {
+            continue;
+          }
+          if (doc.get("isSeen")) {
             reportsOld.add(ReportModel(
-                aiSuggestions: doc.get("ai_suggestions"),
+                aiSuggestions: doc.get("aiSuggestions"),
                 brief: doc.get("brief"),
-                avgHeart: doc.get("avg_heart"),
+                avgHeart: doc.get("avgHeart"),
                 timestamp: doc.get("timestamp"),
-                docSuggestions: doc.get("suggestions"),
+                docSuggestions: doc.get("docSuggestions"),
                 description: doc.get("description"),
                 graph: doc.get("graph"),
                 reportId: doc.id));
           } else {
             reportsNew.add(ReportModel(
                 brief: doc.get("brief"),
-                aiSuggestions: doc.get("ai_suggestions"),
-                avgHeart: doc.get("avg_heart"),
+                aiSuggestions: doc.get("aiSuggestions"),
+                avgHeart: doc.get("avgHeart"),
                 timestamp: doc.get("timestamp"),
-                docSuggestions: doc.get("suggestions"),
+                docSuggestions: doc.get("docSuggestions"),
                 description: doc.get("description"),
                 graph: doc.get("graph"),
                 reportId: doc.id));
@@ -222,6 +227,123 @@ class FirestoreDbService {
     }
   }
 
+  Future<Map<String, dynamic>> fetchReportsV2(String uid) async {
+    try {
+      final DocumentSnapshot resUser = await usersCollection.doc(uid).get();
+
+      if (!resUser.exists) {
+        return {'success': false, 'error': 'User not found'};
+      }
+
+      Map<String, String> patientProfileModel = {
+        'id': uid,
+        'name': resUser.get('name'),
+        'mobile': resUser.get('mobile'),
+        'address': resUser.get('address'),
+        'language': resUser.get('language'),
+        'color': resUser.get('color'),
+        'pic': resUser.get('pic'),
+        'deviceId': resUser.get('deviceId'),
+        'docId': resUser.get('docId'),
+        'email': resUser.get('email'),
+        'age': getAge(resUser.get('birthday'))
+      };
+
+      final snapshot = await usersCollection
+          .doc(uid)
+          .collection('data')
+          .orderBy('timestamp', descending: true)
+          .get();
+
+      final List<Map<String, dynamic>> oldReports = [];
+      final List<Map<String, dynamic>> newReports = [];
+
+      for (DocumentSnapshot doc in snapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        final Map<String, String> reportModel = {
+          'brief': data['brief'],
+          'avgHeart': data['avgHeart'],
+          'timestamp': data['timestamp'],
+          'docSuggestions': data['docSuggestions'],
+          'description': data['description'],
+          'graph': data['graph'],
+          'reportId': doc.id,
+          'isSeen': data['isSeen'] as bool ? 'true' : 'false',
+          'deviceId': data['deviceId'],
+          'aiSuggestions': data['aiSuggestions'],
+          'anomalies': data['anomalies'],
+          'isEditing': data['isEditing'] as bool ? 'true' : 'false',
+          'age': data['age'],
+          'docId': data['docId'],
+        };
+        if (reportModel['isEditing'] == 'true') {
+          continue;
+        }
+
+        final Map<String, dynamic> doctorModel = {};
+
+        await doctorCollection.doc(reportModel['docId']).get().then((value) {
+          if (value.exists) {
+            doctorModel['doctorName'] = value.get('name');
+            doctorModel['doctorEmail'] = value.get('email');
+            doctorModel['doctorMobile'] = value.get('mobile');
+          } else {
+            doctorModel['doctorName'] = "";
+            doctorModel['doctorEmail'] = "";
+            doctorModel['doctorMobile'] = "";
+          }
+        });
+
+        if (doctorModel['doctorName'] == "") {
+          continue;
+        }
+
+        final Map<String, dynamic> deviceModel = {};
+
+        await RealDbService()
+            .fetchDeviceDetails(patientProfileModel['deviceId']!)
+            .then((value) {
+          if (value['success']) {
+            deviceModel['other'] = value;
+          }
+        });
+
+        if (deviceModel['other'] == null) {
+          continue;
+        }
+
+        if (reportModel['isSeen'] == 'true') {
+          oldReports.add({
+            'report': reportModel,
+            'doctor': doctorModel,
+            'device': deviceModel,
+            'patient': patientProfileModel,
+            'data': convertToInt(data['data']),
+          });
+        } else {
+          newReports.add({
+            'report': reportModel,
+            'doctor': doctorModel,
+            'device': deviceModel,
+            'patient': patientProfileModel,
+            'data': convertToInt(data['data']),
+          });
+        }
+      }
+
+      return {
+        'success': true,
+        'data_new': newReports,
+        'data_old': oldReports,
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'error': e.toString(),
+      };
+    }
+  }
+
   Future<Map<String, dynamic>> updateReportSeen(
       String uid, String reportId) async {
     try {
@@ -229,9 +351,9 @@ class FirestoreDbService {
 
       await usersCollection
           .doc(uid)
-          .collection("reports")
+          .collection("data")
           .doc(reportId)
-          .update({'is_seen': true});
+          .update({'isSeen': true});
       return {'success': true, 'message': "updation successful"};
     } catch (e) {
       // Handle errors and return failure

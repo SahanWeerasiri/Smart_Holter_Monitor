@@ -260,7 +260,7 @@ class _SignupState extends State<Signup> {
 
                     setState(() {
                       birthday =
-                          "${pickedDate.year}-${pickedDate.month}-${pickedDate.day}";
+                          "${pickedDate!.year}-${pickedDate.month}-${pickedDate.day}";
                     });
                   },
                   backgroundColor: StyleSheet().btnBackground,
