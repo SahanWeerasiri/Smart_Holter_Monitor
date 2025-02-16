@@ -248,6 +248,20 @@ class _MedicalReportState extends State<MedicalReport> {
                                   selectedReport!.patientProfileModel!.id,
                               reportDate: DateTime.now(),
                             ),
+                            Container(
+                              height:
+                                  400, // Or whatever appropriate height for your chart
+                              padding: EdgeInsets.all(16),
+                              child: selectedReport!.patientProfileModel!
+                                      .device!.data.isNotEmpty
+                                  ? HolterGraph(
+                                      data: selectedReport!
+                                          .patientProfileModel!.device!
+                                          .convertToInt(),
+                                    )
+                                  : Text(
+                                      "No graphs"), // Fallback when data is empty
+                            ),
                             FixedSection(
                                 title: "Overall Summary",
                                 text: selectedReport!.brief),
