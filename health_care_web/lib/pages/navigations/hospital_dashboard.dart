@@ -13,7 +13,7 @@ class _HospitalDashboardState extends State<HospitalDashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Admin Dashboard'),
+        title: const Text('Hospital Dashboard'),
       ),
       body: SingleChildScrollView(
         child: Padding(
