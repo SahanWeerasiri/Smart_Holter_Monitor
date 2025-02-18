@@ -1,4 +1,5 @@
 import 'package:health_care_web/components/buttons/custom_text_button/custom_text_button.dart';
+import 'package:health_care_web/components/dropdown/CustomDropDown.dart';
 import 'package:health_care_web/components/text_input/text_input_with_leading_icon.dart';
 import 'package:health_care_web/controllers/textController.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class _SignupCardState extends State<SignupCard> {
   late final TextStyle textStyleHeading;
   late final TextStyle textStyleTextInputTopic;
   late final TextStyle textStyleInputField;
+  String role = "";
   String msg = "";
 
   @override
@@ -27,7 +29,9 @@ class _SignupCardState extends State<SignupCard> {
     super.initState();
     credentialController = CredentialController();
     textStyleHeading = TextStyle(
-        color: StyleSheet.btnBackground, fontSize: 30, fontWeight: FontWeight.bold);
+        color: StyleSheet.btnBackground,
+        fontSize: 30,
+        fontWeight: FontWeight.bold);
     textStyleTextInputTopic = const TextStyle(
         color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
     textStyleInputField = TextStyle(
@@ -68,12 +72,13 @@ class _SignupCardState extends State<SignupCard> {
     ReturnModel result = await auth.createUserWithEmailAndPassword(
         credentialController.name,
         credentialController.username,
-        credentialController.password);
+        credentialController.password,
+        role);
     if (result.state) {
       setState(() {
         msg = result.message;
       });
-      return false;
+      return true;
     }
     setState(() {
       msg = result.message;
@@ -86,7 +91,7 @@ class _SignupCardState extends State<SignupCard> {
         ),
       );
     });
-    return true;
+    return false;
   }
 
   void signUpError() {
@@ -105,13 +110,19 @@ class _SignupCardState extends State<SignupCard> {
     Navigator.pop(context);
   }
 
+  void onDropDownSelected(value) {
+    setState(() {
+      role = value;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     AppSizes appSizes = AppSizes();
     appSizes.initSizes(context);
     return SizedBox(
         width: 350,
-        height: AppSizes().getBlockSizeVertical(80),
+        height: AppSizes().getBlockSizeVertical(90),
         child: Container(
           decoration: BoxDecoration(
               color: StyleSheet.uiBackground,
@@ -226,6 +237,13 @@ class _SignupCardState extends State<SignupCard> {
                     focusedBorderColor: StyleSheet.enableBorder,
                     isPassword: true,
                     typeKey: CustomTextInputTypes().confirmPassword),
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(5),
+                ),
+                CustomDropdown(
+                    label: 'Role',
+                    options: ['Doctor', 'Hospital'],
+                    onChanged: onDropDownSelected),
                 SizedBox(
                   height: AppSizes().getBlockSizeVertical(5),
                 ),

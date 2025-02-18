@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:health_care_web/models/patient_profile_model.dart';
 import 'package:health_care_web/models/return_model.dart';
 import 'package:health_care_web/services/firestore_db_service.dart';
 
@@ -10,32 +9,19 @@ class AuthService {
       FirestoreDbService(); // Inject Firestore service
 
   Future<ReturnModel> createUserWithEmailAndPassword(
-      String name, String email, String password) async {
+      String name, String email, String password, String role) async {
     try {
-      final userCredential = await _auth.createUserWithEmailAndPassword(
+      await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
+      if (role == "Hospital") {
+        return ReturnModel(
+            state: true, message: "Hospital created successfully");
+      }
       final createAccountResult =
           await _firestoreDbService.createAccount(name, email);
       if (createAccountResult.state) {
         return ReturnModel(
-            state: true,
-            message: "Account created successfully",
-            patientProfileModel: PatientProfileModel(
-                id: userCredential.user!.uid,
-                name: name,
-                age: "",
-                email: email,
-                deviceId: "",
-                docId: "",
-                pic: "",
-                isDone: false,
-                device: null,
-                doctorProfileModel: null,
-                address: "",
-                mobile: "",
-                color: "",
-                language: "",
-                contacts: []));
+            state: true, message: "Account created successfully");
       } else {
         await _auth.currentUser
             ?.delete(); // Clean up if account creation fails.
@@ -51,34 +37,21 @@ class AuthService {
   Future<ReturnModel> loginUserWithEmailAndPassword(
       String email, String password, String role) async {
     try {
-      final userCredential = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
       if (role == "Doctor") {
         final isDoctorResult = await _firestoreDbService.isDoctor(email);
         if (!isDoctorResult.state) {
           await signout();
           return isDoctorResult;
         }
+      } else if (role == "Hospital") {
+        final isHospitalResult = await _firestoreDbService.isHospital(email);
+        if (!isHospitalResult.state) {
+          await signout();
+          return isHospitalResult;
+        }
       }
-      return ReturnModel(
-          state: true,
-          message: "Logged in successfully",
-          patientProfileModel: PatientProfileModel(
-              id: userCredential.user!.uid,
-              name: "",
-              device: null,
-              doctorProfileModel: null,
-              isDone: false,
-              deviceId: "",
-              docId: "",
-              age: "",
-              email: email,
-              pic: "",
-              address: "",
-              mobile: "",
-              color: "",
-              language: "",
-              contacts: []));
+      return ReturnModel(state: true, message: "Logged in successfully");
     } on FirebaseAuthException catch (e) {
       return ReturnModel(state: false, message: _handleFirebaseAuthError(e));
     } catch (e) {

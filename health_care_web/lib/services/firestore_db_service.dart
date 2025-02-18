@@ -164,6 +164,26 @@ class FirestoreDbService {
     }
   }
 
+  Future<ReturnModel> isHospital(String email) async {
+    try {
+      final snapshot = await _firestore
+          .collection('doctor_accounts')
+          .where('email', isEqualTo: email)
+          .get();
+      final snapshot2 = await _firestore
+          .collection('user_accounts')
+          .where('email', isEqualTo: email)
+          .get();
+      return ReturnModel(
+          state: snapshot.docs.isEmpty && snapshot2.docs.isEmpty,
+          message:
+              snapshot.docs.isNotEmpty ? 'Is a hospital' : 'Not a hospital');
+    } catch (e) {
+      return ReturnModel(
+          state: false, message: 'Error checking hospital status: $e');
+    }
+  }
+
   Future<ReturnModel> removePatient(String uid) async {
     try {
       await _firestore
