@@ -7,8 +7,10 @@ class AdminTabs {
   static final String doctorRegistration = "DOCTOR_REGISTRATION";
   static final String deviceAssignment = "DEVICE_ASSIGNMENT";
 
-  Future<void> addNewDevice(String code, String details, BuildContext context)async{
-    ReturnModel res = await RealDbService().addDevice(code, details);
+  Future<void> addNewDevice(String code, String details, String hospitalId,
+      BuildContext context) async {
+    ReturnModel res =
+        await RealDbService().addDevice(code, details, hospitalId);
     showMessages(res.state, res.message, context);
   }
 }

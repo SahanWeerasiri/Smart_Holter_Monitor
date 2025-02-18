@@ -19,14 +19,15 @@ class RealDbService {
         final otherSnapshot = await ref.child('other').once();
         final useSnapshot = await ref.child('use').once();
         final deadlineSnapshot = await ref.child('deadline').once();
-        final assignedSnapshot = await ref.child('assigned').once(); 
+        final assignedSnapshot = await ref.child('assigned').once();
 
         final deviceProfileModel = DeviceProfileModel(
           code: device,
           detail: otherSnapshot.snapshot.value?.toString() ?? "",
           use: useSnapshot.snapshot.value?.toString() ?? "",
           state: assignedSnapshot.snapshot.value as int? ??
-              DeviceProfileModel.notAssigned, // Needs better state handling - consider using enum
+              DeviceProfileModel
+                  .notAssigned, // Needs better state handling - consider using enum
           deadline: deadlineSnapshot.snapshot.value?.toString() ?? "",
           latestValue: latestValue.toString(),
           avgValue: fetchDeviceDataAvg(device).toString(),
@@ -79,70 +80,60 @@ class RealDbService {
       final ref = _database.ref('devices').child(uid);
       final snapshot = await ref.get();
       if (snapshot.exists) {
-
-          return DeviceReportModel(
+        return DeviceReportModel(
             code: snapshot.key.toString(),
             detail: snapshot.child('other').value?.toString() ?? "",
             deadline: snapshot.child('deadline').value?.toString() ?? "",
-            avgValue: (await fetchDeviceDataAvg(uid)).toString()
-          );
-        
+            avgValue: (await fetchDeviceDataAvg(uid)).toString());
       } else {
-        return null;  
-        }
-      
+        return null;
+      }
     } catch (e) {
       return null;
     }
   }
+
   Future<DeviceReportModel?> fetchDeviceOneViewReport(String uid) async {
     try {
       final ref = _database.ref('devices').child(uid);
       final snapshot = await ref.get();
       if (snapshot.exists) {
-
-          return DeviceReportModel(
+        return DeviceReportModel(
             code: snapshot.key.toString(),
             detail: snapshot.child('other').value?.toString() ?? "",
             deadline: snapshot.child('deadline').value?.toString() ?? "",
-            avgValue: ""
-          );
-        
+            avgValue: "");
       } else {
-        return null;  
-        }
-      
+        return null;
+      }
     } catch (e) {
       return null;
     }
   }
+
   Future<DeviceProfileModel?> fetchDeviceOne(String uid) async {
     try {
       final ref = _database.ref('devices').child(uid);
       final snapshot = await ref.get();
       if (snapshot.exists) {
-
-          ReturnModel res = await fetchDeviceData(uid);
-          String latestValue = "0";
-          if(res.state){
-            latestValue = res.deviceProfileModel!.latestValue;
-          }
-          return DeviceProfileModel(
+        ReturnModel res = await fetchDeviceData(uid);
+        String latestValue = "0";
+        if (res.state) {
+          latestValue = res.deviceProfileModel!.latestValue;
+        }
+        return DeviceProfileModel(
             code: snapshot.key.toString(),
             detail: snapshot.child('other').value?.toString() ?? "",
             use: snapshot.child('use').value?.toString() ?? "",
             state: snapshot.child('assigned').value as int? ??
                 DeviceProfileModel.notAssigned,
-                latestValue: latestValue,
+            latestValue: latestValue,
             deadline: snapshot.child('deadline').value?.toString() ?? "",
             data: snapshot.child('data').value as Map<String, String>,
-            avgValue: (await fetchDeviceDataAvg(uid)).toString()
-          );
-        
+            avgValue: (await fetchDeviceDataAvg(uid)).toString());
       } else {
-        return null;  
-        }
-      
+        return null;
+      }
     } catch (e) {
       return null;
     }
@@ -181,7 +172,8 @@ class RealDbService {
     }
   }
 
-  Future<ReturnModel> addDevice(String code, String other) async {
+  Future<ReturnModel> addDevice(
+      String code, String other, String hospitalId) async {
     final ref = _database.ref('devices').child(code);
     try {
       final snapshot = await ref.get();
@@ -190,6 +182,7 @@ class RealDbService {
       } else {
         await ref.set({
           'other': other,
+          'hospitalId': hospitalId,
           'assigned': 0,
           'is_done': false,
           'deadline': "",
@@ -210,7 +203,8 @@ class RealDbService {
 
         // Convert the LinkedMap to a Map<String, String>
         Map<String, String> data = {};
-        if (dataFromSnapshot != null) {  // Handle the case where 'data' might be null
+        if (dataFromSnapshot != null) {
+          // Handle the case where 'data' might be null
           (dataFromSnapshot as Map).forEach((key, value) {
             data[key.toString()] = value.toString();
           });
@@ -258,7 +252,7 @@ class RealDbService {
         'assigned': DeviceProfileModel.assigned,
         'use': other,
         'deadline': (DateTime.now().add(Duration(hours: period))).toString(),
-        'data' : {
+        'data': {
           '2025-02-11 19:58:00': 3092,
           '2025-02-11 19:58:01': 1874,
           '2025-02-11 19:58:02': 395,
