@@ -76,6 +76,29 @@ class FirestoreDbService {
     }
   }
 
+  Future<ReturnModel> fetchPatientsUnassigned() async {
+    try {
+      final snapshot = await _firestore.collection('user_accounts').get();
+      final List<PatientProfileModel> patients = [];
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        if (data['deviceId'] != 'Device') {
+          continue;
+        }
+
+        final patient =
+            PatientProfileModel.fromMap(data, doc.id); //Use fromMap constructor
+        patients.add(patient);
+      }
+      return ReturnModel(
+          state: true,
+          message: 'Patients fetched successfully',
+          patients: patients);
+    } catch (e) {
+      return ReturnModel(state: false, message: 'Error fetching patients: $e');
+    }
+  }
+
   Future<ReturnModel> fetchContacts(String uid) async {
     try {
       final snapshot = await _firestore
@@ -161,6 +184,26 @@ class FirestoreDbService {
     } catch (e) {
       return ReturnModel(
           state: false, message: 'Error checking doctor status: $e');
+    }
+  }
+
+  Future<ReturnModel> isHospital(String email) async {
+    try {
+      final snapshot = await _firestore
+          .collection('doctor_accounts')
+          .where('email', isEqualTo: email)
+          .get();
+      final snapshot2 = await _firestore
+          .collection('user_accounts')
+          .where('email', isEqualTo: email)
+          .get();
+      return ReturnModel(
+          state: snapshot.docs.isEmpty && snapshot2.docs.isEmpty,
+          message:
+              snapshot.docs.isNotEmpty ? 'Is a hospital' : 'Not a hospital');
+    } catch (e) {
+      return ReturnModel(
+          state: false, message: 'Error checking hospital status: $e');
     }
   }
 

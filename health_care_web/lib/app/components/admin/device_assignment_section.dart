@@ -33,7 +33,8 @@ class _DeviceAssignmentSectionState extends State<DeviceAssignmentSection> {
   }
 
   Future<void> addDevices(code, details) async {
-    await AdminTabs().addNewDevice(code, details, context);
+    await AdminTabs().addNewDevice(
+        code, details, FirebaseAuth.instance.currentUser!.uid, context);
   }
 
   void refresh() {
@@ -71,8 +72,9 @@ class _DeviceAssignmentSectionState extends State<DeviceAssignmentSection> {
                 final state = (value)['assigned'] as int?;
                 final deadline = (value)['deadline'] as String?;
                 final useData = (value)['use'] as String?;
+                final hospitalId = (value)['hospitalId'] as String?;
 
-                if (other != null && state != null) {
+                if (other != null && state != null && hospitalId == user.uid) {
                   devices.add(DeviceProfileModel(
                       avgValue: "",
                       latestValue: "",
@@ -145,11 +147,12 @@ class _DeviceAssignmentSectionState extends State<DeviceAssignmentSection> {
               if (v is Map) {
                 final other = (v)['other'] as String?;
                 final state = (v)['assigned'] as int?;
+                final hospitalId = (v)['hospitalId'] as String?;
                 final code = key;
                 final useData = (v)['use'] as String?;
                 final deadline = (v)['deadline'] as String?;
 
-                if (other != null && state != null) {
+                if (other != null && state != null && hospitalId == user.uid) {
                   if (code
                       .toLowerCase()
                       .contains(value.toLowerCase())) // Search by detail

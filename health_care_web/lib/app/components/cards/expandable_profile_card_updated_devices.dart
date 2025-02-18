@@ -46,9 +46,9 @@ class _ExpandableProfileCardUpdatedDevicesState
     setState(() {
       isLoading = true;
     });
+    ReturnModel res = await RealDbService().connectDevicePending(device);
     await fetchPatients();
-    ReturnModel res =
-        await RealDbService().connectDevicePending(device);
+
     setState(() {
       isLoading = false;
     });
@@ -96,7 +96,7 @@ class _ExpandableProfileCardUpdatedDevicesState
     setState(() {
       patients = [];
     });
-    ReturnModel res = await FirestoreDbService().fetchPatients();
+    ReturnModel res = await FirestoreDbService().fetchPatientsUnassigned();
     if (res.state) {
       final pl = res.patients;
       setState(() {

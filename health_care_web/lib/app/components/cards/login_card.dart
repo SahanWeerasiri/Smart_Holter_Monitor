@@ -29,7 +29,9 @@ class _LoginCardState extends State<LoginCard> {
     super.initState();
     credentialController = CredentialController();
     textStyleHeading = TextStyle(
-        color: StyleSheet.btnBackground, fontSize: 30, fontWeight: FontWeight.bold);
+        color: StyleSheet.btnBackground,
+        fontSize: 30,
+        fontWeight: FontWeight.bold);
     textStyleTextInputTopic = const TextStyle(
         color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
     textStyleInputField = TextStyle(
@@ -88,6 +90,13 @@ class _LoginCardState extends State<LoginCard> {
     Navigator.pushNamed(context, '/admin_dashboard');
   }
 
+  void navigateToHospital() {
+    setState(() {
+      credentialController.clear();
+    });
+    Navigator.pushNamed(context, '/hospital_dashboard');
+  }
+
   void onDropDownSelected(value) {
     setState(() {
       role = value;
@@ -99,7 +108,7 @@ class _LoginCardState extends State<LoginCard> {
     AppSizes().initSizes(context);
     return SizedBox(
         width: 350,
-        height: AppSizes().getBlockSizeVertical(70),
+        height: AppSizes().getBlockSizeVertical(90),
         child: Container(
           decoration: BoxDecoration(
               color: StyleSheet.uiBackground,
@@ -167,6 +176,13 @@ class _LoginCardState extends State<LoginCard> {
                 SizedBox(
                   height: AppSizes().getBlockSizeVertical(5),
                 ),
+                CustomDropdown(
+                    label: 'Role',
+                    options: ['Doctor', 'Admin', 'Hospital'],
+                    onChanged: onDropDownSelected),
+                SizedBox(
+                  height: AppSizes().getBlockSizeVertical(5),
+                ),
                 CustomTextButton(
                   label: "Sign In",
                   onPressed: () async {
@@ -176,6 +192,8 @@ class _LoginCardState extends State<LoginCard> {
                       });
                       if (role == "Admin") {
                         navigateToAdmin();
+                      } else if (role == "Hospital") {
+                        navigateToHospital();
                       } else {
                         navigateToHome();
                       }
@@ -187,38 +205,89 @@ class _LoginCardState extends State<LoginCard> {
                   textColor: StyleSheet.btnText,
                   icon: Icons.login,
                 ),
-                CustomTextButton(
-                  label: "Test",
-                  onPressed: () async {
-                    setState(() {
-                      credentialController.username = "doctor@smartcare.com";
-                      credentialController.password = "doctor123";
-                      role = "Doctor";
-                    });
-                    if (await checkCredentials()) {
+                ListView(shrinkWrap: true, children: [
+                  CustomTextButton(
+                    label: "Doctor",
+                    onPressed: () async {
                       setState(() {
-                        credentialController.clear();
+                        credentialController.username = "doctor@smartcare.com";
+                        credentialController.password = "doctor123";
+                        role = "Doctor";
                       });
-                      if (role == "Admin") {
-                        navigateToAdmin();
+                      if (await checkCredentials()) {
+                        setState(() {
+                          credentialController.clear();
+                        });
+                        if (role == "Admin") {
+                          navigateToAdmin();
+                        } else {
+                          navigateToHome();
+                        }
                       } else {
-                        navigateToHome();
+                        loginError();
                       }
-                    } else {
-                      loginError();
-                    }
-                  },
-                  backgroundColor: StyleSheet.btnBackground,
-                  textColor: StyleSheet.btnText,
-                  icon: Icons.login,
-                ),
+                    },
+                    backgroundColor: StyleSheet.btnBackground,
+                    textColor: StyleSheet.btnText,
+                    icon: Icons.login,
+                  ),
+                  CustomTextButton(
+                    label: "Admin",
+                    onPressed: () async {
+                      setState(() {
+                        credentialController.username = "admin@smartcare.com";
+                        credentialController.password = "admin123";
+                        role = "Admin";
+                      });
+                      if (await checkCredentials()) {
+                        setState(() {
+                          credentialController.clear();
+                        });
+                        if (role == "Admin") {
+                          navigateToAdmin();
+                        } else {
+                          navigateToHome();
+                        }
+                      } else {
+                        loginError();
+                      }
+                    },
+                    backgroundColor: StyleSheet.btnBackground,
+                    textColor: StyleSheet.btnText,
+                    icon: Icons.login,
+                  ),
+                  CustomTextButton(
+                    label: "Hospital",
+                    onPressed: () async {
+                      setState(() {
+                        credentialController.username =
+                            "hospital@smartcare.com";
+                        credentialController.password = "hospital123";
+                        role = "Hospital";
+                      });
+                      if (await checkCredentials()) {
+                        setState(() {
+                          credentialController.clear();
+                        });
+                        if (role == "Admin") {
+                          navigateToAdmin();
+                        } else if (role == "Hospital") {
+                          navigateToHospital();
+                        } else {
+                          navigateToHome();
+                        }
+                      } else {
+                        loginError();
+                      }
+                    },
+                    backgroundColor: StyleSheet.btnBackground,
+                    textColor: StyleSheet.btnText,
+                    icon: Icons.login,
+                  ),
+                ]),
                 SizedBox(
                   height: AppSizes().getBlockSizeVertical(5),
                 ),
-                CustomDropdown(
-                    label: 'Role',
-                    options: ['Doctor', 'Admin'],
-                    onChanged: onDropDownSelected)
               ],
             ),
           ),

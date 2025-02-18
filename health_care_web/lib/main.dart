@@ -3,6 +3,7 @@ import 'package:health_care_web/models/style_sheet.dart';
 import 'package:health_care_web/pages/navigations/admin_dashboard.dart';
 import 'package:health_care_web/pages/navigations/before_login_page.dart';
 import 'package:health_care_web/pages/navigations/home.dart';
+import 'package:health_care_web/pages/navigations/hospital_dashboard.dart';
 import 'package:health_care_web/pages/navigations/login_page.dart';
 import 'package:health_care_web/pages/pages/medical_report.dart';
 import 'package:health_care_web/services/firebase_init.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
         '/before_login': (context) => const BeforeLoginPage(),
         '/home': (context) => const Home(),
         '/admin_dashboard': (context) => const AdminDashboard(),
+        '/hospital_dashboard': (context) => const HospitalDashboard(),
         '/medical_report': (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Map;
           return MedicalReport(
