@@ -52,7 +52,7 @@ class _ProfileState extends State<Profile> {
         _userProfile.email = res['data']['email'];
         _userProfile.address = res['data']['address'];
         _userProfile.color = res['data']['color'];
-        _userProfile.device = res['data']['device'];
+        _userProfile.device = res['data']['deviceId'];
         _userProfile.isDone = res['data']['isDone'];
         _userProfile.language = res['data']['language'];
         _userProfile.mobile = res['data']['mobile'];

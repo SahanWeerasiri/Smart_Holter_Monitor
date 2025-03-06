@@ -7,6 +7,7 @@ import 'package:health_care/components/list/design1/list_item_data.dart';
 import 'package:health_care/constants/consts.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care/pages/app/services/firestore_db_service.dart';
+import 'package:health_care/pages/app/services/util.dart';
 import 'package:iconly/iconly.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -45,7 +46,7 @@ class _SummaryState extends State<Summary> {
         _userProfile.email = res['data']['email'];
         _userProfile.address = res['data']['address'];
         _userProfile.color = res['data']['color'];
-        _userProfile.device = res['data']['device'];
+        _userProfile.device = res['data']['deviceId'];
         _userProfile.isDone = res['data']['isDone'];
         _userProfile.language = res['data']['language'];
         _userProfile.mobile = res['data']['mobile'];
@@ -53,8 +54,8 @@ class _SummaryState extends State<Summary> {
         _userProfile.birthday = res['data']['birthday'] ?? "";
         _userProfile.doctorId = res['data']['docId'];
       });
-      if (res['data']['device'] != "Device") {
-        fetchDeviceData(res['data']['device']);
+      if (res['data']['deviceId'] != "Device") {
+        fetchDeviceData(res['data']['deviceId']);
       } else {
         setState(() {
           currentHeartRate = 0;
@@ -109,17 +110,37 @@ class _SummaryState extends State<Summary> {
           ..sort((a, b) =>
               b.key.compareTo(a.key)); // Sort by key (time_stamp) descending
 
-        final values =
-            sortedEntries.map((entry) => entry.value as num).toList();
-        final avgValue = values.isNotEmpty
-            ? values.reduce((a, b) => a + b) / values.length
-            : 0;
+        // final values =
+        //     sortedEntries.map((entry) => entry.value as num).toList();
+        // final avgValue = values.isNotEmpty
+        //     ? values.reduce((a, b) => a + b) / values.length
+        //     : 0;
 
-        // The latest entry will now be the first
-        final latestEntry = sortedEntries.first;
+        // // The latest entry will now be the first
+        // final latestEntry = sortedEntries.first;
+
+        Map<String, int> testMap = {};
+        for (MapEntry me in sortedEntries) {
+          testMap[me.key] = me.value as int;
+        }
+        var sortedMap = Map.fromEntries(
+          testMap.entries.toList()
+            ..sort((a, b) =>
+                DateTime.parse(a.key).compareTo(DateTime.parse(b.key))),
+        );
+        testMap = sortedMap;
+
+        for (String key in testMap.keys) {
+          print(key);
+          print(testMap[key]);
+        }
+
         setState(() {
-          currentHeartRate = latestEntry.value;
-          avgHeartRate = avgValue;
+          // currentHeartRate = latestEntry.value;
+
+          currentHeartRate = getHeartBeat(testMap);
+          // avgHeartRate = avgValue;
+          avgHeartRate = currentHeartRate + 2;
           if (60 <= currentHeartRate && currentHeartRate <= 100) {
             stateBoxColor = StyleSheet().stateHeartBoxGood;
           } else {

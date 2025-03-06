@@ -108,7 +108,7 @@ class _LoginCardState extends State<LoginCard> {
     AppSizes().initSizes(context);
     return SizedBox(
         width: 350,
-        height: AppSizes().getBlockSizeVertical(90),
+        height: AppSizes().getBlockSizeVertical(70),
         child: Container(
           decoration: BoxDecoration(
               color: StyleSheet.uiBackground,
@@ -205,86 +205,86 @@ class _LoginCardState extends State<LoginCard> {
                   textColor: StyleSheet.btnText,
                   icon: Icons.login,
                 ),
-                ListView(shrinkWrap: true, children: [
-                  CustomTextButton(
-                    label: "Doctor",
-                    onPressed: () async {
-                      setState(() {
-                        credentialController.username = "doctor@smartcare.com";
-                        credentialController.password = "doctor123";
-                        role = "Doctor";
-                      });
-                      if (await checkCredentials()) {
-                        setState(() {
-                          credentialController.clear();
-                        });
-                        if (role == "Admin") {
-                          navigateToAdmin();
-                        } else {
-                          navigateToHome();
-                        }
-                      } else {
-                        loginError();
-                      }
-                    },
-                    backgroundColor: StyleSheet.btnBackground,
-                    textColor: StyleSheet.btnText,
-                    icon: Icons.login,
-                  ),
-                  CustomTextButton(
-                    label: "Admin",
-                    onPressed: () async {
-                      setState(() {
-                        credentialController.username = "admin@smartcare.com";
-                        credentialController.password = "admin123";
-                        role = "Admin";
-                      });
-                      if (await checkCredentials()) {
-                        setState(() {
-                          credentialController.clear();
-                        });
-                        if (role == "Admin") {
-                          navigateToAdmin();
-                        } else {
-                          navigateToHome();
-                        }
-                      } else {
-                        loginError();
-                      }
-                    },
-                    backgroundColor: StyleSheet.btnBackground,
-                    textColor: StyleSheet.btnText,
-                    icon: Icons.login,
-                  ),
-                  CustomTextButton(
-                    label: "Hospital",
-                    onPressed: () async {
-                      setState(() {
-                        credentialController.username =
-                            "hospital@smartcare.com";
-                        credentialController.password = "hospital123";
-                        role = "Hospital";
-                      });
-                      if (await checkCredentials()) {
-                        setState(() {
-                          credentialController.clear();
-                        });
-                        if (role == "Admin") {
-                          navigateToAdmin();
-                        } else if (role == "Hospital") {
-                          navigateToHospital();
-                        } else {
-                          navigateToHome();
-                        }
-                      } else {
-                        loginError();
-                      }
-                    },
-                    backgroundColor: StyleSheet.btnBackground,
-                    textColor: StyleSheet.btnText,
-                    icon: Icons.login,
-                  ),
-                ]),
+                // ListView(shrinkWrap: true, children: [
+                //   CustomTextButton(
+                //     label: "Doctor",
+                //     onPressed: () async {
+                //       setState(() {
+                //         credentialController.username = "doctor@smartcare.com";
+                //         credentialController.password = "doctor123";
+                //         role = "Doctor";
+                //       });
+                //       if (await checkCredentials()) {
+                //         setState(() {
+                //           credentialController.clear();
+                //         });
+                //         if (role == "Admin") {
+                //           navigateToAdmin();
+                //         } else {
+                //           navigateToHome();
+                //         }
+                //       } else {
+                //         loginError();
+                //       }
+                //     },
+                //     backgroundColor: StyleSheet.btnBackground,
+                //     textColor: StyleSheet.btnText,
+                //     icon: Icons.login,
+                //   ),
+                //   CustomTextButton(
+                //     label: "Admin",
+                //     onPressed: () async {
+                //       setState(() {
+                //         credentialController.username = "admin@smartcare.com";
+                //         credentialController.password = "admin123";
+                //         role = "Admin";
+                //       });
+                //       if (await checkCredentials()) {
+                //         setState(() {
+                //           credentialController.clear();
+                //         });
+                //         if (role == "Admin") {
+                //           navigateToAdmin();
+                //         } else {
+                //           navigateToHome();
+                //         }
+                //       } else {
+                //         loginError();
+                //       }
+                //     },
+                //     backgroundColor: StyleSheet.btnBackground,
+                //     textColor: StyleSheet.btnText,
+                //     icon: Icons.login,
+                //   ),
+                //   CustomTextButton(
+                //     label: "Hospital",
+                //     onPressed: () async {
+                //       setState(() {
+                //         credentialController.username =
+                //             "hospital@smartcare.com";
+                //         credentialController.password = "hospital123";
+                //         role = "Hospital";
+                //       });
+                //       if (await checkCredentials()) {
+                //         setState(() {
+                //           credentialController.clear();
+                //         });
+                //         if (role == "Admin") {
+                //           navigateToAdmin();
+                //         } else if (role == "Hospital") {
+                //           navigateToHospital();
+                //         } else {
+                //           navigateToHome();
+                //         }
+                //       } else {
+                //         loginError();
+                //       }
+                //     },
+                //     backgroundColor: StyleSheet.btnBackground,
+                //     textColor: StyleSheet.btnText,
+                //     icon: Icons.login,
+                //   ),
+                // ]),
                 SizedBox(
                   height: AppSizes().getBlockSizeVertical(5),
                 ),
