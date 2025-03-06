@@ -1,9 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care_web/app/components/cards/expandable_profile_card_updated.dart';
 import 'package:health_care_web/models/app_sizes.dart';
 import 'package:health_care_web/models/doctor_profile_model.dart';
 import 'package:health_care_web/models/patient_profile_model.dart';
+import 'package:health_care_web/models/return_model.dart';
 import 'package:health_care_web/models/style_sheet.dart';
+import 'package:health_care_web/services/firestore_db_service.dart';
+import 'package:health_care_web/services/util.dart';
 import 'package:iconly/iconly.dart';
 
 class AllPatients extends StatefulWidget {
@@ -40,8 +44,9 @@ class _AllPatientsState extends State<AllPatients> {
       profiles = [];
     });
     _userProfile = await _userProfile!.initDoctor(context);
-    final List<PatientProfileModel> patients = await _userProfile!.fetchAllPatients(context);
-        // showMessages(false, patients.length.toString(), context);
+    final List<PatientProfileModel> patients =
+        await _userProfile!.fetchAllPatients(context);
+    // showMessages(false, patients.length.toString(), context);
 
     setState(() {
       profiles = patients;
@@ -50,7 +55,6 @@ class _AllPatientsState extends State<AllPatients> {
     // showMessages(true, profiles[0].doctorProfileModel!.id, context);
 
     setState(() => isLoading = false);
-    
   }
 
   Future<void> fetchSearch(String name) async {
@@ -58,13 +62,20 @@ class _AllPatientsState extends State<AllPatients> {
       profiles = [];
       isLoading = true;
     });
-    final List<PatientProfileModel> patients = await _userProfile!.fetchSearchPatients(name, context);
+    final List<PatientProfileModel> patients =
+        await _userProfile!.fetchSearchPatients(name, context);
     // showMessages(false, patients.length.toString(), context);
-      setState(() {
-        profiles = patients;
-      });
-      setState(() => isLoading = false);
-  
+    setState(() {
+      profiles = patients;
+    });
+    setState(() => isLoading = false);
+  }
+
+  Future<void> addPatients(String ind) async {
+    ReturnModel res = await FirestoreDbService()
+        .addPatient(ind, FirebaseAuth.instance.currentUser!.uid);
+    showMessages(res.state, res.message, context);
+    refresh();
   }
 
   @override
@@ -119,9 +130,11 @@ class _AllPatientsState extends State<AllPatients> {
                     return ExpandableProfileCardUpdated(
                       patientProfileModel: p,
                       myId: _userProfile!.id,
-                      onRemove: () => p.doctorProfileModel!.removePatients(p.id,context),
-                      onAdd: () => p.doctorProfileModel!.addPatients(
-                          p.id, p.doctorProfileModel!.id,context),
+                      onRemove: () {
+                        p.doctorProfileModel!.removePatients(p.id, context);
+                        refresh();
+                      },
+                      onAdd: () => addPatients(p.id),
                     );
                   }).toList(),
                 ),

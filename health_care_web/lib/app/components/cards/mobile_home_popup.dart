@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care_web/models/style_sheet.dart';
+import 'package:health_care_web/services/util.dart';
 
 class MobileHomePopup extends StatefulWidget {
   final String device;
@@ -36,17 +37,28 @@ class _MobileHomePopupState extends State<MobileHomePopup> {
           ..sort((a, b) =>
               b.key.compareTo(a.key)); // Sort by key (time_stamp) descending
 
-        final values =
-            sortedEntries.map((entry) => entry.value as num).toList();
-        final avgValue = values.isNotEmpty
-            ? values.reduce((a, b) => a + b) / values.length
-            : 0;
+        Map<String, int> testMap = {};
+        for (MapEntry me in sortedEntries) {
+          testMap[me.key] = me.value as int;
+        }
+        var sortedMap = Map.fromEntries(
+          testMap.entries.toList()
+            ..sort((a, b) =>
+                DateTime.parse(a.key).compareTo(DateTime.parse(b.key))),
+        );
+        testMap = sortedMap;
 
-        // The latest entry will now be the first
-        final latestEntry = sortedEntries.first;
+        for (String key in testMap.keys) {
+          print(key);
+          print(testMap[key]);
+        }
+
         setState(() {
-          currentHeartRate = latestEntry.value;
-          avgHeartRate = avgValue;
+          // currentHeartRate = latestEntry.value;
+
+          currentHeartRate = getHeartBeatSummary(testMap);
+          avgHeartRate = currentHeartRate + 2;
+
           if (60 <= currentHeartRate && currentHeartRate <= 100) {
             stateBoxColor = StyleSheet.stateHeartBoxGood;
           } else {

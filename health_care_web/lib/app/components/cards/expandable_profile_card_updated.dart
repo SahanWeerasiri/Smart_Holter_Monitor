@@ -40,7 +40,9 @@ class _ExpandableProfileCardUpdatedState
       height: _cardHeight,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(10)),
-        color: widget.patientProfileModel.docId == widget.myId ? _stateColors[0] : _stateColors[1],
+        color: widget.patientProfileModel.docId == widget.myId
+            ? _stateColors[0]
+            : _stateColors[1],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,7 +90,8 @@ class _ExpandableProfileCardUpdatedState
                         const SizedBox(height: 4),
                         Text("Mobile: ${widget.patientProfileModel.mobile}"),
                         const SizedBox(height: 4),
-                        Text("Device: ${widget.patientProfileModel.deviceId} | deadline: ${widget.patientProfileModel.deviceId=='Device'?'-':widget.patientProfileModel.device!.deadline}"),
+                        Text(
+                            "Device: ${widget.patientProfileModel.deviceId} | deadline: ${widget.patientProfileModel.deviceId == 'Device' ? '-' : widget.patientProfileModel.device!.deadline}"),
                         const SizedBox(height: 4),
                         widget.myId == widget.patientProfileModel.docId
                             ? CustomButton(
@@ -96,24 +99,21 @@ class _ExpandableProfileCardUpdatedState
                                 icon: IconlyLight.delete,
                                 textColor: StyleSheet.uiBackground,
                                 backgroundColor: StyleSheet.patientsDelete,
-                                onPressed: () => {widget.onRemove()})
+                                onPressed: widget.onRemove)
                             : CustomButton(
                                 label: "Add",
                                 textColor: StyleSheet.uiBackground,
                                 icon: IconlyLight.add_user,
                                 backgroundColor: StyleSheet.patientsAdd,
-                                onPressed: () => {widget.onAdd()})
+                                onPressed: widget.onAdd)
                       ],
                     ),
                     // widget.patientProfileModel.pic.isNotEmpty
-                        // ? 
-                        Image.asset(
-                                "assetes/icons/logo.png",
-                                scale: 5,
-                              ),
-                            
-                          
-                        
+                    // ?
+                    Image.asset(
+                      "assetes/icons/logo.png",
+                      scale: 5,
+                    ),
                   ],
                 )),
         ],

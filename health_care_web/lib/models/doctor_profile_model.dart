@@ -212,9 +212,8 @@ class DoctorProfileModel {
     showMessages(res.state, res.message, context);
   }
 
-  Future<void> addPatients(
-      String id, String docId, BuildContext context) async {
-    ReturnModel res = await FirestoreDbService().addPatient(id, docId);
+  Future<void> addPatients(String ind, BuildContext context) async {
+    ReturnModel res = await FirestoreDbService().addPatient(ind, id);
     showMessages(res.state, res.message, context);
   }
 
@@ -273,11 +272,13 @@ class DoctorProfileModel {
                 (await FirestoreDbService().fetchDoctorOne(patient.docId))!;
             // showMessages(true, "${patient.id} | ${patient.doctorProfileModel!.email} | ${patient.docId}", context);
           }
-          ReturnModel res =
-              await RealDbService().fetchDeviceData(patient.deviceId);
-          if (res.state) {
-            patient.device = res.deviceProfileModel;
-            // showMessages(true, "${patient.id} | ${patient.device!.deadline} | ${patient.docId}", context);
+          if (patient.deviceId != "Device") {
+            ReturnModel res =
+                await RealDbService().fetchDeviceData(patient.deviceId);
+            if (res.state) {
+              patient.device = res.deviceProfileModel;
+              // showMessages(true, "${patient.id} | ${patient.device!.deadline} | ${patient.docId}", context);
+            }
           }
         }
 
