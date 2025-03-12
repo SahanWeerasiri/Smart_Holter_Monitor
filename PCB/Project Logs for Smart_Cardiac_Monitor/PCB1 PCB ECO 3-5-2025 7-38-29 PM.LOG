@@ -1,0 +1,25 @@
+Added Component: Designator=On/Off(B2BPHKSLFSN)
+Add component (AddParameter): Name = "Arrow Part Number"; Value = ""; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Arrow Price/Stock"; Value = ""; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Datasheet Link"; Value = "http://www.jst-mfg.com/product/pdf/eng/ePH.pdf"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Height"; Value = "6mm"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Manufacturer_Name"; Value = "JST (JAPAN SOLDERLESS TERMINALS)"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Manufacturer_Part_Number"; Value = "B2B-PH-K-S (LF)(SN)"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Mouser Part Number"; Value = ""; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Mouser Price/Stock"; Value = ""; VariantName = "[No Variations]"
+Added Pin To Net: NetName=11 Pin=Display_JST-6
+Added Pin To Net: NetName=12 Pin=Display_JST-7
+Added Pin To Net: NetName=3.3v Pin=Display_JST-8
+Added Pin To Net: NetName=7.4v Pin=On/Off-1
+Added Pin To Net: NetName=DGND Pin=On/Off-2
+Added Pin To Net: NetName=8 Pin=Display_JST-3
+Added Pin To Net: NetName=8 Pin=IC2-12
+Added Net: Name=8
+Added Pin To Net: NetName=9 Pin=ADS1293-19
+Added Pin To Net: NetName=9 Pin=Display_JST-5
+Added Pin To Net: NetName=9 Pin=IC2-17
+Added Net: Name=9
+Added Pin To Net: NetName=21 Pin=Display_JST-4
+Added Pin To Net: NetName=21 Pin=IC2-23
+Added Net: Name=21
+Added Member To Class: ClassName=Sheet1 Member=Component On/Off B2B-PH-K-S__LF__SN_
