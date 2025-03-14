@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-// import 'package:firebase_storage/firebase_storage.dart';
 import 'package:smartcare/models/chat_message.dart';
 import 'package:smartcare/models/patient_data.dart';
 import 'package:smartcare/models/user.dart' as app_user;
@@ -10,7 +9,6 @@ class FirebaseService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseDatabase _database = FirebaseDatabase.instance;
-  // final FirebaseStorage _storage = FirebaseStorage.instance;
 
   // Authentication methods
   Future<User?> signInWithEmailAndPassword(
@@ -46,7 +44,7 @@ class FirebaseService {
   // User profile methods
   Future<app_user.User?> getUserProfile(String userId) async {
     try {
-      final doc = await _firestore.collection('users').doc(userId).get();
+      final doc = await _firestore.collection('user').doc(userId).get();
       if (doc.exists) {
         final data = doc.data() as Map<String, dynamic>;
 

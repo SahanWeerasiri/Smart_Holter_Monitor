@@ -1,3 +1,4 @@
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -10,6 +11,10 @@ import 'package:smartcare/services/firebase_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+  // Activate App Check with Play Integrity (no reCAPTCHA for web)
+  FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.instance;
+  await firebaseAppCheck.activate();
 
   final firebaseService = FirebaseService();
 
