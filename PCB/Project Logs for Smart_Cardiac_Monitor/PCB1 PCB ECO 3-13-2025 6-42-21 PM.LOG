@@ -1,0 +1,4 @@
+Change Component Designator: OldDesignator=Display_JST NewDesignator=TFT
+Change Component Designator: OldDesignator=ECG_Pins NewDesignator=ECG
+Change Component Designator: OldDesignator=Enable NewDesignator=EN
+Change Component Designator: OldDesignator=SD_Card_Module NewDesignator=SD
