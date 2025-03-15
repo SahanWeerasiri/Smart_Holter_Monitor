@@ -11,7 +11,7 @@ def retrieve_context(query, top_k=4):
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 
-    path = os.path.join(script_dir,"..", "Vector DBs")
+    path = os.path.join(script_dir, "Vector_DB")
     vector_store = FAISS.load_local(path, embeddings, allow_dangerous_deserialization=True)
 
     # Get results from each store
