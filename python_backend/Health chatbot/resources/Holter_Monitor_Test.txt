@@ -104,3 +104,84 @@ If you are having a Holter study to look for silent ischemia, finding strong sig
 
 Summary
 The Holter monitor study is the most widely used type of ambulatory ECG monitoring. The test is quite good at diagnosing transient cardiac arrhythmias that generally occur during any given 24-48 hour period, and is very safe.
+
+
+
+
+Test Details
+How does a Holter monitor work?
+Electrodes (stickers) on your chest sense your heart’s electrical activity. They send this information through wires to the Holter heart monitor in your pocket or elsewhere on your body. The monitor records this data for later. Providers don’t monitor your device as it records information. They access the collected data after you turn in your device.
+
+How do I prepare for a Holter monitor?
+You don’t need to do anything special on your own to prepare for a Holter monitor. You’ll probably want to shower or bathe before putting on the device. You won’t be able to get the monitor wet when you’re wearing it.
+
+What to expect while using a Holter monitor
+A provider will get you set up and then you can go about your normal day. They’ll:
+
+Attach the electrodes to your chest. You’ll need to wear at least two electrodes. A provider may need to shave your chest to make sure the electrodes stay on.
+Help you put on the monitor. They’ll connect it to the electrodes with wires and explain how to take care of the monitor.
+Find a place for the monitor. You can carry the heart monitor in a pocket or bag. You can wear it on a strap around your neck, waist or shoulder.
+Explain how to keep track of your activities and symptoms. You should write down symptoms like shortness of breath, skipped or uneven heartbeats and chest pain. Note when the symptoms happened and what you were doing. Maybe you had chest pain while carrying laundry upstairs at 10:30 a.m. Your provider will look at what was going on in your EKG at that time.
+Restrictions while wearing a Holter monitor
+You can do most of your usual activities — even sleeping — while you wear a Holter heart monitor.
+
+But while wearing your cardiac monitor, you should avoid:
+
+Bathing, showering or swimming.
+Having an X-ray.
+Going near high-voltage areas, magnets or metal detectors.
+Using other electric devices (like microwaves or electric toothbrushes, razors or blankets).
+What to expect after using a Holter monitor
+After the 24- or 48-hour period:
+
+You return the monitor to the provider, who removes the electrodes.
+A provider processes your records, including the EKG and your notes, and sends a report to your cardiologist (heart specialist).
+Note: A medical professional doesn’t continually monitor the findings of this test. Seek medical care if you develop symptoms.
+
+What are the risks or side effects of a Holter monitor?
+Wearing a Holter heart monitor doesn’t involve any risks or pain. Some people might have itchiness or irritation from the tape that attaches the electrodes to your chest.
+
+Let your provider know if you have any allergies to tapes or adhesives.
+
+Results and Follow-Up
+What type of results do you get and what do the results mean?
+The results may show that the Holter monitor detected a heart rhythm disorder (arrhythmia), like:
+
+Atrial fibrillation.
+Bradycardia (slow heart rate).
+Tachycardia (fast heart rate).
+Premature ventricular contractions (PVCs).
+When should I know the results of the test?
+Your provider will contact you with the results within a week or two after the test.
+
+If the results are abnormal, what are the next steps?
+Your provider will discuss the next steps with you. They may recommend:
+
+More cardiac tests.
+Heart medications.
+A pacemaker.
+Cardioversion procedure to help your heart return to a steady rhythm.
+Ablation, a treatment for abnormal rhythm that uses hot or cold energy to create scar tissue.
+When should I call my provider?
+Contact your provider if:
+
+You’re having trouble with the Holter monitor you’re using.
+You have a question about how to use the monitor.
+An electrode comes loose.
+You’re having heart-related symptoms that make you feel uneasy or concerned.
+Please note that a medical professional isn’t continually monitoring the findings of this test. You should seek medical care if you develop symptoms.
+
+Additional Common Questions
+Can a Holter monitor detect anxiety?
+If anxiety is causing you to have heart palpitations, a Holter monitor can record them. Your provider will need to analyze the recording to see what kind of palpitations you had. It may be helpful to write down what you’re doing and feeling when you have palpitations.
+
+What’s the difference between an EKG and a Holter monitor?
+An EKG measures your heart’s activity at that moment in time, as you’re having the test. But your heart’s rhythm and symptoms can change throughout the day.
+
+Your provider may want to see how your heart’s rhythm changes during the day as you do your regular activities. The heart monitor gives your provider a more complete picture of your heart rhythm.
+
+What’s the difference between Holter and event monitoring?
+A Holter monitor records your heart rhythm continuously for 24 or 48 hours. An event monitor isn’t continuous. It only records your heart’s activity when you feel symptoms and activate the monitor.
+
+A note from Cleveland Clinic
+What’s causing your heart flutters, racing heart or dizziness? Not knowing the cause is frustrating. A Holter monitor may help you find out. While it may take a little getting used to, this small, painless device is something you only wear for a day or so. After that, you’re one step closer to a diagnosis and feeling better.
