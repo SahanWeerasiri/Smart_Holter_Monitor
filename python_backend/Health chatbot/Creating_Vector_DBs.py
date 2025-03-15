@@ -6,7 +6,7 @@ from langchain_community.document_loaders import DirectoryLoader, TextLoader
 
 def create_vector_db_from_datasets():
     script_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-    datasets_path = os.path.join(script_dir,"Intellihack_Cognic_AI_03", "datasets")
+    datasets_path = os.path.join(script_dir,"Health chatbot", "resources")
     
     # Load all .md files from the datasets directory using TextLoader with encoding fallback
     loader = DirectoryLoader(
@@ -42,16 +42,20 @@ def create_vector_db_from_datasets():
             print(f"Error processing document: {e}")
             continue
     
+    # Check if there are any chunks before creating vector store
+    if not all_chunks:
+        raise ValueError("No text chunks were generated. Please check if the documents contain valid text content.")
+        
     # Create a single vector store
     vector_store = FAISS.from_texts(all_chunks, embeddings)
     print("Created a single vector store for all documents")
     
     # Save the vector store
-    vector_dbs_dir = os.path.join(script_dir, "Vector_DB")
+    vector_dbs_dir = os.path.join(script_dir, "Health chatbot","Vector_DB")
     os.makedirs(vector_dbs_dir, exist_ok=True)
-    save_path = os.path.join(vector_dbs_dir, "all_documents_vector_store")
+    save_path = os.path.join(vector_dbs_dir)
     vector_store.save_local(save_path)
-    print(f"Vector store 'all_documents' saved in '{vector_dbs_dir}'")
+    print(f"Vector store saved in '{vector_dbs_dir}'")
     
     return vector_store
 
