@@ -6,6 +6,8 @@ def chat_with_bot():
     session = requests.Session()
     
     print("Chat with the cricket team selection assistant (type 'quit' to exit)")
+    print("Select language (english/sinhala/tamil):")
+    language = input().lower().strip()
     print("=" * 50)
     
     while True:
@@ -21,7 +23,10 @@ def chat_with_bot():
             # Send request to chat endpoint
             response = session.post(
                 url,
-                json={"message": user_message}
+                json={
+                    "message": user_message,
+                    "language": language
+                }
             )
             
             # Check if request was successful
