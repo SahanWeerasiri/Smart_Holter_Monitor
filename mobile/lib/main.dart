@@ -1,32 +1,38 @@
-import 'package:firebase_app_check/firebase_app_check.dart';
+// import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:firebase_core/firebase_core.dart';
+// import 'package:provider/provider.dart';
+// import 'package:firebase_core/firebase_core.dart';
 // import 'package:smartcare/firebase_options.dart';
-import 'package:smartcare/providers/auth_provider.dart';
-import 'package:smartcare/providers/patient_provider.dart';
+// import 'package:smartcare/providers/auth_provider.dart';
+// import 'package:smartcare/providers/patient_provider.dart';
 import 'package:smartcare/screens/splash_screen.dart';
-import 'package:smartcare/services/firebase_service.dart';
+// import 'package:smartcare/services/firebase_service.dart';
+import 'package:smartcare/services/mongo_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  // await Firebase.initializeApp();
 
-  // Activate App Check with Play Integrity (no reCAPTCHA for web)
-  FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.instance;
-  await firebaseAppCheck.activate();
+  // // Activate App Check with Play Integrity (no reCAPTCHA for web)
+  // FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.instance;
+  // await firebaseAppCheck.activate();
 
-  final firebaseService = FirebaseService();
+  // final firebaseService = FirebaseService();
 
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider(firebaseService)),
-        ChangeNotifierProvider(create: (_) => PatientProvider(firebaseService)),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  // runApp(
+  //   MultiProvider(
+  //     providers: [
+  //       ChangeNotifierProvider(create: (_) => AuthProvider(firebaseService)),
+  //       ChangeNotifierProvider(create: (_) => PatientProvider(firebaseService)),
+  //     ],
+  //     child: const MyApp(),
+  //   ),
+  // );
+
+  final mongoService = MongoService();
+  await mongoService.connect();
+
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
