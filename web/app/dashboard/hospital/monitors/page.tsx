@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { PlusCircle, Trash2, Search, Info, CheckCircle2, Clock, AlertTriangle, Loader2, PlusCircleIcon } from "lucide-react"
+import { PlusCircle, Trash2, Search, Info, CheckCircle2, Clock, AlertTriangle, Loader2, PlusCircleIcon, MinusCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dialog"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useToast } from "@/components/ui/use-toast"
-import { getHolterMonitors, addHolterMonitor, deleteHolterMonitor, assignHolterMonitor } from "@/lib/firebase/firestore"
+import { getHolterMonitors, addHolterMonitor, deleteHolterMonitor, assignHolterMonitor, removeHolterMonitor } from "@/lib/firebase/firestore"
 import { onValue, ref, set } from "firebase/database"
 import { auth, db, rtdb } from "@/lib/firebase/config"
 import { collection, getDocs, query, where } from "firebase/firestore"
@@ -235,6 +235,10 @@ export default function HospitalMonitorsPage() {
         set(monitorRef, 2)
         setIsShowing(true);
         setSelectedMonitor(monitorId)
+    };
+
+    const handleDeviceAssignmentReverse = async (monitorId: string) => {
+        await removeHolterMonitor(monitorId)
     };
 
     const filteredMonitors = monitors.filter(
@@ -497,6 +501,30 @@ export default function HospitalMonitorsPage() {
                                                             {monitor.status === "available"
                                                                 ? "Assign device"
                                                                 : "Cannot assign a device to a monitor in use"}
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() => handleDeviceAssignmentReverse(monitor.id)}
+                                                                disabled={monitor.status === "available"}
+                                                                className={
+                                                                    monitor.status !== "available"
+                                                                        ? "opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                        : "opacity-50 cursor-not-allowed"
+                                                                }
+                                                            >
+                                                                <MinusCircle className="h-4 w-4 text-blue-500" /> {/* Use an appropriate icon */}
+                                                            </Button>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            {monitor.status !== "available"
+                                                                ? "Remove device"
+                                                                : "Cannot remove a device without a device"}
                                                         </TooltipContent>
                                                     </Tooltip>
                                                 </TooltipProvider>

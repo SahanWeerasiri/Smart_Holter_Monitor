@@ -645,6 +645,7 @@ export const assignHolterMonitor = async (patientId: string, monitorId: string) 
       assigned: 1,
       deadline: deadline.getTime(),
       isDone: false,
+      data: [{ "2025-03-16 21:21:30": 5 }]
     })
 
     // Update patient in Firestore
@@ -664,41 +665,67 @@ export const assignHolterMonitor = async (patientId: string, monitorId: string) 
   }
 }
 
-export const removeHolterMonitor = async (patientId: string) => {
+export const removeHolterMonitor = async (monitorId: string) => {
   try {
-    logOperation("Removing holter monitor", { patientId })
-
     // Get the patient
-    const patientDoc = await getDoc(doc(db, "user_accounts", patientId))
-    if (!patientDoc.exists()) {
-      logOperation("Patient not found", { patientId })
+    const patientQuery = query(collection(db, "user_accounts"), where("deviceId", "==", monitorId));
+    const querySnapshot = await getDocs(patientQuery);
+
+
+
+    if (querySnapshot.empty) {
+      logOperation("Patient not found", { monitorId })
       throw new Error("Patient not found")
     }
+    const patientDoc = querySnapshot.docs[0];
+    const patientId = patientDoc.id;
+    logOperation("Removing holter monitor", { patientId })
 
-    const patientData = patientDoc.data()
-    if (!patientData.monitorId) {
-      logOperation("Patient does not have a monitor assigned", { patientId })
-      throw new Error("Patient does not have a monitor assigned")
-    }
+
+    // const patientData = patientDoc.data()
+    // if (!patientData.monitorId) {
+    //   logOperation("Patient does not have a monitor assigned", { patientId })
+    //   throw new Error("Patient does not have a monitor assigned")
+    // }
 
     // Update device in Realtime Database
-    const deviceRef = ref(rtdb, `devices/${patientData.monitorId}`)
+    const deviceRef = ref(rtdb, `devices/${monitorId}`)
+    const deviceSnapshot = await get(deviceRef);
+    const deviceData = deviceSnapshot.exists() ? deviceSnapshot.val() : {};
+
     await update(deviceRef, {
-      assigned: null,
-      deadline: null,
-      isDone: true,
+      assigned: 0,
+      deadline: "",
+      isDone: false,
     })
 
     // Update patient in Firestore
     await updateDoc(doc(db, "user_accounts", patientId), {
-      monitorId: null,
+      deviceId: "Device",
       assignedDate: null,
+      data: null
     })
+
+    await addDoc(collection(db, "user_accounts", patientId, "data"), {
+      data: deviceData.data, // Correct way to add fetched device data
+      timestamp: new Date(),
+      aiSuggestion: "",
+      title: "",
+      brief: "",
+      doctorId: "",
+      age: "",
+      gender: "",
+      deviceId: monitorId,
+      docSuggestions: "",
+      anomalies: "",
+      isSeen: false,
+      isFinished: false
+    });
 
     await addLog(
       "Holter monitor is removed", `Holter monitor is removed from ${patientId}`, ["hospital", "remove"])
 
-    logOperation("Holter monitor removed", { patientId, monitorId: patientData.monitorId })
+    logOperation("Holter monitor removed", { patientId, monitorId: monitorId })
     return true
   } catch (error) {
     logOperation("Error removing holter monitor", error)
