@@ -60,9 +60,10 @@
     "zod": "^3.24.1",
     "chart.js": "latest",
     "firebase": "latest",
-    "chartjs-plugin-zoom": "latest",
     "ai": "latest",
-    "@ai-sdk/openai": "latest"
+    "@ai-sdk/openai": "latest",
+    "chartjs-plugin-zoom": "latest",
+    "jose": "latest"
   },
   "devDependencies": {
     "@types/node": "^22",

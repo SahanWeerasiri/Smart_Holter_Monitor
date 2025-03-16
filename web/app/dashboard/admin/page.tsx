@@ -15,7 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Plus, Search, Trash2, Edit } from "lucide-react"
+import { Plus, Search, Trash2, Edit } from 'lucide-react'
 import { getUserRole, getDoctors, getHospitals, addDoctor, addHospital } from "@/lib/firebase/firestore"
 import { useRouter } from "next/navigation"
 
@@ -91,34 +91,46 @@ export default function AdminPage() {
 
   const handleAddDoctor = async () => {
     try {
-      if (!newDoctor.name || !newDoctor.email || !newDoctor.password || !newDoctor.hospitalId) {
-        alert("Please fill in all required fields")
+      if (!newDoctor.name || !newDoctor.email || !newDoctor.password) {
+        alert("Please fill in all required fields (name, email, password)")
         return
       }
 
-      const doctorId = await addDoctor({
+      // Create a new doctor with default values if fields are empty
+      const doctorData = {
         name: newDoctor.name,
         email: newDoctor.email,
         password: newDoctor.password,
-        specialization: newDoctor.specialization,
-        hospitalId: newDoctor.hospitalId,
+        specialization: newDoctor.specialization || "General Medicine",
+        hospitalId: newDoctor.hospitalId || "",
         role: "doctor",
-      })
+      }
 
-      const hospital = hospitals.find((h) => h.id === newDoctor.hospitalId)
+      console.log("[ADMIN] Adding new doctor:", doctorData)
+      const doctorId = await addDoctor(doctorData)
+      console.log("[ADMIN] Doctor added with ID:", doctorId)
 
+      // Find hospital name if hospitalId is provided
+      let hospitalName = ""
+      if (newDoctor.hospitalId) {
+        const hospital = hospitals.find((h) => h.id === newDoctor.hospitalId)
+        hospitalName = hospital?.name || ""
+      }
+
+      // Add the new doctor to the local state
       setDoctors([
         ...doctors,
         {
           id: doctorId,
           name: newDoctor.name,
           email: newDoctor.email,
-          specialization: newDoctor.specialization,
-          hospitalId: newDoctor.hospitalId,
-          hospitalName: hospital?.name || "",
+          specialization: newDoctor.specialization || "General Medicine",
+          hospitalId: newDoctor.hospitalId || "",
+          hospitalName: hospitalName,
         },
       ])
 
+      // Reset the form
       setNewDoctor({
         name: "",
         email: "",
@@ -129,7 +141,7 @@ export default function AdminPage() {
       setIsAddDoctorDialogOpen(false)
     } catch (error) {
       console.error("Error adding doctor:", error)
-      alert("Failed to add doctor")
+      alert("Failed to add doctor: " + (error instanceof Error ? error.message : String(error)))
     }
   }
 
@@ -312,7 +324,18 @@ export default function AdminPage() {
                 {filteredDoctors.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} className="h-24 text-center">
-                      No doctors found.
+                      <div className="flex flex-col items-center justify-center py-4">
+                        <p className="mb-2 text-muted-foreground">No doctors found</p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setIsAddDoctorDialogOpen(true)}
+                          className="mt-2"
+                        >
+                          <Plus className="mr-2 h-4 w-4" />
+                          Add Your First Doctor
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -320,8 +343,8 @@ export default function AdminPage() {
                     <TableRow key={doctor.id}>
                       <TableCell className="font-medium">{doctor.name}</TableCell>
                       <TableCell>{doctor.email}</TableCell>
-                      <TableCell>{doctor.specialization}</TableCell>
-                      <TableCell>{doctor.hospitalName}</TableCell>
+                      <TableCell>{doctor.specialization || "Not specified"}</TableCell>
+                      <TableCell>{doctor.hospitalName || "Not assigned"}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           <Button variant="ghost" size="icon">
@@ -416,7 +439,18 @@ export default function AdminPage() {
                 {filteredHospitals.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={4} className="h-24 text-center">
-                      No hospitals found.
+                      <div className="flex flex-col items-center justify-center py-4">
+                        <p className="mb-2 text-muted-foreground">No hospitals found</p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setIsAddHospitalDialogOpen(true)}
+                          className="mt-2"
+                        >
+                          <Plus className="mr-2 h-4 w-4" />
+                          Add Your First Hospital
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -446,4 +480,3 @@ export default function AdminPage() {
     </div>
   )
 }
-

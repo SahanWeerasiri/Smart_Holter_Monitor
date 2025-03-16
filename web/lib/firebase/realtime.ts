@@ -1,5 +1,10 @@
+import { ref, get, update, push, onValue, off } from "firebase/database"
+import { rtdb, logOperation } from "./config"
+
 // Generate mock heart rate data for demo purposes
-const generateMockHeartRateData = (startHour: number, endHour: number) => {
+export const generateMockHeartRateData = (startHour: number, endHour: number) => {
+  logOperation("Generating mock heart rate data", { startHour, endHour })
+
   const channel1 = []
   const channel2 = []
   const channel3 = []
@@ -61,37 +66,154 @@ const generateMockHeartRateData = (startHour: number, endHour: number) => {
   return { channel1, channel2, channel3 }
 }
 
-export const getHeartRateData = async (startHour: number, endHour: number) => {
+export const getHeartRateData = async (deviceId: string, startHour: number, endHour: number) => {
   try {
-    // In a real application, you would fetch data from Firebase Realtime Database
-    // For demo purposes, we'll generate mock data
+    logOperation("Getting heart rate data", { deviceId, startHour, endHour })
 
-    // This is how you would fetch real data from Firebase:
-    /*
-    const startTime = new Date();
-    startTime.setHours(startHour, 0, 0, 0);
-    
-    const endTime = new Date();
-    endTime.setHours(endHour, 0, 0, 0);
-    
-    const heartRateRef = ref(rtdb, 'heartRateData');
-    const heartRateQuery = query(
-      heartRateRef,
-      orderByChild('timestamp'),
-      startAt(startTime.getTime()),
-      endAt(endTime.getTime())
-    );
-    
-    const snapshot = await get(heartRateQuery);
-    const data = snapshot.val();
-    
-    // Process the data into the format needed for the chart
-    */
+    // Get device data from Realtime Database
+    const deviceRef = ref(rtdb, `devices/${deviceId}/data`)
+    const deviceSnapshot = await get(deviceRef)
 
-    // For demo, return mock data
-    return generateMockHeartRateData(startHour, endHour)
+    if (!deviceSnapshot.exists()) {
+      logOperation("No data found for device", { deviceId })
+      // Return mock data for demo purposes
+      return generateMockHeartRateData(startHour, endHour)
+    }
+
+    const deviceData = deviceSnapshot.val() || []
+
+    // Filter data by time range
+    const startTime = new Date()
+    startTime.setHours(startHour, 0, 0, 0)
+
+    const endTime = new Date()
+    endTime.setHours(endHour, 0, 0, 0)
+
+    // Process data into channels
+    const channel1 = []
+    const channel2 = []
+    const channel3 = []
+
+    for (const dataPoint of deviceData) {
+      const timestamp = dataPoint.timestamp
+
+      if (timestamp >= startTime.getTime() && timestamp <= endTime.getTime()) {
+        // Split the value into 3 channels (for demo purposes)
+        const value = dataPoint.value
+
+        channel1.push({
+          x: timestamp,
+          y: value * 0.5,
+        })
+
+        channel2.push({
+          x: timestamp,
+          y: value * 0.75,
+        })
+
+        channel3.push({
+          x: timestamp,
+          y: value,
+        })
+      }
+    }
+
+    // If no data points found in the time range, return mock data
+    if (channel1.length === 0) {
+      logOperation("No data found in time range, using mock data", { deviceId, startHour, endHour })
+      return generateMockHeartRateData(startHour, endHour)
+    }
+
+    logOperation("Heart rate data retrieved", { deviceId, dataPoints: channel1.length })
+    return { channel1, channel2, channel3 }
   } catch (error) {
-    console.error("Error fetching heart rate data:", error)
+    logOperation("Error getting heart rate data", error)
+    // Return mock data for demo purposes
+    return generateMockHeartRateData(startHour, endHour)
+  }
+}
+
+export const addDeviceDataPoint = async (deviceId: string, value: number) => {
+  try {
+    logOperation("Adding device data point", { deviceId, value })
+
+    // Get device reference
+    const deviceRef = ref(rtdb, `devices/${deviceId}/data`)
+
+    // Add new data point
+    const newDataPoint = {
+      timestamp: Date.now(),
+      value: value,
+    }
+
+    await push(deviceRef, newDataPoint)
+    logOperation("Device data point added", { deviceId })
+
+    return true
+  } catch (error) {
+    logOperation("Error adding device data point", error)
+    throw error
+  }
+}
+
+export const subscribeToDeviceData = (deviceId: string, callback: (data: any) => void) => {
+  logOperation("Subscribing to device data", { deviceId })
+
+  const deviceRef = ref(rtdb, `devices/${deviceId}/data`)
+
+  onValue(deviceRef, (snapshot) => {
+    const data = snapshot.val() || []
+    callback(data)
+  })
+
+  // Return unsubscribe function
+  return () => {
+    logOperation("Unsubscribing from device data", { deviceId })
+    off(deviceRef)
+  }
+}
+
+export const getDeviceDetails = async (deviceId: string) => {
+  try {
+    logOperation("Getting device details", { deviceId })
+
+    const deviceRef = ref(rtdb, `devices/${deviceId}`)
+    const deviceSnapshot = await get(deviceRef)
+
+    if (!deviceSnapshot.exists()) {
+      logOperation("Device not found", { deviceId })
+      throw new Error("Device not found")
+    }
+
+    const deviceData = deviceSnapshot.val()
+    logOperation("Device details retrieved", { deviceId })
+
+    return {
+      id: deviceId,
+      use: deviceData.use || "",
+      assigned: deviceData.assigned,
+      isDone: deviceData.isDone || false,
+      hospitalId: deviceData.hospitalId || "",
+      deadline: deviceData.deadline,
+      other: deviceData.other || "",
+    }
+  } catch (error) {
+    logOperation("Error getting device details", error)
+    throw error
+  }
+}
+
+export const updateDeviceDetails = async (deviceId: string, details: any) => {
+  try {
+    logOperation("Updating device details", { deviceId })
+
+    const deviceRef = ref(rtdb, `devices/${deviceId}`)
+    await update(deviceRef, details)
+
+    logOperation("Device details updated", { deviceId })
+    return true
+  } catch (error) {
+    logOperation("Error updating device details", error)
     throw error
   }
 }

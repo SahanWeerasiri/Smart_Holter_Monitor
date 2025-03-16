@@ -6,24 +6,24 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <header className="px-4 lg:px-6 h-16 flex items-center border-b">
         <Link href="/" className="flex items-center justify-center">
-          <span className="font-bold text-xl">SmartCare</span>
+          <span className="font-bold text-xl text-primary">SmartCare</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link href="/login" className="text-sm font-medium hover:underline underline-offset-4">
+          <Link href="/login" className="text-sm font-medium hover:text-primary hover:underline underline-offset-4">
             Login
           </Link>
         </nav>
       </header>
       <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
+        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-b from-blue-50 to-white">
           <div className="container px-4 md:px-6">
             <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
-                  <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
+                  <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none text-blue-900">
                     Advanced Patient Monitoring System
                   </h1>
-                  <p className="max-w-[600px] text-muted-foreground md:text-xl">
+                  <p className="max-w-[600px] text-blue-700 md:text-xl">
                     Monitor patients, create reports, and manage holter monitors with our comprehensive healthcare
                     solution.
                   </p>
@@ -46,12 +46,12 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-blue-50">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Key Features</h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-blue-900">Key Features</h2>
+                <p className="max-w-[900px] text-blue-700 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                   Our platform provides comprehensive tools for healthcare professionals
                 </p>
               </div>
@@ -75,8 +75,8 @@ export default function Home() {
                   </svg>
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-xl font-bold">Patient Monitoring</h3>
-                  <p className="text-muted-foreground">
+                  <h3 className="text-xl font-bold text-blue-900">Patient Monitoring</h3>
+                  <p className="text-blue-700">
                     Real-time monitoring of patient vitals and holter data with alerts for critical conditions.
                   </p>
                 </div>
@@ -101,8 +101,8 @@ export default function Home() {
                   </svg>
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-xl font-bold">Device Management</h3>
-                  <p className="text-muted-foreground">
+                  <h3 className="text-xl font-bold text-blue-900">Device Management</h3>
+                  <p className="text-blue-700">
                     Efficiently manage holter monitors, track usage, and assign devices to patients.
                   </p>
                 </div>
@@ -129,8 +129,8 @@ export default function Home() {
                   </svg>
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-xl font-bold">Comprehensive Reports</h3>
-                  <p className="text-muted-foreground">
+                  <h3 className="text-xl font-bold text-blue-900">Comprehensive Reports</h3>
+                  <p className="text-blue-700">
                     Generate detailed reports on patient health data and device utilization.
                   </p>
                 </div>

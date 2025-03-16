@@ -3,58 +3,29 @@
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Activity, Users, Stethoscope, Clock } from "lucide-react"
-import { getDashboardStats } from "@/lib/firebase/firestore"
-import { collection, getDocs } from "firebase/firestore"
-import { db, rtdb } from "@/lib/firebase/config"
-import { onValue, ref } from "firebase/database"
-import { set } from "date-fns"
+import { UserCog, Users, Stethoscope, Clock } from "lucide-react"
+import { getHospitalStats } from "@/lib/firebase/firestore"
 
-export default function DashboardPage() {
+export default function HospitalDashboardPage() {
   const [stats, setStats] = useState({
+    totalDoctors: 0,
     totalPatients: 0,
     activeMonitors: 0,
     availableMonitors: 0,
-    pendingReports: 0,
   })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const dashboardStats = await getDashboardStats()
-        setStats(dashboardStats)
+        const hospitalStats = await getHospitalStats()
+        setStats(hospitalStats)
       } catch (error) {
-        console.error("Error fetching dashboard stats:", error)
+        console.error("Error fetching hospital stats:", error)
       } finally {
         setLoading(false)
       }
     }
-
-    const realTimeStatsListener = () => {
-      const tempD = ref(rtdb, "devices");
-      let total = 0;
-      let inUse = 0;
-      // Listen for real-time updates
-      onValue(tempD, (snapshot) => {
-        total = snapshot.size; // Correct way to get total count
-        inUse = 0; // Reset count before iterating
-        snapshot.forEach((childSnapshot) => {
-          if (childSnapshot.val()['assigned'] === 0) { // Ensure strict comparison
-            inUse++;
-          }
-        });
-        // console.log(inUse)
-        setStats(
-          {
-            ...stats,
-            activeMonitors: inUse,
-            availableMonitors: total - inUse,
-          })
-      }
-      );
-    }
-    realTimeStatsListener()
 
     fetchStats()
   }, [])
@@ -70,11 +41,21 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">Overview of your SmartCare system</p>
+        <h1 className="text-3xl font-bold tracking-tight">Hospital Dashboard</h1>
+        <p className="text-muted-foreground">Overview of your hospital's SmartCare system</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Doctors</CardTitle>
+            <UserCog className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalDoctors}</div>
+            <p className="text-xs text-muted-foreground">Registered in your hospital</p>
+          </CardContent>
+        </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Patients</CardTitle>
@@ -82,13 +63,13 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalPatients}</div>
-            <p className="text-xs text-muted-foreground">Registered in the system</p>
+            <p className="text-xs text-muted-foreground">Under your hospital's care</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Active Monitors</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
+            <Stethoscope className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.activeMonitors}</div>
@@ -98,21 +79,11 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Available Monitors</CardTitle>
-            <Stethoscope className="h-4 w-4 text-muted-foreground" />
+            <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.availableMonitors}</div>
             <p className="text-xs text-muted-foreground">Ready for assignment</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Reports</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.pendingReports}</div>
-            <p className="text-xs text-muted-foreground">Awaiting review</p>
           </CardContent>
         </Card>
       </div>
@@ -120,15 +91,15 @@ export default function DashboardPage() {
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="reports">Recent Reports</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="doctors">Doctors</TabsTrigger>
+          <TabsTrigger value="patients">Patients</TabsTrigger>
+          <TabsTrigger value="monitors">Monitors</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>Monitor the latest activities in your system</CardDescription>
+              <CardTitle>Hospital Activity</CardTitle>
+              <CardDescription>Monitor the latest activities in your hospital</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -138,7 +109,9 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex-1 space-y-1">
                     <p className="text-sm font-medium leading-none">New holter monitor assigned</p>
-                    <p className="text-sm text-muted-foreground">Device HM-2023-45 assigned to patient John Doe</p>
+                    <p className="text-sm text-muted-foreground">
+                      Device HM-2023-45 assigned to patient John Doe by Dr. Smith
+                    </p>
                   </div>
                   <div className="text-sm text-muted-foreground">2h ago</div>
                 </div>
@@ -148,17 +121,17 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex-1 space-y-1">
                     <p className="text-sm font-medium leading-none">New patient registered</p>
-                    <p className="text-sm text-muted-foreground">Jane Smith was added to the system</p>
+                    <p className="text-sm text-muted-foreground">Jane Smith was added to the system by Dr. Johnson</p>
                   </div>
                   <div className="text-sm text-muted-foreground">5h ago</div>
                 </div>
                 <div className="flex items-center">
                   <div className="mr-4 rounded-full bg-primary/10 p-2">
-                    <Activity className="h-4 w-4 text-primary" />
+                    <UserCog className="h-4 w-4 text-primary" />
                   </div>
                   <div className="flex-1 space-y-1">
-                    <p className="text-sm font-medium leading-none">Abnormal heart activity detected</p>
-                    <p className="text-sm text-muted-foreground">Patient Michael Johnson - Device HM-2023-32</p>
+                    <p className="text-sm font-medium leading-none">New doctor onboarded</p>
+                    <p className="text-sm text-muted-foreground">Dr. Michael Brown joined the cardiology department</p>
                   </div>
                   <div className="text-sm text-muted-foreground">1d ago</div>
                 </div>
@@ -166,36 +139,36 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="analytics" className="space-y-4">
+        <TabsContent value="doctors" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Analytics</CardTitle>
-              <CardDescription>View detailed analytics of your system</CardDescription>
+              <CardTitle>Doctors Overview</CardTitle>
+              <CardDescription>View detailed information about your hospital's doctors</CardDescription>
             </CardHeader>
             <CardContent className="h-[300px] flex items-center justify-center">
-              <p className="text-muted-foreground">Analytics charts will be displayed here</p>
+              <p className="text-muted-foreground">Doctors information will be displayed here</p>
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="reports" className="space-y-4">
+        <TabsContent value="patients" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Recent Reports</CardTitle>
-              <CardDescription>View recently generated reports</CardDescription>
+              <CardTitle>Patients Overview</CardTitle>
+              <CardDescription>View detailed information about your hospital's patients</CardDescription>
             </CardHeader>
             <CardContent className="h-[300px] flex items-center justify-center">
-              <p className="text-muted-foreground">Recent reports will be displayed here</p>
+              <p className="text-muted-foreground">Patients information will be displayed here</p>
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="notifications" className="space-y-4">
+        <TabsContent value="monitors" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Notifications</CardTitle>
-              <CardDescription>Manage your notifications</CardDescription>
+              <CardTitle>Monitors Overview</CardTitle>
+              <CardDescription>View detailed information about your hospital's holter monitors</CardDescription>
             </CardHeader>
             <CardContent className="h-[300px] flex items-center justify-center">
-              <p className="text-muted-foreground">Notifications will be displayed here</p>
+              <p className="text-muted-foreground">Monitors information will be displayed here</p>
             </CardContent>
           </Card>
         </TabsContent>

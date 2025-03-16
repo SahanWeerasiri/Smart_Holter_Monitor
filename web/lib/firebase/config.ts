@@ -2,9 +2,9 @@ import { initializeApp, getApps } from "firebase/app"
 import { getFirestore } from "firebase/firestore"
 import { getDatabase } from "firebase/database"
 import { getStorage } from "firebase/storage"
+import { getAuth } from "firebase/auth"
 
 // Your Firebase configuration
-// Replace with your actual Firebase project configuration
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -20,4 +20,11 @@ export const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getA
 export const db = getFirestore(app)
 export const rtdb = getDatabase(app)
 export const storage = getStorage(app)
+export const auth = getAuth(app)
+
+// Logging function for Firebase operations
+export const logOperation = (operation: string, details: any) => {
+  console.log(`[FIREBASE] ${operation}:`, details)
+  // In a production app, you might want to send logs to a service like Firebase Analytics
+}
 
