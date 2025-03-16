@@ -9,6 +9,7 @@ class AuthService {
   Future<Map<String, dynamic>> createUserWithEmailAndPassword(
       String name, String email, String password, String birthday) async {
     try {
+      print('${[name, email, password, birthday]}');
       final cred = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       Map<String, dynamic> res =
