@@ -71,12 +71,12 @@ export function SidebarNav({ className, closeMobileMenu }: SidebarNavProps) {
 
     if (role === "admin") {
         navItems = [
-            {
-                name: "Dashboard",
-                href: "/dashboard/admin",
-                icon: LayoutDashboard,
-                active: pathname === "/dashboard/admin",
-            },
+            // {
+            //     name: "Dashboard",
+            //     href: "/dashboard/admin",
+            //     icon: LayoutDashboard,
+            //     active: pathname === "/dashboard/admin",
+            // },
             {
                 name: "Doctors",
                 href: "/dashboard/admin/doctors",

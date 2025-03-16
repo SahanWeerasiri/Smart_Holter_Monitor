@@ -11,6 +11,7 @@ import {
   limit,
   setDoc,
   collectionGroup,
+  deleteDoc,
 } from "firebase/firestore"
 import { ref, get, set, update, remove } from "firebase/database"
 import { db, rtdb, logOperation } from "./config"
@@ -1270,17 +1271,41 @@ export const getHospitals = async () => {
 
     const hospitalsQuery = query(collection(db, "users"), where("role", "==", "hospital"))
     const hospitalsSnapshot = await getDocs(hospitalsQuery)
+    const hospitals = []
+    for (const hospitalDoc of hospitalsSnapshot.docs) {
+      const doc = hospitalDoc.data()
+      const doctors = query(collection(db, "users"), where("role", "==", "doctor"))
+      const hospitalDoctorsSnapshot = await getDocs(doctors)
+      let count = 0
+      for (const doctorDoc of hospitalDoctorsSnapshot.docs) {
+        if (doctorDoc.get("hospitalId") === hospitalDoc.id) {
+          count++
+        }
+      }
 
-    const hospitals = hospitalsSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      name: doc.data().name,
-      address: doc.data().address || "",
-      contactNumber: doc.data().mobile || "",
-      email: doc.data().email || "",
-      description: doc.data().description || "",
-      createdAt: doc.data().createdAt ? new Date(doc.data().createdAt) : new Date(),
-      pic: doc.data().pic || "",
-    }))
+      logOperation("Hospital doctors retrieved", { count: count })
+      hospitals.push({
+        id: doc.id,
+        name: doc.name,
+        address: doc.address || "",
+        contactNumber: doc.mobile || "",
+        email: doc.email || "",
+        description: doc.description || "",
+        createdAt: doc.createdAt ? new Date(doc.createdAt) : new Date(),
+        pic: doc.pic || "",
+        doctorCount: hospitalDoctorsSnapshot.size,
+      })
+    }
+    // const hospitals = hospitalsSnapshot.docs.map((doc) => ({
+    //   id: doc.id,
+    //   name: doc.data().name,
+    //   address: doc.data().address || "",
+    //   contactNumber: doc.data().mobile || "",
+    //   email: doc.data().email || "",
+    //   description: doc.data().description || "",
+    //   createdAt: doc.data().createdAt ? new Date(doc.data().createdAt) : new Date(),
+    //   pic: doc.data().pic || "",
+    // }))
 
     logOperation("Hospitals retrieved", { count: hospitals.length })
     return hospitals
@@ -1470,3 +1495,26 @@ export const updatePassword = async (currentPassword: string, newPassword: strin
   }
 }
 
+export const removeHospital = async (hospitalId: string) => {
+  try {
+    logOperation("Removing hospital", {
+      uid: hospitalId,
+    })
+    const hospitalDoc = await getDoc(doc(db, "users", hospitalId))
+    if (!hospitalDoc.exists()) {
+      logOperation("Hospital not found", {
+        uid: hospitalId,
+      })
+      throw new Error("Hospital not found")
+    }
+    const hospitalData = deleteDoc(doc(db, "users", hospitalId))
+    logOperation("Hospital removed", {
+      uid: hospitalId,
+    })
+
+    return hospitalData;
+  } catch (error) {
+    logOperation("Error removing hospital", error)
+    throw error
+  }
+}

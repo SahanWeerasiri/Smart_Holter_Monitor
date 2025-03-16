@@ -347,9 +347,9 @@ export default function AdminPage() {
                       <TableCell>{doctor.hospitalName || "Not assigned"}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="icon">
+                          {/* <Button variant="ghost" size="icon">
                             <Edit className="h-4 w-4" />
-                          </Button>
+                          </Button> */}
                           <Button variant="ghost" size="icon">
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -460,14 +460,14 @@ export default function AdminPage() {
                       <TableCell>{hospital.address}</TableCell>
                       <TableCell>{hospital.contactNumber}</TableCell>
                       <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="icon">
+                        {/* <div className="flex justify-end gap-2"> */}
+                        {/* <Button variant="ghost" size="icon">
                             <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
+                          </Button> */}
+                        <Button variant="ghost" size="icon">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                        {/* </div> */}
                       </TableCell>
                     </TableRow>
                   ))

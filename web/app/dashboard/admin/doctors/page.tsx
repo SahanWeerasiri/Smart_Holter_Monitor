@@ -150,7 +150,7 @@ export default function DoctorsPage() {
                                         <TableHead>Specialization</TableHead>
                                         <TableHead>Hospital</TableHead>
                                         <TableHead>Contact</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
+                                        {/* <TableHead className="text-right">Actions</TableHead> */}
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -191,7 +191,7 @@ export default function DoctorsPage() {
                                                     <span className="text-muted-foreground text-sm">Not provided</span>
                                                 )}
                                             </TableCell>
-                                            <TableCell className="text-right">
+                                            {/* <TableCell className="text-right">
                                                 <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <Button variant="ghost" size="icon" asChild>
                                                         <Link href={`/dashboard/admin/doctors/edit/${doctor.id}`}>
@@ -204,7 +204,7 @@ export default function DoctorsPage() {
                                                         <span className="sr-only">Delete</span>
                                                     </Button>
                                                 </div>
-                                            </TableCell>
+                                            </TableCell> */}
                                         </TableRow>
                                     ))}
                                 </TableBody>

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { getHospitals } from "@/lib/firebase/firestore"
+import { getHospitals, removeHospital } from "@/lib/firebase/firestore"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { Plus, Search, Trash2, Edit, Building2, RefreshCw, MapPin, Phone } from "lucide-react"
 import Link from "next/link"
 import { useToast } from "@/hooks/use-toast"
+import { set } from "date-fns"
 
 interface Hospital {
     id: string
@@ -19,6 +20,7 @@ interface Hospital {
     contactNumber: string
     description: string
     createdAt: Date
+    doctorCount: number
 }
 
 export default function HospitalsPage() {
@@ -66,6 +68,29 @@ export default function HospitalsPage() {
             setIsLoading(false)
         }
     }
+
+    const deleteHospital = (hospitalId: string) => async () => {
+        setIsLoading(true)
+        try {
+            await removeHospital(hospitalId)
+            toast({
+                title: "Success",
+                description: "Hospital deleted successfully.",
+                variant: "destructive",
+            })
+            fetchHospitals()
+        } catch (error) {
+            console.error("[ADMIN] Error deleting hospital:", error)
+            toast({
+                title: "Error",
+                description: "Failed to delete hospital." + (error instanceof Error ? error.message : String(error)),
+                variant: "destructive",
+            })
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
 
     return (
         <div className="space-y-6">
@@ -143,7 +168,7 @@ export default function HospitalsPage() {
                                         <TableHead className="text-right">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
-                                <TableBody>
+                                <TableBody key={hospitals[0].id}>
                                     {filteredHospitals.map((hospital) => (
                                         <TableRow key={hospital.id} className="group">
                                             <TableCell>
@@ -164,18 +189,18 @@ export default function HospitalsPage() {
                                             </TableCell>
                                             <TableCell>
                                                 <Badge variant="outline" className="bg-primary/5">
-                                                    0 Doctors
+                                                    {hospital.doctorCount} Doctors
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <Button variant="ghost" size="icon" asChild>
+                                                    {/* <Button variant="ghost" size="icon" asChild>
                                                         <Link href={`/dashboard/admin/hospitals/edit/${hospital.id}`}>
                                                             <Edit className="h-4 w-4" />
                                                             <span className="sr-only">Edit</span>
                                                         </Link>
-                                                    </Button>
-                                                    <Button variant="ghost" size="icon" className="text-destructive">
+                                                    </Button> */}
+                                                    <Button variant="ghost" size="icon" className="text-destructive" onClick={deleteHospital(hospital.id)}>
                                                         <Trash2 className="h-4 w-4" />
                                                         <span className="sr-only">Delete</span>
                                                     </Button>
