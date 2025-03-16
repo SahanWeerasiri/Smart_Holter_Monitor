@@ -341,6 +341,7 @@ export const getHolterMonitors = async (hospitalId?: string) => {
       monitors.push({
         id: deviceId,
         deviceCode: deviceId,
+        deadline: deviceData.deadline,
         description: deviceData.other || "",
         status: deviceData.assigned == 1 ? "in-use" : deviceData.assigned == 2 ? "pending" : "available",
         assignedTo,
@@ -447,15 +448,12 @@ export const getPatients = async () => {
 
     let patientsQuery
 
-    if (user.role === "admin") {
+    if (user.role === "admin" || user.role === "hospital") {
       // Admin can see all patients
       patientsQuery = query(collection(db, "user_accounts"))
     } else if (user.role === "doctor") {
       // Doctors can only see their patients
       patientsQuery = query(collection(db, "user_accounts"), where("doctorId", "==", user.uid))
-    } else if (user.role === "hospital") {
-      // Hospital can see all patients in their hospital
-      patientsQuery = query(collection(db, "user_accounts"), where("hospitalId", "==", user.uid))
     } else {
       throw new Error("Unauthorized access")
     }
@@ -644,14 +642,14 @@ export const assignHolterMonitor = async (patientId: string, monitorId: string) 
 
     // Update device in Realtime Database
     await update(deviceRef, {
-      assigned: patientId,
+      assigned: 1,
       deadline: deadline.getTime(),
       isDone: false,
     })
 
     // Update patient in Firestore
     await updateDoc(doc(db, "user_accounts", patientId), {
-      monitorId,
+      deviceId: monitorId,
       assignedDate: new Date(),
     })
 

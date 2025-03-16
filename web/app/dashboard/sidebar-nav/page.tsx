@@ -167,12 +167,12 @@ export function SidebarNav({ className, closeMobileMenu }: SidebarNavProps) {
             //     icon: UserCog,
             //     active: pathname.startsWith("/dashboard/hospital/doctors"),
             // },
-            // {
-            //     name: "Patients",
-            //     href: "/dashboard/hospital/patients",
-            //     icon: Users,
-            //     active: pathname.startsWith("/dashboard/hospital/patients"),
-            // },
+            {
+                name: "Patients",
+                href: "/dashboard/hospital/patients",
+                icon: Users,
+                active: pathname.startsWith("/dashboard/hospital/patients"),
+            },
             {
                 name: "Holter Monitors",
                 href: "/dashboard/hospital/monitors",

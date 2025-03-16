@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { PlusCircle, Trash2, Search, Info, CheckCircle2, Clock, AlertTriangle, Loader2 } from "lucide-react"
+import { PlusCircle, Trash2, Search, Info, CheckCircle2, Clock, AlertTriangle, Loader2, PlusCircleIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -22,10 +22,12 @@ import {
 } from "@/components/ui/dialog"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useToast } from "@/components/ui/use-toast"
-import { getHolterMonitors, addHolterMonitor, deleteHolterMonitor } from "@/lib/firebase/firestore"
-import { onValue, ref } from "firebase/database"
+import { getHolterMonitors, addHolterMonitor, deleteHolterMonitor, assignHolterMonitor } from "@/lib/firebase/firestore"
+import { onValue, ref, set } from "firebase/database"
 import { auth, db, rtdb } from "@/lib/firebase/config"
 import { collection, getDocs, query, where } from "firebase/firestore"
+import HospitalPatientsPage from "./patients/page"
+import { useRouter } from "next/navigation"
 
 export default function HospitalMonitorsPage() {
     const [monitors, setMonitors] = useState<any[]>([])
@@ -35,6 +37,8 @@ export default function HospitalMonitorsPage() {
     const [description, setDescription] = useState("")
     const [searchQuery, setSearchQuery] = useState("")
     const [submitting, setSubmitting] = useState(false)
+    const [isShowing, setIsShowing] = useState(false)
+    const [selectedMonitor, setSelectedMonitor] = useState("")
     const { toast } = useToast()
 
     useEffect(() => {
@@ -72,6 +76,12 @@ export default function HospitalMonitorsPage() {
         hospitalId?: string;
         isDone: boolean;
         deadline?: string;
+    }
+
+    const onClose = () => {
+        setIsShowing(false)
+        const monitorRef = ref(rtdb, `devices/${selectedMonitor}/assigned`)
+        set(monitorRef, 0)
     }
 
     const listenHolterMonitors = async () => {
@@ -219,11 +229,18 @@ export default function HospitalMonitorsPage() {
         }
     }
 
+
+    const handleDeviceAssignment = async (monitorId: string) => {
+        const monitorRef = ref(rtdb, `devices/${selectedMonitor}/assigned`)
+        set(monitorRef, 2)
+        setIsShowing(true);
+        setSelectedMonitor(monitorId)
+    };
+
     const filteredMonitors = monitors.filter(
         (monitor) =>
             monitor.deviceCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (monitor.description && monitor.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
-            (monitor.assignedTo && monitor.assignedTo.patientName.toLowerCase().includes(searchQuery.toLowerCase())),
+            (monitor.description && monitor.description.toLowerCase().includes(searchQuery.toLowerCase()))
     )
 
     // Calculate statistics
@@ -231,6 +248,23 @@ export default function HospitalMonitorsPage() {
     const availableMonitors = monitors.filter((m) => m.status === "available").length
     const inUseMonitors = monitors.filter((m) => m.status === "in-use").length
     const completedMonitors = monitors.filter((m) => m.isDone).length
+
+    const onAssignmentDevice = async (patientId: string) => {
+        await assignHolterMonitor(patientId, selectedMonitor)
+        fetchMonitors()
+        setIsShowing(false)
+    }
+
+    if (isShowing) {
+        return (
+            // <div className="flex justify-between items-center mb-6">
+            <HospitalPatientsPage monitorId={selectedMonitor} onClose={onClose} onAssignDevice={onAssignmentDevice} />
+
+        );
+    }
+
+
+
 
     return (
         <div className="space-y-6">
@@ -377,7 +411,7 @@ export default function HospitalMonitorsPage() {
                                         <TableHead>Device Code</TableHead>
                                         <TableHead>Description</TableHead>
                                         <TableHead>Status</TableHead>
-                                        <TableHead>Assigned To</TableHead>
+                                        {/* <TableHead>Assigned To</TableHead> */}
                                         <TableHead>Deadline</TableHead>
                                         <TableHead className="text-right">Actions</TableHead>
                                     </TableRow>
@@ -403,16 +437,16 @@ export default function HospitalMonitorsPage() {
                                                     {monitor.status === "available" ? "Available" : monitor.status === "in-use" ? "In Use" : "Pending"}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell>
+                                            {/* <TableCell>
                                                 {monitor.assignedTo ? (
                                                     <span className="text-sm font-medium">{monitor.assignedTo.patientName}</span>
                                                 ) : (
                                                     "—"
                                                 )}
-                                            </TableCell>
+                                            </TableCell> */}
                                             <TableCell>
-                                                {monitor.assignedTo && monitor.assignedTo.deadline ? (
-                                                    <span className="text-sm">{new Date(monitor.assignedTo.deadline).toLocaleDateString()}</span>
+                                                {monitor.assigned === 1 && monitor.deadline ? (
+                                                    <span className="text-sm">{new Date(monitor.deadline).toLocaleDateString()}</span>
                                                 ) : (
                                                     "—"
                                                 )}
@@ -439,6 +473,30 @@ export default function HospitalMonitorsPage() {
                                                             {monitor.status === "available"
                                                                 ? "Delete monitor"
                                                                 : "Cannot delete a monitor that is in use"}
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() => handleDeviceAssignment(monitor.id)}
+                                                                disabled={monitor.status !== "available"}
+                                                                className={
+                                                                    monitor.status === "available"
+                                                                        ? "opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                        : "opacity-50 cursor-not-allowed"
+                                                                }
+                                                            >
+                                                                <PlusCircle className="h-4 w-4 text-blue-500" /> {/* Use an appropriate icon */}
+                                                            </Button>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            {monitor.status === "available"
+                                                                ? "Assign device"
+                                                                : "Cannot assign a device to a monitor in use"}
                                                         </TooltipContent>
                                                     </Tooltip>
                                                 </TooltipProvider>
