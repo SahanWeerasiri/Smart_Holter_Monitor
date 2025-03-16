@@ -14,7 +14,8 @@ import {
   deleteDoc,
 } from "firebase/firestore"
 import { ref, get, set, update, remove } from "firebase/database"
-import { db, rtdb, logOperation } from "./config"
+import { addLog } from "./realtime"
+import { db, rtdb, logOperation, auth } from "./config"
 import { getCurrentUser } from "./auth"
 import { getAuth } from "firebase/auth"
 import { generateText } from "ai"
@@ -210,18 +211,18 @@ export const getHospitalStats = async () => {
     const user = await getCurrentUser()
     if (!user) throw new Error("User not authenticated")
 
-    logOperation("Getting hospital stats", { hospitalId: user.uid })
+    logOperation("Getting hospital stats", { hospitalId: auth.currentUser?.uid })
 
     // Get doctors for this hospital
     const doctorsQuery = query(
       collection(db, "users"),
       where("role", "==", "doctor"),
-      where("hospitalId", "==", user.uid),
+      where("hospitalId", "==", auth.currentUser?.uid),
     )
     const doctorsSnapshot = await getDocs(doctorsQuery)
 
     // Get patients for this hospital
-    const patientsQuery = query(collection(db, "user_accounts"), where("hospitalId", "==", user.uid))
+    const patientsQuery = query(collection(db, "user_accounts"))
     const patientsSnapshot = await getDocs(patientsQuery)
 
     // Get devices from Realtime Database for this hospital
@@ -234,7 +235,7 @@ export const getHospitalStats = async () => {
     let availableMonitors = 0
 
     Object.entries(devices).forEach(([_, device]: [string, any]) => {
-      if (device.hospitalId === user.uid) {
+      if (device.hospitalId === auth.currentUser?.uid) {
         if (device.assigned) {
           activeMonitors++
         } else {
@@ -299,7 +300,7 @@ export const getHospitalDoctors = async () => {
 }
 
 // Holter monitors - using Realtime Database
-export const getHolterMonitors = async () => {
+export const getHolterMonitors = async (hospitalId?: string) => {
   try {
     logOperation("Getting holter monitors", {})
 
@@ -315,26 +316,33 @@ export const getHolterMonitors = async () => {
 
       // If monitor is assigned to a patient, get patient details
       let assignedTo = undefined
+      if (deviceData.hospitalId !== hospitalId) {
+        continue
+      }
       if (deviceData.assigned) {
         try {
-          const patientDoc = await getDoc(doc(db, "user_accounts", deviceData.assigned))
-          if (patientDoc.exists()) {
-            assignedTo = {
-              patientId: patientDoc.id,
-              patientName: patientDoc.data().name,
-              deadline: deviceData.deadline,
+          const q = query(collection(db, "user_accounts"), where("deviceId", "==", deviceId))
+          const snapshot = await getDocs(q)
+          // const patientDoc = await getDoc(doc(db, "user_accounts", deviceData.assigned))
+          if (!snapshot.empty) {
+            const patientDoc = snapshot.docs[0]
+            if (patientDoc.exists()) {
+              assignedTo = {
+                patientId: patientDoc.id,
+                patientName: patientDoc.data().name,
+                deadline: deviceData.deadline,
+              }
             }
           }
         } catch (error) {
           logOperation("Error getting patient details for monitor", { deviceId, error })
         }
       }
-
       monitors.push({
         id: deviceId,
         deviceCode: deviceId,
-        description: deviceData.use || "",
-        status: deviceData.assigned ? "in-use" : "available",
+        description: deviceData.other || "",
+        status: deviceData.assigned == 1 ? "in-use" : deviceData.assigned == 2 ? "pending" : "available",
         assignedTo,
         hospitalId: deviceData.hospitalId || "",
         isDone: deviceData.isDone || false,
@@ -392,14 +400,17 @@ export const addHolterMonitor = async (monitorData: any) => {
     const deviceRef = ref(rtdb, `devices/${deviceId}`)
 
     await set(deviceRef, {
-      use: monitorData.description,
-      assigned: null,
+      other: monitorData.description,
+      assigned: 0,
       isDone: false,
       hospitalId: user.role === "hospital" ? user.uid : monitorData.hospitalId,
-      deadline: null,
+      deadline: "",
       data: [],
-      other: monitorData.other || "",
+      use: monitorData.other || "",
     })
+
+    await addLog(
+      "Holter monitor added", monitorData.deviceCode, ["hospital", "monitor"])
 
     logOperation("Holter monitor added", { deviceId })
     return deviceId
@@ -416,6 +427,8 @@ export const deleteHolterMonitor = async (monitorId: string) => {
     // Delete device from Realtime Database
     const deviceRef = ref(rtdb, `devices/${monitorId}`)
     await remove(deviceRef)
+    await addLog(
+      "Holter monitor removed", monitorId, ["hospital", "monitor"])
 
     logOperation("Holter monitor deleted", { monitorId })
   } catch (error) {
@@ -642,6 +655,9 @@ export const assignHolterMonitor = async (patientId: string, monitorId: string) 
       assignedDate: new Date(),
     })
 
+    await addLog(
+      "Holter monitor is assigned", `${monitorId} is assigned to ${patientId}`, ["hospital", "assignment"])
+
     logOperation("Holter monitor assigned", { patientId, monitorId })
     return true
   } catch (error) {
@@ -680,6 +696,9 @@ export const removeHolterMonitor = async (patientId: string) => {
       monitorId: null,
       assignedDate: null,
     })
+
+    await addLog(
+      "Holter monitor is removed", `Holter monitor is removed from ${patientId}`, ["hospital", "remove"])
 
     logOperation("Holter monitor removed", { patientId, monitorId: patientData.monitorId })
     return true

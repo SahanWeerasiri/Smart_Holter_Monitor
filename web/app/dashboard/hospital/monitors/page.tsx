@@ -3,7 +3,6 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
 import { PlusCircle, Trash2, Search, Info, CheckCircle2, Clock, AlertTriangle, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
@@ -24,6 +23,9 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useToast } from "@/components/ui/use-toast"
 import { getHolterMonitors, addHolterMonitor, deleteHolterMonitor } from "@/lib/firebase/firestore"
+import { onValue, ref } from "firebase/database"
+import { auth, db, rtdb } from "@/lib/firebase/config"
+import { collection, getDocs, query, where } from "firebase/firestore"
 
 export default function HospitalMonitorsPage() {
     const [monitors, setMonitors] = useState<any[]>([])
@@ -34,16 +36,17 @@ export default function HospitalMonitorsPage() {
     const [searchQuery, setSearchQuery] = useState("")
     const [submitting, setSubmitting] = useState(false)
     const { toast } = useToast()
-    const router = useRouter()
 
     useEffect(() => {
         fetchMonitors()
+        listenHolterMonitors()
     }, [])
 
     const fetchMonitors = async () => {
         try {
             setLoading(true)
-            const monitorsData = await getHolterMonitors()
+            const monitorsData = await getHolterMonitors(auth.currentUser?.uid)
+            console.log("Fetched monitors:", monitorsData)
             setMonitors(monitorsData)
         } catch (error) {
             console.error("Error fetching monitors:", error)
@@ -56,6 +59,100 @@ export default function HospitalMonitorsPage() {
             setLoading(false)
         }
     }
+
+    interface AssignedTo {
+        patientId: string;
+        patientName: string;
+        deadline: string;
+    }
+
+    interface Device {
+        other: string;
+        assigned: number;
+        hospitalId?: string;
+        isDone: boolean;
+        deadline?: string;
+    }
+
+    const listenHolterMonitors = async () => {
+        setMonitors([]); // Clear monitors on start
+
+        const devicesRef = ref(rtdb, "devices");
+
+        onValue(devicesRef, async (snapshot) => {
+            try {
+                const devices = snapshot.val() || {}; // Devices from RTDB
+                const monitors: Array<{
+                    id: string;
+                    deviceCode: string;
+                    description: string;
+                    status: string;
+                    assignedTo?: AssignedTo;
+                    hospitalId: string;
+                    isDone: boolean;
+                }> = [];
+
+                // Iterate over devices
+                for (const [deviceId, device] of Object.entries(devices)) {
+                    const deviceData = device as Device; // Cast to Device type
+                    let assignedTo: AssignedTo | undefined = undefined;
+                    console.log(auth.currentUser?.uid)
+                    if (deviceData.hospitalId != auth.currentUser?.uid) {
+                        continue;
+                    }
+                    if (deviceData.assigned === 1) { // If device is assigned
+                        try {
+                            const q = query(collection(db, "user_accounts"), where("deviceId", "==", deviceId));
+                            const snapshot = await getDocs(q);
+                            if (!snapshot.empty) {
+                                const patientDoc = snapshot.docs[0];
+                                assignedTo = {
+                                    patientId: patientDoc.id,
+                                    patientName: patientDoc.data().name || "Unknown", // Safe check for name
+                                    deadline: deviceData.deadline || "N/A",
+                                };
+                            }
+                        } catch (error) {
+                            console.error("Error fetching user data:", error);
+                        }
+                    }
+
+                    monitors.push({
+                        id: deviceId,
+                        deviceCode: deviceId,
+                        description: deviceData.other,
+                        status: deviceData.assigned === 1
+                            ? "in-use"
+                            : deviceData.assigned === 2
+                                ? "pending"
+                                : "available",
+                        assignedTo,
+                        hospitalId: deviceData.hospitalId || "",
+                        isDone: deviceData.isDone || false,
+                    });
+                }
+
+                setMonitors(monitors); // Update state with the fetched monitors
+            } catch (error) {
+                console.error("Error processing devices:", error);
+                toast({
+                    title: "Error",
+                    description: "An error occurred while processing devices. Please try again.",
+                    variant: "destructive",
+                });
+            }
+        }, (error) => {
+            console.error("Error with Firebase Realtime Database listener:", error);
+            toast({
+                title: "Error",
+                description: "An error occurred while fetching device data. Please try again.",
+                variant: "destructive",
+            });
+        });
+    };
+
+
+
 
     const handleAddMonitor = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -98,6 +195,7 @@ export default function HospitalMonitorsPage() {
             setSubmitting(false)
         }
     }
+
 
     const handleDeleteMonitor = async (monitorId: string) => {
         if (!confirm("Are you sure you want to delete this monitor?")) {
@@ -291,14 +389,18 @@ export default function HospitalMonitorsPage() {
                                             <TableCell>{monitor.description || "—"}</TableCell>
                                             <TableCell>
                                                 <Badge
-                                                    variant={monitor.status === "available" ? "outline" : "default"}
+                                                    variant={
+                                                        monitor.status === "available" ? "outline" : monitor.status === "in-use" ? "default" : "secondary"
+                                                    }
                                                     className={
                                                         monitor.status === "available"
                                                             ? "bg-green-50 text-green-700 hover:bg-green-50 hover:text-green-700"
-                                                            : "bg-blue-100 text-blue-800 hover:bg-blue-100 hover:text-blue-800"
+                                                            : monitor.status === "in-use"
+                                                                ? "bg-blue-100 text-blue-800 hover:bg-blue-100 hover:text-blue-800"
+                                                                : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100 hover:text-yellow-800"
                                                     }
                                                 >
-                                                    {monitor.status === "available" ? "Available" : "In Use"}
+                                                    {monitor.status === "available" ? "Available" : monitor.status === "in-use" ? "In Use" : "Pending"}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>

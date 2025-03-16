@@ -218,3 +218,25 @@ export const updateDeviceDetails = async (deviceId: string, details: any) => {
   }
 }
 
+export const addLog = async (title: string, description: string, tags: string[]) => {
+  try {
+    logOperation("Adding log", { title, description })
+
+    const logRef = ref(rtdb, `logs`)
+    const newLog = {
+      timestamp: Date.now(),
+      title: title,
+      description: description,
+      tag: tags
+    }
+
+    await push(logRef, newLog)
+    logOperation("Log added", { title, description })
+
+    return true
+  } catch (error) {
+    logOperation("Error adding log", error)
+    throw error
+  }
+}
+

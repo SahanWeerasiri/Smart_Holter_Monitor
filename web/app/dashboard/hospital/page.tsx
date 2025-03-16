@@ -5,11 +5,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { UserCog, Users, Stethoscope, Clock } from "lucide-react"
 import { getHospitalStats } from "@/lib/firebase/firestore"
+import { onValue, ref } from "firebase/database"
+import { auth, rtdb } from "@/lib/firebase/config"
 
 export default function HospitalDashboardPage() {
   const [stats, setStats] = useState({
     totalDoctors: 0,
     totalPatients: 0,
+  })
+  const [stats2, setStats2] = useState({
     activeMonitors: 0,
     availableMonitors: 0,
   })
@@ -20,6 +24,18 @@ export default function HospitalDashboardPage() {
       try {
         const hospitalStats = await getHospitalStats()
         setStats(hospitalStats)
+        onValue(ref(rtdb, "devices"), (snapshot) => {
+          let available = 0
+          for (const key in snapshot.val()) {
+            if (snapshot.val()[key].assigned === 0 && snapshot.val()[key].hospitalId === auth.currentUser?.uid) {
+              available++
+            }
+          }
+          setStats2({
+            activeMonitors: snapshot.size - available,
+            availableMonitors: available,
+          })
+        })
       } catch (error) {
         console.error("Error fetching hospital stats:", error)
       } finally {
@@ -72,7 +88,7 @@ export default function HospitalDashboardPage() {
             <Stethoscope className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.activeMonitors}</div>
+            <div className="text-2xl font-bold">{stats2.activeMonitors}</div>
             <p className="text-xs text-muted-foreground">Currently in use</p>
           </CardContent>
         </Card>
@@ -82,7 +98,7 @@ export default function HospitalDashboardPage() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.availableMonitors}</div>
+            <div className="text-2xl font-bold">{stats2.availableMonitors}</div>
             <p className="text-xs text-muted-foreground">Ready for assignment</p>
           </CardContent>
         </Card>
@@ -91,8 +107,8 @@ export default function HospitalDashboardPage() {
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="doctors">Doctors</TabsTrigger>
-          <TabsTrigger value="patients">Patients</TabsTrigger>
+          {/* <TabsTrigger value="doctors">Doctors</TabsTrigger>
+          <TabsTrigger value="patients">Patients</TabsTrigger> */}
           <TabsTrigger value="monitors">Monitors</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="space-y-4">
@@ -165,13 +181,23 @@ export default function HospitalDashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle>Monitors Overview</CardTitle>
-              <CardDescription>View detailed information about your hospital's holter monitors</CardDescription>
+              <CardDescription>View detailed information about Holter monitors</CardDescription>
             </CardHeader>
-            <CardContent className="h-[300px] flex items-center justify-center">
-              <p className="text-muted-foreground">Monitors information will be displayed here</p>
+            <CardContent className="h-[400px] flex-column items-center justify-center">
+              <p className="mb-4">A Holter monitor is a portable device used for continuous heart activity monitoring, typically for 24 to 48 hours. It records electrical signals from the heart to detect irregularities that may not be captured during a standard ECG.</p>
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">Key Features</h2>
+              <ul className="list-disc pl-5 mb-4">
+                <li>Continuous heart rhythm recording</li>
+                <li>Compact and wearable design</li>
+                <li>Detects arrhythmias and other cardiac anomalies</li>
+                <li>Used for diagnosing heart conditions</li>
+              </ul>
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">Usage</h2>
+              <p>The Holter monitor is attached to the patient’s chest using electrodes. It records the heart's electrical activity while the patient goes about daily activities. After the monitoring period, the recorded data is analyzed by a doctor.</p>
             </CardContent>
           </Card>
         </TabsContent>
+
       </Tabs>
     </div>
   )
