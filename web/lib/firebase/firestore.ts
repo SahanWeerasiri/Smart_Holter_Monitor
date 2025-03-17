@@ -453,7 +453,7 @@ export const getPatients = async () => {
       patientsQuery = query(collection(db, "user_accounts"))
     } else if (user.role === "doctor") {
       // Doctors can only see their patients
-      patientsQuery = query(collection(db, "user_accounts"), where("doctorId", "==", user.uid))
+      patientsQuery = query(collection(db, "user_accounts"), where("docId", "==", user.uid))
     } else {
       throw new Error("Unauthorized access")
     }
@@ -473,14 +473,14 @@ export const getPatients = async () => {
       let monitorCode = undefined
       let monitorStatus = "not_attached"
 
-      if (patientData.monitorId) {
+      if (patientData.deviceId !== "Device") {
         // Get device from Realtime Database
-        const deviceRef = ref(rtdb, `devices/${patientData.monitorId}`)
+        const deviceRef = ref(rtdb, `devices/${patientData.deviceId}`)
         const deviceSnapshot = await get(deviceRef)
 
         if (deviceSnapshot.exists()) {
           const deviceData = deviceSnapshot.val()
-          monitorCode = patientData.monitorId
+          monitorCode = patientData.deviceId
           monitorStatus = deviceData.isDone ? "finished" : "monitoring"
         }
       }
@@ -587,29 +587,11 @@ export const addPatient = async (patientData: any) => {
     logOperation("Adding patient", { name: patientData.name })
 
     // Create patient document in user_accounts collection
-    const patientRef = await addDoc(collection(db, "user_accounts"), {
-      name: patientData.name,
-      age: patientData.age,
-      gender: patientData.gender,
-      mobile: patientData.contactNumber,
-      medicalHistory: patientData.medicalHistory || "",
-      role: "patient",
-      doctorId: user.role === "doctor" ? user.uid : patientData.doctorId,
-      hospitalId: user.role === "hospital" ? user.uid : patientData.hospitalId,
-      createdAt: new Date(),
+    await updateDoc(doc(db, "user_accounts", patientData), {
+      ...patientData,
+      docId: auth.currentUser?.uid,
     })
 
-    // Add emergency contact if provided
-    if (patientData.emergencyContact) {
-      await addDoc(collection(db, "user_accounts", patientRef.id, "emergency"), {
-        name: patientData.emergencyContact.name,
-        mobile: patientData.emergencyContact.mobile,
-      })
-      logOperation("Emergency contact added", { patientId: patientRef.id })
-    }
-
-    logOperation("Patient added", { patientId: patientRef.id })
-    return patientRef.id
   } catch (error) {
     logOperation("Error adding patient", error)
     throw error
@@ -1559,6 +1541,50 @@ export const removeHospital = async (hospitalId: string) => {
     return hospitalData;
   } catch (error) {
     logOperation("Error removing hospital", error)
+    throw error
+  }
+}
+
+export const assignPatientToDoctor = async (patientId: string) => {
+  try {
+    logOperation("Assigning patient to doctor", { patientId })
+    await updateDoc(doc(db, "user_accounts", patientId), {
+      docId: auth.currentUser?.uid,
+    })
+    logOperation("Patient assigned to doctor", { patientId })
+    return true
+  } catch (error) {
+    logOperation("Error assigning patient to doctor", error)
+    throw error
+  }
+}
+
+export const removePatientFromDoctor = async (patientId: string) => {
+  try {
+    logOperation("Removing patient from doctor", { patientId })
+    await updateDoc(doc(db, "user_accounts", patientId), {
+      docId: "",
+    })
+    logOperation("Patient removed from doctor", { patientId })
+    return true
+  } catch (error) {
+    logOperation("Error removing patient from doctor", error)
+    throw error
+  }
+}
+
+
+export const getPatientAll = async () => {
+  try {
+    const user = await getDocs(collection(db, "user_accounts"))
+    const patientData = user.docs.map((doc) => ({
+      value: doc.id,
+      label: doc.get("name")
+    }))
+    return patientData
+
+  } catch (error) {
+    logOperation("Error getting patient", error)
     throw error
   }
 }

@@ -21,10 +21,13 @@ import { useRouter } from "next/navigation"
 import {
   getPatients,
   addPatient,
+  getPatientAll,
   getAvailableHolterMonitors,
   assignHolterMonitor,
   removeHolterMonitor,
 } from "@/lib/firebase/firestore"
+import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 interface Patient {
   id: string
@@ -33,7 +36,7 @@ interface Patient {
   gender: string
   contactNumber: string
   medicalHistory: string
-  status: "not_attached" | "monitoring" | "finished"
+  status: string
   monitorId?: string
   monitorCode?: string
   assignedDate?: string
@@ -46,8 +49,14 @@ interface HolterMonitor {
   description: string
 }
 
+interface allPatients {
+  value: string
+  label: string
+}
+
 export default function PatientsPage() {
   const [patients, setPatients] = useState<Patient[]>([])
+  const [patientsAll, setPatientsAll] = useState<allPatients[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [activeTab, setActiveTab] = useState("all")
@@ -56,23 +65,51 @@ export default function PatientsPage() {
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
   const [availableMonitors, setAvailableMonitors] = useState<HolterMonitor[]>([])
   const [selectedMonitorId, setSelectedMonitorId] = useState("")
-  const [newPatient, setNewPatient] = useState({
-    name: "",
-    age: "",
-    gender: "male",
-    contactNumber: "",
-    medicalHistory: "",
-  })
+  const [newPatient, setNewPatient] = useState("")
   const router = useRouter()
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false)
+
+  // Example patient options - replace with your actual data
+  // const patientOptions = [
+  //   { value: "1|John Doe", label: "John Doe" },
+  //   { value: "2|Jane Smith", label: "Jane Smith" },
+  //   { value: "3|Robert Johnson", label: "Robert Johnson" },
+  //   { value: "4|Emily Davis", label: "Emily Davis" },
+  // ]
+
+  // Filter patients based on search query
+  const filteredPatientsAdd = patientsAll.filter((patient) =>
+    patient.label.toLowerCase().includes(searchQuery.toLowerCase()),
+  )
+
+  // Reset search when dialog closes
+  useEffect(() => {
+    if (!isAddPatientDialogOpen) {
+      setSearchQuery("")
+      setIsPopoverOpen(false)
+    }
+  }, [isAddPatientDialogOpen])
 
   useEffect(() => {
     fetchPatients()
+    fetchAllPatients()
   }, [])
 
   const fetchPatients = async () => {
     try {
       const patientsData = await getPatients()
       setPatients(patientsData)
+    } catch (error) {
+      console.error("Error fetching patients:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchAllPatients = async () => {
+    try {
+      const patientsData = await getPatientAll()
+      setPatientsAll(patientsData)
     } catch (error) {
       console.error("Error fetching patients:", error)
     } finally {
@@ -91,27 +128,11 @@ export default function PatientsPage() {
 
   const handleAddPatient = async () => {
     try {
-      if (!newPatient.name || !newPatient.age || !newPatient.gender || !newPatient.contactNumber) {
-        alert("Please fill in all required fields")
+      if (newPatient.length === 0) {
+        alert("Please select a patient")
         return
       }
-
-      await addPatient({
-        name: newPatient.name,
-        age: Number.parseInt(newPatient.age),
-        gender: newPatient.gender,
-        contactNumber: newPatient.contactNumber,
-        medicalHistory: newPatient.medicalHistory,
-        status: "not_attached",
-      })
-
-      setNewPatient({
-        name: "",
-        age: "",
-        gender: "male",
-        contactNumber: "",
-        medicalHistory: "",
-      })
+      await addPatient(newPatient)
       setIsAddPatientDialogOpen(false)
       fetchPatients()
     } catch (error) {
@@ -119,6 +140,37 @@ export default function PatientsPage() {
       alert("Failed to add patient")
     }
   }
+
+  // const handleAddPatient = async () => {
+  //   try {
+  //     if (!newPatient.name || !newPatient.age || !newPatient.gender || !newPatient.contactNumber) {
+  //       alert("Please fill in all required fields")
+  //       return
+  //     }
+
+  //     await addPatient({
+  //       name: newPatient.name,
+  //       age: Number.parseInt(newPatient.age),
+  //       gender: newPatient.gender,
+  //       contactNumber: newPatient.contactNumber,
+  //       medicalHistory: newPatient.medicalHistory,
+  //       status: "not_attached",
+  //     })
+
+  //     setNewPatient({
+  //       name: "",
+  //       age: "",
+  //       gender: "male",
+  //       contactNumber: "",
+  //       medicalHistory: "",
+  //     })
+  //     setIsAddPatientDialogOpen(false)
+  //     fetchPatients()
+  //   } catch (error) {
+  //     console.error("Error adding patient:", error)
+  //     alert("Failed to add patient")
+  //   }
+  // }
 
   const handleAssignDevice = async () => {
     try {
@@ -192,61 +244,53 @@ export default function PatientsPage() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Add New Patient</DialogTitle>
-              <DialogDescription>Enter the details for the new patient.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="name">Full Name</Label>
+              <div className="relative w-full">
                 <Input
-                  id="name"
-                  value={newPatient.name}
-                  onChange={(e) => setNewPatient({ ...newPatient, name: e.target.value })}
-                  placeholder="John Doe"
+                  placeholder="Search or select a patient"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value)
+                    if (!isPopoverOpen) {
+                      setIsPopoverOpen(true)
+                    }
+                  }}
+                  className="w-full"
+                  onFocus={() => setIsPopoverOpen(true)}
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowDown") {
+                      e.preventDefault()
+                      setIsPopoverOpen(true)
+                      // Focus the first command item
+                      const firstItem = document.querySelector("[cmdk-item]") as HTMLElement
+                      if (firstItem) firstItem.focus()
+                    }
+                  }}
                 />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="age">Age</Label>
-                  <Input
-                    id="age"
-                    type="number"
-                    value={newPatient.age}
-                    onChange={(e) => setNewPatient({ ...newPatient, age: e.target.value })}
-                    placeholder="45"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="gender">Gender</Label>
-                  <select
-                    id="gender"
-                    value={newPatient.gender}
-                    onChange={(e) => setNewPatient({ ...newPatient, gender: e.target.value })}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="contactNumber">Contact Number</Label>
-                <Input
-                  id="contactNumber"
-                  value={newPatient.contactNumber}
-                  onChange={(e) => setNewPatient({ ...newPatient, contactNumber: e.target.value })}
-                  placeholder="+1 (555) 123-4567"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="medicalHistory">Medical History</Label>
-                <textarea
-                  id="medicalHistory"
-                  value={newPatient.medicalHistory}
-                  onChange={(e) => setNewPatient({ ...newPatient, medicalHistory: e.target.value })}
-                  placeholder="Previous conditions, medications, etc."
-                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                />
+                {isPopoverOpen && (
+                  <div className="absolute top-full left-0 w-full z-50 mt-1 rounded-md border bg-popover shadow-md">
+                    <Command>
+                      <CommandList>
+                        <CommandEmpty>No patients found</CommandEmpty>
+                        <CommandGroup>
+                          {filteredPatientsAdd.map((patient) => (
+                            <CommandItem
+                              key={patient.value}
+                              onSelect={() => {
+                                setNewPatient(patient.value)
+                                setSearchQuery(patient.label)
+                                setIsPopoverOpen(false)
+                              }}
+                            >
+                              {patient.label}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </div>
+                )}
               </div>
             </div>
             <DialogFooter>
@@ -327,7 +371,7 @@ export default function PatientsPage() {
                     <TableCell>{patient.monitorCode ? patient.monitorCode : "Not assigned"}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        {patient.status === "not_attached" && (
+                        {/* {patient.status === "not_attached" && (
                           <Button
                             variant="outline"
                             size="sm"
@@ -337,8 +381,8 @@ export default function PatientsPage() {
                             <Stethoscope className="h-3.5 w-3.5" />
                             <span>Assign Device</span>
                           </Button>
-                        )}
-                        {patient.status === "monitoring" && (
+                        )} */}
+                        {/* {patient.status === "monitoring" && (
                           <Button
                             variant="outline"
                             size="sm"
@@ -348,7 +392,7 @@ export default function PatientsPage() {
                             <Stethoscope className="h-3.5 w-3.5" />
                             <span>Remove Device</span>
                           </Button>
-                        )}
+                        )} */}
                         {patient.status === "finished" && (
                           <Button
                             variant="outline"
