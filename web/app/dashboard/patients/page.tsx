@@ -35,8 +35,8 @@ interface Patient {
   age: number
   gender: string
   contactNumber: string
-  medicalHistory: string
   status: string
+  isDone?: boolean
   monitorId?: string
   monitorCode?: string
   assignedDate?: string
@@ -361,7 +361,7 @@ export default function PatientsPage() {
                               : "secondary"
                         }
                       >
-                        {patient.status === "not_attached"
+                        {patient.status === "not_attached" && patient.isDone === false
                           ? "Not Attached"
                           : patient.status === "monitoring"
                             ? "Monitoring"
@@ -393,7 +393,7 @@ export default function PatientsPage() {
                             <span>Remove Device</span>
                           </Button>
                         )} */}
-                        {patient.status === "finished" && (
+                        {patient.status === "not_attached" && patient.isDone === true ?
                           <Button
                             variant="outline"
                             size="sm"
@@ -402,8 +402,8 @@ export default function PatientsPage() {
                           >
                             <FileText className="h-3.5 w-3.5" />
                             <span>Create Report</span>
-                          </Button>
-                        )}
+                          </Button> :
+                          null}
                       </div>
                     </TableCell>
                   </TableRow>

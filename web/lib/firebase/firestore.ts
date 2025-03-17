@@ -26,6 +26,7 @@ import {
   reauthenticateWithCredential,
   updatePassword as firebaseUpdatePassword,
 } from "firebase/auth"
+import { log } from "console"
 
 // User roles
 export const getUserRole = async (userId?: string) => {
@@ -503,10 +504,10 @@ export const getPatients = async () => {
         age: patientData.age || 0,
         gender: patientData.gender || "",
         contactNumber: patientData.mobile || "",
-        medicalHistory: patientData.medicalHistory || "",
         status: monitorStatus,
         monitorId: patientData.monitorId || null,
         monitorCode,
+        isDone: patientData.isDone || false,
         assignedDate: patientData.assignedDate || null,
         doctorId: patientData.doctorId || null,
         emergencyContact,
@@ -703,6 +704,18 @@ export const removeHolterMonitor = async (monitorId: string) => {
       isSeen: false,
       isFinished: false
     });
+
+    const q = query(
+      collection(db, "user_accounts", patientId, "data"),
+      orderBy("timestamp", "desc"),
+      limit(1)
+    );
+
+    const temp = await getDocs(q);
+
+    await updateDoc(doc(db, "user_accounts", patientId, "data", temp.docs[0].id), {
+      reportId: temp.docs[0].id
+    })
 
     await addLog(
       "Holter monitor is removed", `Holter monitor is removed from ${patientId}`, ["hospital", "remove"])
@@ -1031,6 +1044,88 @@ export const getReportById = async (patientId: string, reportId: string) => {
   }
 }
 
+export const getLatestReport = async (patientId: string) => {
+  try {
+
+    const q = query(
+      collection(db, "user_accounts", patientId, "data"),
+      orderBy("timestamp", "desc"),
+      limit(1)
+    );
+
+    const temp = await getDocs(q);
+    const reportId = temp.docs[0].id
+    logOperation("Getting report by ID", { patientId, reportId })
+
+    const reportDoc = await getDoc(doc(db, "user_accounts", patientId, "data", reportId))
+
+    if (!reportDoc.exists()) {
+      logOperation("Report not found", { patientId, reportId })
+      throw new Error("Report not found")
+    }
+
+    const reportData = reportDoc.data()
+
+    // Get patient details
+    const patientDoc = await getDoc(doc(db, "user_accounts", patientId))
+    if (!patientDoc.exists()) {
+      logOperation("Patient not found", { patientId })
+      throw new Error("Patient not found")
+    }
+    const patientData = patientDoc.data()
+
+    // Get doctor details
+    let doctorName = "Unknown Doctor"
+    let doctorSpecialization = ""
+    let hospitalName = "Unknown Hospital"
+
+    if (patientData.docId) {
+      const doctorDoc = await getDoc(doc(db, "users", patientData.docId))
+      if (doctorDoc.exists()) {
+        const doctorData = doctorDoc.data()
+        doctorName = doctorData.name
+        doctorSpecialization = doctorData.specialization || ""
+
+        // Get hospital details
+        if (doctorData.hospitalId) {
+          const hospitalDoc = await getDoc(doc(db, "users", doctorData.hospitalId))
+          if (hospitalDoc.exists()) {
+            hospitalName = hospitalDoc.data().name
+          }
+        }
+      }
+    }
+
+    const report = {
+      id: reportDoc.id,
+      title: reportData.title || "Holter Monitor Report",
+      patientId: patientId,
+      patientName: patientData.name,
+      patientAge: patientData.age,
+      patientGender: patientData.gender,
+      doctorId: patientData.docId,
+      doctorName: doctorName,
+      doctorSpecialization: doctorSpecialization,
+      hospitalName: hospitalName,
+      summary: reportData.brief || "",
+      anomalyDetection: reportData.anomalies || "",
+      doctorSuggestion: reportData.docSuggestions || "",
+      aiSuggestion: reportData.aiSuggestions || "",
+      createdAt: reportData.timestamp.toDate().toISOString(),
+      status: "completed",
+      timeRange: reportData.timeRange || { start: 0, end: 24 },
+      data: reportData.data || [],
+    }
+
+    logOperation("Report retrieved", { report })
+    logOperation("Report retrieved", { patientId, reportId })
+    return report
+  } catch (error) {
+    logOperation("Error getting report", error)
+    throw error
+  }
+}
+
 export const createReport = async (reportData: any) => {
   try {
     const user = await getCurrentUser()
@@ -1038,33 +1133,91 @@ export const createReport = async (reportData: any) => {
 
     logOperation("Creating report", { patientId: reportData.patientId })
 
+    const q = query(
+      collection(db, "user_accounts", reportData.patientId, "data"),
+      orderBy("timestamp", "desc"),
+      limit(1)
+    );
+
+    const temp = await getDocs(q);
     // Add data document to patient's data collection
-    const docRef = await addDoc(collection(db, "user_accounts", reportData.patientId, "data"), {
+    const docRef = await updateDoc(doc(db, "user_accounts", reportData.patientId, "data", temp.docs[0].id), {
       title: reportData.title,
       brief: reportData.summary,
-      description: reportData.anomalyDetection,
+      anomalies: reportData.anomalyDetection,
       docSuggestions: reportData.doctorSuggestion,
       aiSuggestions: reportData.aiSuggestion,
       timestamp: new Date(),
-      isDone: true,
+      isSeen: false,
+      isFinished: true,
+      timeRange: reportData.timeRange || { start: 0, end: 24 },
+      data: reportData.data || [],
+    })
+
+    await updateDoc(doc(db, "user_accounts", reportData.patientId), {
+      isDone: false,
+    })
+
+    // If patient has a monitor, mark it as done
+    // const patientDoc = await getDoc(doc(db, "user_accounts", reportData.patientId))
+    // if (patientDoc.exists()) {
+    //   const patientData = patientDoc.data()
+    //   if (patientData.deviceId !== "Device") {
+    //     const deviceRef = ref(rtdb, `devices/${patientData.monitorId}`)
+    //     await update(deviceRef, {
+    //       isDone: true,
+    //     })
+    //   }
+    // }
+
+    logOperation("Report created", { patientId: reportData.patientId, reportId: temp.docs[0].id })
+    return temp.docs[0].id
+  } catch (error) {
+    logOperation("Error creating report", error)
+    throw error
+  }
+}
+
+export const saveReport = async (reportData: any) => {
+  try {
+    const user = await getCurrentUser()
+    if (!user) throw new Error("User not authenticated")
+
+    logOperation("Creating report", { patientId: reportData.patientId })
+
+    const q = query(
+      collection(db, "user_accounts", reportData.patientId, "data"),
+      orderBy("timestamp", "desc"),
+      limit(1)
+    );
+
+    const temp = await getDocs(q);
+    // Add data document to patient's data collection
+    const docRef = await updateDoc(doc(db, "user_accounts", reportData.patientId, "data", temp.docs[0].id), {
+      title: reportData.title,
+      brief: reportData.summary,
+      anomalies: reportData.anomalyDetection,
+      docSuggestions: reportData.doctorSuggestion,
+      aiSuggestions: reportData.aiSuggestion,
+      timestamp: new Date(),
       timeRange: reportData.timeRange || { start: 0, end: 24 },
       data: reportData.data || [],
     })
 
     // If patient has a monitor, mark it as done
-    const patientDoc = await getDoc(doc(db, "user_accounts", reportData.patientId))
-    if (patientDoc.exists()) {
-      const patientData = patientDoc.data()
-      if (patientData.monitorId) {
-        const deviceRef = ref(rtdb, `devices/${patientData.monitorId}`)
-        await update(deviceRef, {
-          isDone: true,
-        })
-      }
-    }
+    // const patientDoc = await getDoc(doc(db, "user_accounts", reportData.patientId))
+    // if (patientDoc.exists()) {
+    //   const patientData = patientDoc.data()
+    //   if (patientData.deviceId !== "Device") {
+    //     const deviceRef = ref(rtdb, `devices/${patientData.monitorId}`)
+    //     await update(deviceRef, {
+    //       isDone: true,
+    //     })
+    //   }
+    // }
 
-    logOperation("Report created", { patientId: reportData.patientId, reportId: docRef.id })
-    return docRef.id
+    logOperation("Report created", { patientId: reportData.patientId, reportId: temp.docs[0].id })
+    return temp.docs[0].id
   } catch (error) {
     logOperation("Error creating report", error)
     throw error
