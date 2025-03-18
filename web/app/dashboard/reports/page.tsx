@@ -67,17 +67,13 @@ export default function ReportsPage() {
   })
 
   const handleViewReport = (reportId: string, patientId: any) => {
-    router.push(`/dashboard/doctor/reports/${reportId}?patientId=${patientId}`)
+    router.push(`/dashboard/reports/${reportId}/${patientId}`)
   }
 
   return (
     <div className="container mx-auto py-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Reports</h1>
-        <Button onClick={() => router.push("/dashboard/doctor/patients")}>
-          <Plus className="mr-2 h-4 w-4" />
-          Create New Report
-        </Button>
       </div>
 
       <Card>
@@ -155,12 +151,6 @@ export default function ReportsPage() {
                 <p className="text-muted-foreground">
                   {searchQuery ? "No reports match your search criteria" : "You haven't created any reports yet"}
                 </p>
-                {!searchQuery && (
-                  <Button className="mt-4" onClick={() => router.push("/dashboard/doctor/patients")}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create New Report
-                  </Button>
-                )}
               </div>
             )}
           </div>

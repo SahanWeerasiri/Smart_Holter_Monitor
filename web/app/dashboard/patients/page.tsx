@@ -329,7 +329,7 @@ export default function PatientsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Age/Gender</TableHead>
+                <TableHead>Age</TableHead>
                 <TableHead>Contact</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Device</TableHead>
@@ -348,7 +348,7 @@ export default function PatientsPage() {
                   <TableRow key={patient.id}>
                     <TableCell className="font-medium">{patient.name}</TableCell>
                     <TableCell>
-                      {patient.age} / {patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1)}
+                      {patient.age}
                     </TableCell>
                     <TableCell>{patient.contactNumber}</TableCell>
                     <TableCell>

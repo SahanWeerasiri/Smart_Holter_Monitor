@@ -19,27 +19,42 @@ import { Badge } from "@/components/ui/badge"
 import { Plus, Search, Trash2, Edit } from "lucide-react"
 import { getHolterMonitors, addHolterMonitor, deleteHolterMonitor } from "@/lib/firebase/firestore"
 
-interface HolterMonitor {
-  id: string
-  deviceCode: string
-  description: string
-  status: "available" | "in-use"
-  assignedTo?: {
-    patientId: string
-    patientName: string
-    deadline: string
-  }
+interface MonitorData {
+  id: string;
+  deviceCode: string;
+  deadline: any;
+  description: any;
+  status: string;
+  assignedTo: {
+    patientId: string;
+    patientName: any;
+    deadline: any;
+  } | undefined;
+  hospitalId: any;
+  isDone: any;
 }
 
 export default function MonitorsPage() {
-  const [monitors, setMonitors] = useState<HolterMonitor[]>([])
+  const [monitors, setMonitors] = useState<MonitorData[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [newMonitor, setNewMonitor] = useState({
+  const [newMonitor, setNewMonitor] = useState<MonitorData>({
     deviceCode: "",
     description: "",
+    status: "available",
+    assignedTo: {
+      patientId: "",
+      patientName: "",
+      deadline: "",
+    },
+    hospitalId: "",
+    isDone: false,
+    deadline: "",
+    id: "",
   })
+
+
 
   useEffect(() => {
     const fetchMonitors = async () => {
@@ -76,10 +91,18 @@ export default function MonitorsPage() {
           deviceCode: newMonitor.deviceCode,
           description: newMonitor.description,
           status: "available",
+          assignedTo: {
+            patientId: "",
+            patientName: "",
+            deadline: "",
+          },
+          hospitalId: "",
+          isDone: false,
+          deadline: "",
         },
       ])
 
-      setNewMonitor({ deviceCode: "", description: "" })
+      setNewMonitor({ deviceCode: "", description: "", status: "available", assignedTo: { patientId: "", patientName: "", deadline: "" }, hospitalId: "", isDone: false, deadline: "", id: "" })
       setIsAddDialogOpen(false)
     } catch (error) {
       console.error("Error adding holter monitor:", error)

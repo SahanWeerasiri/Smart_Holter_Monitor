@@ -95,6 +95,7 @@ export default function HospitalMonitorsPage() {
                 const monitors: Array<{
                     id: string;
                     deviceCode: string;
+                    deadline?: string;
                     description: string;
                     status: string;
                     assignedTo?: AssignedTo;
@@ -130,6 +131,7 @@ export default function HospitalMonitorsPage() {
                     monitors.push({
                         id: deviceId,
                         deviceCode: deviceId,
+                        deadline: deviceData.deadline,
                         description: deviceData.other,
                         status: deviceData.assigned === 1
                             ? "in-use"
@@ -449,7 +451,7 @@ export default function HospitalMonitorsPage() {
                                                 )}
                                             </TableCell> */}
                                             <TableCell>
-                                                {monitor.assigned === 1 && monitor.deadline ? (
+                                                {monitor.deadline ? (
                                                     <span className="text-sm">{new Date(monitor.deadline).toLocaleDateString()}</span>
                                                 ) : (
                                                     "—"
