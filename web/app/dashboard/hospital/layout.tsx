@@ -13,10 +13,10 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
     return (
         <div className="flex min-h-screen">
-            <aside className="border-r hidden w-60 flex-none border-gray-200 bg-white py-10 px-4 lg:block">
+            {/* <aside className="border-r hidden w-60 flex-none border-gray-200 bg-white py-10 px-4 lg:block">
                 <nav className="space-y-1">
                     <NavItem href="/dashboard/hospital" icon={<LayoutDashboard className="h-5 w-5" />}>
-                        Dashboard
+                        Dashboards
                     </NavItem>
                     <NavItem href="/dashboard/hospital/doctors" icon={<Users className="h-5 w-5" />}>
                         Doctors
@@ -28,7 +28,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         Settings
                     </NavItem>
                 </nav>
-            </aside>
+            </aside>*/}
             <div className="flex-1">
                 <main className="container py-10">{children}</main>
             </div>
