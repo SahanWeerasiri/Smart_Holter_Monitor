@@ -49,14 +49,13 @@ export default function ReportDetailPage() {
     createdAt: string,
     status: string,
     timeRange: { start: number, end: number },
-    data: Data[]
+    data: {
+      key: string,
+      value: number
+    }[][]
   }
 
-  interface Data {
-    time: number,
-    value: number,
-    isAnomaly: boolean
-  }
+
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -295,9 +294,8 @@ export default function ReportDetailPage() {
                     />
                     {report.data &&
                       report.data
-                        .filter((point) => point.isAnomaly)
                         .map((point, index) => (
-                          <ReferenceLine key={index} x={point.time} stroke="red" strokeDasharray="3 3" />
+                          <ReferenceLine key={index} x={point[0].key} stroke="red" strokeDasharray="3 3" />
                         ))}
                   </LineChart>
                 </ResponsiveContainer>
@@ -394,9 +392,8 @@ export default function ReportDetailPage() {
                     />
                     {report.data &&
                       report.data
-                        .filter((point) => point.isAnomaly)
                         .map((point, index) => (
-                          <ReferenceLine key={index} x={point.time} stroke="red" strokeDasharray="3 3" />
+                          <ReferenceLine key={index} x={point[0].key} stroke="red" strokeDasharray="3 3" />
                         ))}
                   </LineChart>
                 </ResponsiveContainer>
@@ -454,7 +451,7 @@ export default function ReportDetailPage() {
                     <div className="text-center">
                       <div className="text-2xl font-bold">
                         {report.data
-                          ? Math.round(report.data.reduce((sum, point) => sum + point.value, 0) / report.data.length)
+                          ? Math.round(report.data.reduce((sum, point) => sum + point[0].value, 0) / report.data.length)
                           : 0}
                       </div>
                       <p className="text-sm text-muted-foreground">Average Heart Rate (bpm)</p>
@@ -466,7 +463,7 @@ export default function ReportDetailPage() {
                   <CardContent className="pt-6">
                     <div className="text-center">
                       <div className="text-2xl font-bold">
-                        {report.data ? Math.max(...report.data.map((point) => point.value)) : 0}
+                        {report.data ? Math.max(...report.data.map((point) => point[0].value)) : 0}
                       </div>
                       <p className="text-sm text-muted-foreground">Maximum Heart Rate (bpm)</p>
                     </div>
@@ -477,23 +474,23 @@ export default function ReportDetailPage() {
                   <CardContent className="pt-6">
                     <div className="text-center">
                       <div className="text-2xl font-bold">
-                        {report.data ? Math.min(...report.data.map((point) => point.value)) : 0}
+                        {report.data ? Math.min(...report.data.map((point) => point[0].value)) : 0}
                       </div>
                       <p className="text-sm text-muted-foreground">Minimum Heart Rate (bpm)</p>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
+                {/* <Card>
                   <CardContent className="pt-6">
                     <div className="text-center">
                       <div className="text-2xl font-bold">
-                        {report.data ? report.data.filter((point) => point.isAnomaly).length : 0}
+                        {report.data ? report.data.filter((point) => point.).length : 0}
                       </div>
                       <p className="text-sm text-muted-foreground">Anomalies Detected</p>
                     </div>
                   </CardContent>
-                </Card>
+                </Card> */}
               </div>
             </CardContent>
           </Card>

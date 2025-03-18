@@ -1,6 +1,7 @@
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 
+
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
@@ -39,7 +40,7 @@ export default function Home() {
                 </div>
               </div>
               <img
-                src="/placeholder.svg?height=550&width=550"
+                src="https://www.aeologic.com/blog/wp-content/uploads/2023/09/Health-Care-with-Artificial-Intelligence.png"
                 alt="Heart monitoring"
                 className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last lg:aspect-square"
               />

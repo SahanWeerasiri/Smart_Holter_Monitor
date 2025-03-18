@@ -1022,6 +1022,22 @@ export const getReportById = async (patientId: string, reportId: string) => {
         }
       }
     }
+    const data = [];
+    const channels = [reportData.data.c1, reportData.data.c2, reportData.data.c3];
+    console.log(channels);
+    for (const channel of channels) {
+      const keys = channel.key as Array<string>;
+      const values = channel.value as Array<number>;
+      const temp = [];
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        const value = values[i];
+        // console.log(`Key: ${key}, Value: ${value}`);
+        temp.push({ key, value })
+      }
+      data.push(temp);
+    }
+
 
     const report = {
       id: reportDoc.id,
@@ -1041,7 +1057,7 @@ export const getReportById = async (patientId: string, reportId: string) => {
       createdAt: reportData.timestamp.toDate().toISOString(),
       status: "completed",
       timeRange: reportData.timeRange || { start: 0, end: 24 },
-      data: reportData.data || [],
+      data: data || []
     }
 
     logOperation("Report retrieved", { patientId, reportId })
@@ -1113,6 +1129,20 @@ export const getReportByIdV2 = async (reportId: string) => {
         }
       }
     }
+    const data = [];
+    const channels = [reportData.data.c1, reportData.data.c2, reportData.data.c3];
+    for (const channel of channels) {
+      const keys = channel.key as Array<string>;
+      const values = channel.value as Array<number>;
+      const temp = [];
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        const value = values[i];
+        // console.log(`Key: ${key}, Value: ${value}`);
+        temp.push({ key, value })
+      }
+      data.push(temp);
+    }
 
     const report = {
       id: reportDoc.id,
@@ -1132,7 +1162,7 @@ export const getReportByIdV2 = async (reportId: string) => {
       createdAt: reportData.timestamp.toDate().toISOString(),
       status: "completed",
       timeRange: reportData.timeRange || { start: 0, end: 24 },
-      data: reportData.data || [],
+      data: data || []
     }
 
     logOperation("Report retrieved", { patientId, reportId })
@@ -1195,6 +1225,25 @@ export const getLatestReport = async (patientId: string) => {
       }
     }
 
+    // console.log((reportData.data.c1.key as Array<any>).length)
+    const data = [];
+    const channels = [reportData.data.c1, reportData.data.c2, reportData.data.c3];
+    // console.log(channels);
+    for (const channel of channels) {
+      const keys: Array<string> = channel.key as Array<string>;
+      const values: Array<number> = channel.value as Array<number>;
+      console.log(keys[0])
+
+      const temp = [];
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        const value = values[i];
+        // console.log(`Key: ${key}, Value: ${value}`);
+        temp.push({ key, value })
+      }
+      data.push(temp);
+    }
+
     const report = {
       id: reportDoc.id,
       title: reportData.title || "Holter Monitor Report",
@@ -1213,7 +1262,7 @@ export const getLatestReport = async (patientId: string) => {
       createdAt: reportData.timestamp.toDate().toISOString(),
       status: "completed",
       timeRange: reportData.timeRange || { start: 0, end: 24 },
-      data: reportData.data || [],
+      data: data || []
     }
 
     logOperation("Report retrieved", { report })
@@ -1249,8 +1298,7 @@ export const createReport = async (reportData: any) => {
       timestamp: new Date(),
       isSeen: false,
       isFinished: true,
-      timeRange: reportData.timeRange || { start: 0, end: 24 },
-      data: reportData.data || [],
+      // timeRange: reportData.timeRange || { start: 0, end: 24 },
     })
 
     await updateDoc(doc(db, "user_accounts", reportData.patientId), {
@@ -1299,8 +1347,17 @@ export const saveReport = async (reportData: any) => {
       docSuggestions: reportData.doctorSuggestion,
       aiSuggestions: reportData.aiSuggestion,
       timestamp: new Date(),
-      timeRange: reportData.timeRange || { start: 0, end: 24 },
-      data: reportData.data || [],
+      // timeRange: reportData.timeRange || { start: 0, end: 24 },
+      // dataTime: {
+      //   c1: reportData.data.c1.key as Array<string>,
+      //   c2: reportData.data.c2.key as Array<string>,
+      //   c3: reportData.data.c3.key as Array<string>,
+      // },
+      // dataValue: {
+      //   c1: reportData.data.c1.value as Array<number>,
+      //   c2: reportData.data.c2.value as Array<number>,
+      //   c3: reportData.data.c3.value as Array<number>,
+      // }
     })
 
     // If patient has a monitor, mark it as done

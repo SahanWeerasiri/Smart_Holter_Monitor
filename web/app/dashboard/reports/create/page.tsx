@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, SetStateAction } from "react"
+import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 import {
@@ -14,44 +14,24 @@ import {
   ResponsiveContainer,
   ReferenceArea,
 } from "recharts"
-import { Slider } from "@/components/ui/slider"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { getPatientById, createReport, generateAIReportSuggestion, saveReport, getLatestReport } from "@/lib/firebase/firestore"
+import {
+  getPatientById,
+  createReport,
+  generateAIReportSuggestion,
+  saveReport,
+  getLatestReport,
+} from "@/lib/firebase/firestore"
 import { Loader2 } from "lucide-react"
-
-// Sample ECG data generator function
-const generateSampleECGData = (hours = 24, anomalyPoints: number[] = []) => {
-  const data = []
-  const pointsPerHour = 60 // One point per minute
-
-  for (let h = 0; h < hours; h++) {
-    for (let m = 0; m < pointsPerHour; m++) {
-      const time = h + m / pointsPerHour
-      const isAnomaly = anomalyPoints.some((point) => Math.abs(point - time) < 0.05)
-
-      // Base value with some natural variation
-      let value = 70 + Math.sin(time * 0.5) * 5 + (Math.random() * 10 - 5)
-
-      // Add anomaly if this is an anomaly point
-      if (isAnomaly) {
-        value = value + (Math.random() > 0.5 ? 40 : -30)
-      }
-
-      data.push({
-        time: time.toFixed(2),
-        value: Math.round(value),
-        isAnomaly,
-      })
-    }
-  }
-
-  return data
-}
+import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { CalendarIcon } from "lucide-react"
+import { format } from "date-fns"
 
 export default function CreateReportPage() {
   const router = useRouter()
@@ -62,73 +42,196 @@ export default function CreateReportPage() {
   const [submitting, setSubmitting] = useState(false)
   const [generatingAI, setGeneratingAI] = useState(false)
   const [patient, setPatient] = useState<Patient>()
-  const [reportData, setReportData] = useState<ReportData>(
-    {
-      id: "",
-      title: "Holter Monitor Report",
-      patientId: "",
-      patientName: "",
-      patientAge: 0,
-      patientGender: "",
-      doctorId: "",
-      doctorName: "",
-      doctorSpecialization: "",
-      hospitalName: "",
-      summary: "",
-      anomalyDetection: "",
-      doctorSuggestion: "",
-      aiSuggestion: "",
-      createdAt: "",
-      status: "completed",
-      timeRange: { start: 0, end: 24 },
-      data: [],
-    }
-
-  )
-  const [timeRange, setTimeRange] = useState([0, 24])
-  const [ecgData, setEcgData] = useState<Data[]>([])
-  const [anomalyPoints, setAnomalyPoints] = useState<number[]>([4, 9, 15, 20])
-
-  // const [report/Data, setReportData] = useState<>()
+  const [displayData, setDisplayData] = useState<ChannelData[]>([])
+  const [reportData, setReportData] = useState<ReportData>({
+    id: "",
+    title: "Holter Monitor Report",
+    patientId: "",
+    patientName: "",
+    patientAge: 0,
+    patientGender: "",
+    doctorId: "",
+    doctorName: "",
+    doctorSpecialization: "",
+    hospitalName: "",
+    summary: "",
+    anomalyDetection: "",
+    doctorSuggestion: "",
+    aiSuggestion: "",
+    createdAt: "",
+    status: "completed",
+    timeRange: { start: 0, end: 24 },
+    data: [],
+  })
+  const [timeRange, setTimeRange] = useState([0, 48])
+  const [ecgData, setEcgData] = useState<ChannelData>()
+  const [startDate, setStartDate] = useState<Date | undefined>(new Date())
+  const [endDate, setEndDate] = useState<Date | undefined>(new Date())
+  const [filteredChartData, setFilteredChartData] = useState<any[]>([])
 
   interface ReportData {
-    id: string,
-    title: string,
-    patientId: string,
-    patientName: string,
-    patientAge: number,
-    patientGender: string,
-    doctorId: string,
-    doctorName: string,
-    doctorSpecialization: string,
-    hospitalName: string,
-    summary: string,
-    anomalyDetection: string,
-    doctorSuggestion: string,
+    id: string
+    title: string
+    patientId: string
+    patientName: string
+    patientAge: number
+    patientGender: string
+    doctorId: string
+    doctorName: string
+    doctorSpecialization: string
+    hospitalName: string
+    summary: string
+    anomalyDetection: string
+    doctorSuggestion: string
     aiSuggestion: string
-    createdAt: string,
-    status: string,
-    timeRange: { start: number, end: number },
-    data: Data[]
-  }
-  interface Patient {
-    id: string;
-    name: any;
-    age: any;
-    gender: any;
-    contactNumber: any;
-    medicalHistory: any;
-    status: string;
-    emergencyContact: {
-      name: string;
-      mobile: string;
-    };
+    createdAt: string
+    status: string
+    timeRange: { start: number; end: number }
+    data: ChannelData[]
   }
 
-  interface Data {
-    time: string;
-    value: number;
-  }[]
+  interface Patient {
+    id: string
+    name: string
+    age: number
+    gender: string
+    contactNumber: string
+    medicalHistory: string
+    status: string
+    emergencyContact: {
+      name: string
+      mobile: string
+    }
+  }
+
+  interface Point {
+    key: string | number
+    value: number
+  }
+
+  interface ChannelData {
+    c1: Point[]
+    c2: Point[]
+    c3: Point[]
+  }
+  interface Entry {
+    time: string | number | Date
+    c1?: number
+    c2?: number
+    c3?: number
+  }
+
+  interface TransformedData {
+    timestamp: string
+    time: number
+    c1: number
+    c2: number
+    c3: number
+  }
+
+  const transformedData: TransformedData[] = []
+
+  const formatDate = (dateString: string | number | Date) => {
+    const date = new Date(dateString)
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date)
+  }
+
+  const transformReportData = (reportData: any) => {
+    if (!reportData || !reportData.data) return []
+
+    // const transformedData: { timestamp: string; time: number | Date; c1: number; c2: number; c3: number }[] = []
+
+    if (Array.isArray(reportData.data)) {
+      reportData.data.forEach((entry: { time: string | number | Date; c1: any; c2: any; c3: any }) => {
+        // Convert entry.time to a number
+        let time: number
+
+        if (typeof entry.time === "string") {
+          if (entry.time.includes(":")) {
+            // If it's a timestamp string (e.g., "2023:10:01 12:00:00:000")
+            const [datePart, timePart] = entry.time.split(" ")
+            const [year, month, day] = datePart.split(":")
+            const [hour, minute, secondMs] = timePart.split(":")
+            const [second, ms] = secondMs ? secondMs.split(".") : ["0", "0"]
+
+            const date = new Date(
+              Number.parseInt(year),
+              Number.parseInt(month) - 1, // Month is 0-indexed in JavaScript
+              Number.parseInt(day),
+              Number.parseInt(hour),
+              Number.parseInt(minute),
+              Number.parseInt(second),
+              Number.parseInt(ms),
+            )
+
+            time = date.getTime()
+          } else {
+            // If it's a numeric string (e.g., "1234567890")
+            time = Number.parseFloat(entry.time)
+          }
+        } else if (entry.time instanceof Date) {
+          // If it's a Date object, get the timestamp directly
+          time = entry.time.getTime()
+        } else {
+          // If it's already a number, use it directly
+          time = entry.time
+        }
+
+        // Push the transformed data
+        transformedData.push({
+          timestamp: typeof entry.time === "string" ? entry.time : new Date(entry.time).toISOString(),
+          time: time,
+          c1: entry.c1 || 0, // Fallback to 0 if undefined
+          c2: entry.c2 || 0, // Fallback to 0 if undefined
+          c3: entry.c3 || 0, // Fallback to 0 if undefined
+        })
+      })
+    } else if (reportData.data.c1 && typeof reportData.data.c1 === "object" && !Array.isArray(reportData.data.c1)) {
+      const timestamps = Object.keys(reportData.data.c1)
+
+      timestamps.forEach((timestamp) => {
+        let time: number
+
+        if (!isNaN(Number(timestamp))) {
+          time = Number(timestamp)
+        } else {
+          const [datePart, timePart] = timestamp.split(" ")
+          const [year, month, day] = datePart.split(":")
+          const [hour, minute, secondMs] = timePart.split(":")
+          const [second, ms] = secondMs ? secondMs.split(".") : [0, 0]
+
+          const date = new Date(
+            Number.parseInt(year),
+            Number.parseInt(month) - 1,
+            Number.parseInt(day),
+            Number.parseInt(hour),
+            Number.parseInt(minute),
+            Number.parseInt(second.toString()),
+            ms ? Number.parseInt(ms.toString()) : 0,
+          )
+
+          time = date.getTime()
+        }
+
+        transformedData.push({
+          timestamp,
+          time,
+          c1: reportData.data.c1[timestamp] || 0,
+          c2: reportData.data.c2[timestamp] || 0,
+          c3: reportData.data.c3[timestamp] || 0,
+        })
+      })
+    }
+
+    transformedData.sort((a, b) => a.time - b.time)
+    return transformedData
+  }
 
   useEffect(() => {
     const fetchPatientData = async () => {
@@ -144,13 +247,33 @@ export default function CreateReportPage() {
 
         const reportData = await getLatestReport(patientId)
         setReportData(reportData)
+        console.log("Report data", reportData.data)
 
+        const data: ChannelData = {
+          c1: reportData.data[0],
+          c2: reportData.data[1],
+          c3: reportData.data[2],
+        }
 
+        console.log("final", data)
 
-        // Generate sample ECG data
-        // const data = generateSampleECGData(24, anomalyPoints)
-        // setEcgData(data)
-        setEcgData(reportData.data)
+        // for (let i = 0; i < reportData.data[0].length; i++) {
+        //   const entry = reportData.data[0]
+        //   // console.log("Entry", entry)
+        //   for (let key in entry.keys) {
+        //     console.log("Key", key)
+        //     const point1: Point = { key: key, value: entry[key] || 0 }
+        //     const point2: Point = { key: key, value: entry[key] || 0 }
+        //     const point3: Point = { key: key, value: entry[key] || 0 }
+        //     data.c1.push(point1)
+        //     data.c2.push(point2)
+        //     data.c3.push(point3)
+        //   }
+
+        // }
+        setEcgData(data)
+
+        console.log("ECG data", data)
 
         setLoading(false)
       } catch (error) {
@@ -171,7 +294,7 @@ export default function CreateReportPage() {
     }))
   }
 
-  const handleTimeRangeChange = (values: SetStateAction<number[]>) => {
+  const handleTimeRangeChange = (values: number[]) => {
     setTimeRange(values)
   }
 
@@ -215,10 +338,17 @@ export default function CreateReportPage() {
 
     setSubmitting(true)
     try {
-      // Filter ECG data based on selected time range
-      const filteredData = ecgData.filter(
-        (point) => Number.parseFloat(point.time) >= timeRange[0] && Number.parseFloat(point.time) <= timeRange[1],
-      )
+      if (!ecgData) {
+        throw new Error("ECG data is not available")
+      }
+      const filteredData =
+        filteredChartData.length > 0
+          ? filteredChartData.map((point) => ({ key: point.time, value: point.value }))
+          : ecgData.c1.filter(
+            (point) =>
+              Number.parseFloat(point.key as string) >= timeRange[0] &&
+              Number.parseFloat(point.key as string) <= timeRange[1],
+          )
 
       const reportId = await createReport({
         patientId,
@@ -232,7 +362,7 @@ export default function CreateReportPage() {
           end: timeRange[1],
         },
         data: filteredData,
-        isDone: true
+        isDone: true,
       })
 
       toast.success("Report created successfully")
@@ -254,11 +384,18 @@ export default function CreateReportPage() {
     }
 
     try {
-      // Filter ECG data based on selected time range
-      const filteredData = ecgData.filter(
-        (point) => Number.parseFloat(point.time) >= timeRange[0] && Number.parseFloat(point.time) <= timeRange[1],
-      )
+      if (!ecgData) {
+        throw new Error("ECG data is not available")
+      }
 
+      const filteredData =
+        filteredChartData.length > 0
+          ? filteredChartData.map((point) => ({ key: point.time, value: point.value }))
+          : ecgData.c1.filter(
+            (point) =>
+              Number.parseFloat(point.key as string) >= timeRange[0] &&
+              Number.parseFloat(point.key as string) <= timeRange[1],
+          )
       const reportId = await saveReport({
         patientId,
         title: reportData.title,
@@ -290,13 +427,26 @@ export default function CreateReportPage() {
     )
   }
 
-  // Filter data based on selected time range for display
-  const displayData = ecgData.filter(
-    (point) => Number.parseFloat(point.time) >= timeRange[0] && Number.parseFloat(point.time) <= timeRange[1],
-  )
+  if (!ecgData) {
+    throw new Error("ECG data is not available")
+  }
 
-  // Count anomalies in the selected range
-  // const anomaliesInRange = displayData.filter((point) => point.isAnomaly).length
+  // Step 1: Get the starting time (first datetime in the `key` array)
+  const startingTime = new Date(ecgData.c1[0].key).getTime()
+
+  const processedData = ecgData.c1.map((point: Point) => {
+    const timestamp = new Date(point.key).getTime()
+    const hoursFromStart = (timestamp - startingTime) / (1000 * 60 * 60) // Convert to hours
+    return {
+      time: hoursFromStart,
+      value: point.value,
+    }
+  })
+
+  // Step 3: Filter the data based on the time range
+  const filteredData = processedData.filter(
+    (point: { time: number }) => point.time >= timeRange[0] && point.time <= timeRange[1],
+  )
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -323,10 +473,10 @@ export default function CreateReportPage() {
                 <Label>Age</Label>
                 <div className="font-medium">{patient.age} years</div>
               </div>
-              <div>
+              {/* <div>
                 <Label>Gender</Label>
                 <div className="font-medium">{patient.gender}</div>
-              </div>
+              </div> */}
               <div>
                 <Label>Contact Number</Label>
                 <div className="font-medium">{patient.contactNumber || "N/A"}</div>
@@ -350,16 +500,42 @@ export default function CreateReportPage() {
         <CardContent className="space-y-6">
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={ecgData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+              <LineChart data={ecgData.c1} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="time" label={{ value: "Time (hours)", position: "insideBottomRight", offset: -10 }} />
                 <YAxis label={{ value: "Heart Rate (bpm)", angle: -90, position: "insideLeft" }} />
                 <Tooltip
-                  formatter={(value, name) => [`${value} bpm`, "Heart Rate"]}
+                  formatter={(value, name) => [`${value} bpm`, name]}
                   labelFormatter={(label) => `Time: ${label} hours`}
                 />
                 <Legend />
-                <Line type="monotone" dataKey="value" stroke="#8884d8" dot={false} name="Heart Rate" />
+                {/* Line for the first dataset (c1) */}
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  data={ecgData.c1}
+                  stroke="#8884d8"
+                  dot={false}
+                  name="Heart Rate (C1)"
+                />
+                {/* Line for the second dataset (c2) */}
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  data={ecgData.c2}
+                  stroke="#82ca9d"
+                  dot={false}
+                  name="Heart Rate (C2)"
+                />
+                {/* Line for the third dataset (c3) */}
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  data={ecgData.c3}
+                  stroke="#ff8042"
+                  dot={false}
+                  name="Heart Rate (C3)"
+                />
                 <ReferenceArea
                   x1={timeRange[0]}
                   x2={timeRange[1]}
@@ -371,54 +547,97 @@ export default function CreateReportPage() {
             </ResponsiveContainer>
           </div>
 
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <Label>Time Range Selection</Label>
-              <span className="text-sm text-muted-foreground">
-                {timeRange[0]} - {timeRange[1]} hours
-              </span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Start Date & Time</Label>
+              <div className="flex flex-col space-y-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant={"outline"} className="w-full justify-start text-left font-normal">
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {startDate ? format(startDate, "PPP HH:mm") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar mode="single" selected={startDate} onSelect={setStartDate} initialFocus />
+                    <div className="p-3 border-t border-border">
+                      <Input
+                        type="time"
+                        value={startDate ? format(startDate, "HH:mm") : ""}
+                        onChange={(e) => {
+                          if (startDate && e.target.value) {
+                            const [hours, minutes] = e.target.value.split(":")
+                            const newDate = new Date(startDate)
+                            newDate.setHours(Number.parseInt(hours, 10), Number.parseInt(minutes, 10))
+                            setStartDate(newDate)
+                          }
+                        }}
+                      />
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
-            <Slider
-              defaultValue={[0, 24]}
-              max={24}
-              step={0.5}
-              value={timeRange}
-              onValueChange={handleTimeRangeChange}
-            />
+
+            <div className="space-y-2">
+              <Label>End Date & Time</Label>
+              <div className="flex flex-col space-y-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant={"outline"} className="w-full justify-start text-left font-normal">
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {endDate ? format(endDate, "PPP HH:mm") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar mode="single" selected={endDate} onSelect={setEndDate} initialFocus />
+                    <div className="p-3 border-t border-border">
+                      <Input
+                        type="time"
+                        value={endDate ? format(endDate, "HH:mm") : ""}
+                        onChange={(e) => {
+                          if (endDate && e.target.value) {
+                            const [hours, minutes] = e.target.value.split(":")
+                            const newDate = new Date(endDate)
+                            newDate.setHours(Number.parseInt(hours, 10), Number.parseInt(minutes, 10))
+                            setEndDate(newDate)
+                          }
+                        }}
+                      />
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card>
-              <CardHeader className="p-4">
-                <CardTitle className="text-base">Selected Duration</CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 pt-0">
-                <div className="text-2xl font-bold">{timeRange[1] - timeRange[0]} hours</div>
-              </CardContent>
-            </Card>
+          <div className="flex justify-end">
+            <Button
+              onClick={() => {
+                if (!startDate || !endDate || !ecgData) return
 
-            {/* <Card>
-              <CardHeader className="p-4">
-                <CardTitle className="text-base">Anomalies Detected</CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 pt-0">
-                <div className="text-2xl font-bold">{anomaliesInRange}</div>
-              </CardContent>
-            </Card> */}
+                const startTime = startDate.getTime()
+                const endTime = endDate.getTime()
 
-            <Card>
-              <CardHeader className="p-4">
-                <CardTitle className="text-base">Average Heart Rate</CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 pt-0">
-                <div className="text-2xl font-bold">
-                  {displayData.length > 0
-                    ? Math.round(displayData.reduce((sum, point) => sum + point.value, 0) / displayData.length)
-                    : 0}{" "}
-                  bpm
-                </div>
-              </CardContent>
-            </Card>
+                // Convert to hours from start for filtering
+                const startingTime = new Date(ecgData.c1[0].key).getTime()
+                const startHours = (startTime - startingTime) / (1000 * 60 * 60)
+                const endHours = (endTime - startingTime) / (1000 * 60 * 60)
+
+                // Update timeRange for use in report creation
+                setTimeRange([startHours, endHours])
+
+                // Filter data for chart display
+                const filtered = processedData.filter(
+                  (point: { time: number }) => point.time >= startHours && point.time <= endHours,
+                )
+
+                setFilteredChartData(filtered)
+                toast.success("Time range filter applied")
+              }}
+            >
+              Apply Filter
+            </Button>
           </div>
         </CardContent>
       </Card>
