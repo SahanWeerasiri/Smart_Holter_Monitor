@@ -690,8 +690,52 @@ export const removeHolterMonitor = async (monitorId: string) => {
       data: null
     })
 
+    const data = {
+      c1: {
+        key: [] as string[],
+        value: [] as number[]
+      },
+      c2: {
+        key: [] as string[],
+        value: [] as number[]
+      },
+      c3: {
+        key: [] as string[],
+        value: [] as number[]
+      }
+    };
+
+    // Iterate over each channel (c1, c2, c3)
+    Object.keys(deviceData).forEach((channel, index) => {
+      const channelData = deviceData[channel as keyof typeof deviceData];
+
+      // Initialize lists for keys and values
+      const keys: string[] = [];
+      const values: number[] = [];
+
+      // Iterate over each key-value pair in the channel
+      Object.keys(channelData).forEach((key) => {
+        const entry = channelData[key];
+        keys.push(key);
+        values.push(entry.value);
+      });
+
+      // Assign keys and values to the corresponding channel in `data`
+      if (index === 0) {
+        data.c1.key = keys;
+        data.c1.value = values;
+      } else if (index === 1) {
+        data.c2.key = keys;
+        data.c2.value = values;
+      } else if (index === 2) {
+        data.c3.key = keys;
+        data.c3.value = values;
+      }
+    });
+
+
     await addDoc(collection(db, "user_accounts", patientId, "data"), {
-      data: deviceData.data, // Correct way to add fetched device data
+      data: data, // Correct way to add fetched device data
       timestamp: new Date(),
       aiSuggestion: "",
       title: "",
