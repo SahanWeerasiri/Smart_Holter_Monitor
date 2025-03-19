@@ -44,12 +44,18 @@ class RealDbService {
     // Reference to the device's data
     final ref = _database.ref('devices').child(device);
 
+    // Await the values from the database
+    final otherSnapshot = await ref.child('other').get();
+    final detailsSnapshot = await ref.child('details').get();
+    final stateSnapshot = await ref.child('idDone').get();
+    final hospitalIdSnapshot = await ref.child('hospitalId').get();
+
     return {
       'success': true,
-      'other': ref.child('other').get(),
-      'details': ref.child('details').get(),
-      'state': ref.child('state').get(),
-      'hospitalId': ref.child('hospitalId').get(),
+      'other': otherSnapshot.value as String? ?? "",
+      'details': detailsSnapshot.value as String? ?? "",
+      'idDone': stateSnapshot.value as bool? ?? false,
+      'hospitalId': hospitalIdSnapshot.value as String? ?? "",
     };
   }
 }

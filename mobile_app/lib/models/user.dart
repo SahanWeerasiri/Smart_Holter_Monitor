@@ -26,7 +26,7 @@ class Account {
   String doctorHospitalId = "";
   String deviceDescription = "";
   String deviceDeadline = "";
-  String deviceState = "";
+  bool deviceState = false;
   String deviceHospitalId = "";
 
   List<Map<String, dynamic>> emergency = [];
@@ -83,10 +83,11 @@ class Account {
         if (deviceId != "Device") {
           Map<String, dynamic> data3 =
               await RealDbService().fetchDeviceDetails(deviceId);
+          print("Device data fetched");
           if (data3['success']) {
             deviceDescription = data3["other"] ?? "";
             deviceDeadline = data3["deadline"] ?? "";
-            deviceState = data3["state"] ?? "";
+            deviceState = data3["idDone"] ?? false;
             deviceHospitalId = data3["hospitalId"] ?? "";
           }
         }
@@ -112,9 +113,10 @@ class Account {
       } catch (e) {
         print("Error initializing account: $e");
       }
-    } else {
-      clear();
     }
+    // else {
+    //   clear();
+    // }
   }
 
   void clear() {
@@ -137,7 +139,7 @@ class Account {
     doctorImageURL = "";
     deviceDescription = "";
     deviceDeadline = "";
-    deviceState = "";
+    deviceState = false;
     deviceHospitalId = "";
     emergency = [];
     reports = [];

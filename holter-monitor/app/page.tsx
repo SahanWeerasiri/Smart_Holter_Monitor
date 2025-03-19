@@ -59,7 +59,8 @@ export default function HolterMonitor() {
   const dataBufferRef1 = useRef<Map<string, number>>(new Map())
   const dataBufferRef2 = useRef<Map<string, number>>(new Map())
   const dataBufferRef3 = useRef<Map<string, number>>(new Map())
-
+  const samplesPerBeat = 11 // As in the Python code
+  const [heartRatesToSync, setHeartRateToSync] = useState<{ timestamp: string; value: number }[]>([]);
   const fetchDevices = async () => {
     try {
       // Fetch data from Firebase
@@ -95,7 +96,7 @@ export default function HolterMonitor() {
     const baseline = 1024
 
     // Calculate samples per beat based on heart rate
-    const samplesPerBeat = 11 // As in the Python code
+
 
     // Get current position in the beat cycle
     const position = beatPositionRef.current
@@ -146,8 +147,10 @@ export default function HolterMonitor() {
     return Math.max(0, Math.min(4095, Math.floor(heartbeatValue)))
   }
 
-  // Start the holter monitor
-  // Start the holter monitor
+  // Variables to track R-peaks and calculate heart rate
+
+  let count = 0;
+
   const startMonitor = () => {
     if (isRunning) return;
 
@@ -174,12 +177,64 @@ export default function HolterMonitor() {
       const newMemoryUsed = memoryUsed + (1 / (DATA_RATE * 3600)) * MEMORY_PER_HOUR;
       setMemoryUsed(newMemoryUsed);
 
-      // Randomly adjust heart rate occasionally
-      if (Math.random() < 0.01) {
-        setHeartRate((prev) => Math.max(60, Math.min(100, prev + (Math.random() * 6 - 3))));
+      // // Detect R-peak in channel 1
+      const position = beatPositionRef.current;
+      // const t = position / samplesPerBeat;
+
+      // if (0.4 <= t && t < 0.6) {
+      //   // This is the R-peak region
+      //   if (position === Math.floor(0.45 * samplesPerBeat)) {
+      //     const currentTime = Date.now();
+
+      //     if (lastRPeakTime !== null) {
+      //       // Calculate the time difference between consecutive R-peaks
+      //       const interval = currentTime - lastRPeakTime;
+      //       rPeakIntervalSum += interval;
+      //       rPeakCount++;
+
+      //       // Calculate average interval and heart rate
+      //       if (rPeakCount >= 2) {
+      //         const averageInterval = rPeakIntervalSum / rPeakCount;
+      //         const heartRateBPM = Math.round((60 * 1000) / averageInterval);
+
+      //         // Update heart rate state
+      //         // setHeartRate((prev) => {
+      //         //   // Smooth the transition using a weighted average
+      //         //   const smoothedHeartRate = Math.round((prev * 0.7) + (heartRateBPM * 0.3));
+      //         //   return Math.max(60, Math.min(100, smoothedHeartRate));
+      //         // });
+      //         setHeartRate(heartRateBPM);
+
+      //         // Add the new heart rate to the sync array
+      //         setHeartRateToSync((prev) => [
+      //           ...prev,
+      //           { timestamp: getDateTime(), value: heartRateBPM }, // Use heartRateBPM instead of heartRate
+      //         ]);
+      //       }
+      //     }
+
+      //     // Update last R-peak time
+      //     lastRPeakTime = currentTime;
+      //   }
+      // }
+      if (count > 20) {//by 30 seconds = 600
+        let heartRateBPM = Math.round(Math.random() * 10 + 65);
+        setHeartRate(heartRateBPM);
+        //         // Add the new heart rate to the sync array
+        setHeartRateToSync((prev) => [
+          ...prev,
+          { timestamp: getDateTime(), value: heartRateBPM }, // Use heartRateBPM instead of heartRate
+        ]);
+
+        count = 0;
       }
+      count++;
+
+      // Increment position for next call
+      beatPositionRef.current = (position + 1) % samplesPerBeat;
     }, 1000 / DATA_RATE);
 
+    // Repeat for other channels (unchanged)
     dataIntervalRef2.current = setInterval(() => {
       const timestamp = getDateTime();
       const newPoint = generateEcgPoint();
@@ -196,11 +251,6 @@ export default function HolterMonitor() {
       // Update memory usage
       const newMemoryUsed = memoryUsed + (1 / (DATA_RATE * 3600)) * MEMORY_PER_HOUR;
       setMemoryUsed(newMemoryUsed);
-
-      // Randomly adjust heart rate occasionally
-      if (Math.random() < 0.01) {
-        setHeartRate((prev) => Math.max(60, Math.min(100, prev + (Math.random() * 6 - 3))));
-      }
     }, 1000 / DATA_RATE);
 
     dataIntervalRef3.current = setInterval(() => {
@@ -219,11 +269,6 @@ export default function HolterMonitor() {
       // Update memory usage
       const newMemoryUsed = memoryUsed + (1 / (DATA_RATE * 3600)) * MEMORY_PER_HOUR;
       setMemoryUsed(newMemoryUsed);
-
-      // Randomly adjust heart rate occasionally
-      if (Math.random() < 0.01) {
-        setHeartRate((prev) => Math.max(60, Math.min(100, prev + (Math.random() * 6 - 3))));
-      }
     }, 1000 / DATA_RATE);
 
     // Set up Firebase sync interval
@@ -234,6 +279,7 @@ export default function HolterMonitor() {
       setBatteryLevel((prev) => Math.max(0, prev - 0.1));
     }, 60000); // Drain 0.1% per minute
   };
+
 
   const getDateTime = () => {
     const year = new Date().getFullYear();
@@ -246,7 +292,7 @@ export default function HolterMonitor() {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
   }
   // Stop the holter monitor
-  const stopMonitor = () => {
+  const stopMonitor = async () => {
     if (!isRunning) return
 
     setIsRunning(false)
@@ -261,9 +307,9 @@ export default function HolterMonitor() {
 
     // Final sync to Firebase
     syncToFirebase()
+    await set(ref(database, `devices/${deviceCode}/isDone`), true);
   }
 
-  // Sync data to Firebase
   // Sync data to Firebase
   const syncToFirebase = async () => {
     if (deviceCode.length === 0) {
@@ -274,7 +320,8 @@ export default function HolterMonitor() {
     if (
       dataBufferRef1.current.size === 0 &&
       dataBufferRef2.current.size === 0 &&
-      dataBufferRef3.current.size === 0
+      dataBufferRef3.current.size === 0 &&
+      heartRatesToSync.length === 0
     ) {
       return;
     }
@@ -286,19 +333,20 @@ export default function HolterMonitor() {
       const dataToSync1 = Array.from(dataBufferRef1.current.entries());
       const dataToSync2 = Array.from(dataBufferRef2.current.entries());
       const dataToSync3 = Array.from(dataBufferRef3.current.entries());
+      const bpmToSync = heartRatesToSync;
 
       // Clear the buffers
       dataBufferRef1.current.clear();
       dataBufferRef2.current.clear();
       dataBufferRef3.current.clear();
+      setHeartRateToSync([]);
 
       // Send to Firebase
       const syncTime = new Date();
       await set(ref(database, `devices/${deviceCode}/data/c1/`), dataToSync1);
-
       await set(ref(database, `devices/${deviceCode}/data/c2/`), dataToSync2);
-
       await set(ref(database, `devices/${deviceCode}/data/c3/`), dataToSync3);
+      await set(ref(database, `devices/${deviceCode}/beats/`), bpmToSync);
 
       setLastSync(syncTime);
     } catch (error) {
@@ -307,7 +355,6 @@ export default function HolterMonitor() {
       setIsSyncing(false);
     }
   };
-
   // Clean up on unmount
   useEffect(() => {
     fetchDevices();
