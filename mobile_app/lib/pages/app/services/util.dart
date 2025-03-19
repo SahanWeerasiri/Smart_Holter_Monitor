@@ -14,16 +14,40 @@ String getAge(String birthday) {
   return age.toString();
 }
 
-Map<String, int> convertToInt(data) {
-  Map<String, int> dataHolter = {};
+List<Map<String, int>> convertToInt(Map<dynamic, dynamic> data) {
+  List<Map<String, int>> result = [];
 
-  data.forEach((date, value) {
-    int parsedValue = int.tryParse(value) ??
-        0; // Convert value string to int, default to 0 if invalid
-    dataHolter[date] = parsedValue; // Simple assignment works better here
+  // Iterate over each channel (c1, c2, etc.)
+  data.forEach((channel, channelData) {
+    if (channelData is Map) {
+      // Extract the lists of timestamps and values
+      final timestamps = channelData['key'] as List<dynamic>?;
+      final values = channelData['value'] as List<dynamic>?;
+
+      if (timestamps != null &&
+          values != null &&
+          timestamps.length == values.length) {
+        // Create a map for the current channel
+        Map<String, int> channelMap = {};
+
+        // Iterate over the timestamps and values
+        for (int i = 0; i < timestamps.length; i++) {
+          final timestamp =
+              timestamps[i].toString(); // Ensure timestamp is a String
+          final value =
+              values[i] is int ? values[i] : 0; // Ensure value is an int
+
+          // Add the timestamp-value pair to the channel map
+          channelMap[timestamp] = value;
+        }
+
+        // Add the channel map to the result list
+        result.add(channelMap);
+      }
+    }
   });
 
-  return dataHolter;
+  return result;
 }
 
 // int getHeartBeat(Map<String, int> data) {

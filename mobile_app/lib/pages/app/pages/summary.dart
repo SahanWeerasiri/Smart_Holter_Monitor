@@ -111,6 +111,9 @@ class _SummaryState extends State<Summary> {
   // }
 
   Future<void> fetchDeviceData(String device) async {
+    if (device == "Device") {
+      return;
+    }
     final FirebaseDatabase database = FirebaseDatabase.instance;
     // Reference to the device's data
     final ref = database.ref('devices').child(device).child('beats');
@@ -323,8 +326,13 @@ class _SummaryState extends State<Summary> {
       statusColor = Colors.green;
       statusIcon = Icons.check_circle;
     } else {
-      statusColor = Colors.orange;
-      statusIcon = Icons.monitor;
+      if (patientData.deviceId == "Device") {
+        statusColor = Colors.red;
+        statusIcon = Icons.device_unknown;
+      } else {
+        statusColor = Colors.orange;
+        statusIcon = Icons.monitor;
+      }
     }
 
     return Card(
@@ -380,7 +388,9 @@ class _SummaryState extends State<Summary> {
                       Text(
                         patientData.deviceState
                             ? 'Completed'
-                            : 'Still Monitoring',
+                            : patientData.deviceId == "Device"
+                                ? 'No Device'
+                                : 'Still Monitoring',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,

@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:health_care/models/report.dart';
+import 'package:health_care/models/user.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class ReportDetailScreen extends StatefulWidget {
   final Report report;
+  final Account patient;
+  final ReportDoctor doctor;
 
   const ReportDetailScreen({
     super.key,
     required this.report,
+    required this.patient,
+    required this.doctor,
   });
 
   @override
@@ -40,11 +45,9 @@ class _ReportDetailScreenState extends State<ReportDetailScreen>
 
   @override
   Widget build(BuildContext context) {
-    final dateFormat = DateFormat('MMM dd, yyyy');
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.report.title),
+        title: Text("General Report - ${widget.report.timestamp}"),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -69,7 +72,7 @@ class _ReportDetailScreenState extends State<ReportDetailScreen>
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          dateFormat.format(widget.report.date),
+                          widget.report.timestamp,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -80,11 +83,11 @@ class _ReportDetailScreenState extends State<ReportDetailScreen>
                     const SizedBox(height: 12),
                     const Divider(),
                     const SizedBox(height: 12),
-                    _buildInfoRow('Patient', widget.report.patientName),
+                    _buildInfoRow('Patient', widget.patient.name),
                     const SizedBox(height: 8),
                     _buildInfoRow(
                       'Doctor',
-                      widget.report.doctor?.name ?? 'No doctor assigned',
+                      widget.doctor.name,
                     ),
                   ],
                 ),
@@ -139,13 +142,12 @@ class _ReportDetailScreenState extends State<ReportDetailScreen>
               ),
             ),
             const SizedBox(height: 24),
-            _buildSectionCard('Summary', widget.report.summary),
+            _buildSectionCard('Summary', widget.report.brief),
+            const SizedBox(height: 16),
+            _buildSectionCard('Anomaly Detection', widget.report.anomalies),
             const SizedBox(height: 16),
             _buildSectionCard(
-                'Anomaly Detection', widget.report.anomalyDetection),
-            const SizedBox(height: 16),
-            _buildSectionCard(
-                'Doctor Suggestions', widget.report.doctorSuggestions),
+                'Doctor Suggestions', widget.report.docSuggestions),
             const SizedBox(height: 16),
             _buildSectionCard('AI Suggestions', widget.report.aiSuggestions),
           ],

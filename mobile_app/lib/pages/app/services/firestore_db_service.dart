@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flame/extensions.dart';
 import 'package:health_care/constants/consts.dart';
 import 'package:health_care/pages/app/additional/chat_bubble.dart';
-import 'package:health_care/pages/app/services/real_db_service.dart';
 import 'package:health_care/pages/app/services/util.dart';
 
 class FirestoreDbService {
@@ -263,66 +262,68 @@ class FirestoreDbService {
 
       final List<Map<String, dynamic>> oldReports = [];
       final List<Map<String, dynamic>> newReports = [];
-
+      print(snapshot.docs.length);
       for (DocumentSnapshot doc in snapshot.docs) {
+        print("Report data");
+        // print((doc.data() as Map<String, dynamic>)['timestamp'].toString());
         final data = doc.data() as Map<String, dynamic>;
         final Map<String, String> reportModel = {
           'brief': data['brief'],
-          'avgHeart': data['avgHeart'],
-          'timestamp': data['timestamp'],
+          'timestamp': DateTime.now()
+              .toIso8601String(), //(data['timestamp']).toString(),
           'docSuggestions': data['docSuggestions'],
-          'description': data['description'],
-          'graph': data['graph'],
           'reportId': doc.id,
           'isSeen': data['isSeen'] as bool ? 'true' : 'false',
           'deviceId': data['deviceId'],
-          'aiSuggestions': data['aiSuggestions'],
+          'aiSuggestions': data['aiSuggestion'],
           'anomalies': data['anomalies'],
-          'isEditing': data['isEditing'] as bool ? 'true' : 'false',
-          'age': data['age'],
-          'docId': data['docId'],
+          'isEditing': data['isFinished'] as bool ? 'true' : 'false',
+          'age': data['age'].toString(),
+          'docId': data['doctorId'],
         };
-        if (reportModel['isEditing'] == 'true') {
+        if (reportModel['isEditing'] == 'false') {
           continue;
         }
-
+        print("Doctor data");
         final Map<String, dynamic> doctorModel = {};
 
-        await doctorCollection.doc(reportModel['docId']).get().then((value) {
-          if (value.exists) {
-            doctorModel['doctorName'] = value.get('name');
-            doctorModel['doctorEmail'] = value.get('email');
-            doctorModel['doctorMobile'] = value.get('mobile');
-          } else {
-            doctorModel['doctorName'] = "";
-            doctorModel['doctorEmail'] = "";
-            doctorModel['doctorMobile'] = "";
-          }
-        });
+        final doctorData =
+            await doctorCollection.doc(reportModel['docId']).get();
+        if (doctorData.exists) {
+          doctorModel['doctorName'] = doctorData.get('name');
+          doctorModel['doctorEmail'] = doctorData.get('email');
+          doctorModel['doctorMobile'] = doctorData.get('mobile');
+        } else {
+          doctorModel['doctorName'] = "";
+          doctorModel['doctorEmail'] = "";
+          doctorModel['doctorMobile'] = "";
+        }
+
+        print(doctorModel['doctorName']);
 
         if (doctorModel['doctorName'] == "") {
           continue;
         }
 
-        final Map<String, dynamic> deviceModel = {};
+        // final Map<String, dynamic> deviceModel = {};
+        // print("Device data");
+        // await RealDbService()
+        //     .fetchDeviceDetails(patientProfileModel['deviceId']!)
+        //     .then((value) {
+        //   if (value['success']) {
+        //     deviceModel['other'] = value;
+        //   }
+        // });
 
-        await RealDbService()
-            .fetchDeviceDetails(patientProfileModel['deviceId']!)
-            .then((value) {
-          if (value['success']) {
-            deviceModel['other'] = value;
-          }
-        });
-
-        if (deviceModel['other'] == null) {
-          continue;
-        }
+        // if (deviceModel['other'] == null) {
+        //   continue;
+        // }
 
         if (reportModel['isSeen'] == 'true') {
           oldReports.add({
             'report': reportModel,
             'doctor': doctorModel,
-            'device': deviceModel,
+            // 'device': deviceModel,
             'patient': patientProfileModel,
             'data': convertToInt(data['data']),
           });
@@ -330,13 +331,15 @@ class FirestoreDbService {
           newReports.add({
             'report': reportModel,
             'doctor': doctorModel,
-            'device': deviceModel,
+            // 'device': deviceModel,
             'patient': patientProfileModel,
             'data': convertToInt(data['data']),
           });
         }
       }
 
+      print("ready to return");
+      print(newReports.first['patient']['name']);
       return {
         'success': true,
         'data_new': newReports,
