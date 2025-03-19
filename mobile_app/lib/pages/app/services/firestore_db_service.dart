@@ -97,7 +97,7 @@ class FirestoreDbService {
 
       final docs = snapshot.docs;
 
-      docs.sort((a, b) => b.get("timestamp").compareTo(a.get("timestamp")));
+      docs.sort((a, b) => b.get("createdAt").compareTo(a.get("createdAt")));
       docs.reverse();
 
       List<ChatModel> chats = [];
@@ -138,6 +138,7 @@ class FirestoreDbService {
         "msg": chatModel.msg,
         "timestamp": chatModel.timestamp,
         "sender": chatModel.isSender ? "me" : "ai",
+        "createdAt": DateTime.now().toIso8601String()
       });
       return {'success': true, 'msg': "Msg saved successfully!", "key": res.id};
     } catch (e) {
@@ -147,16 +148,16 @@ class FirestoreDbService {
   }
 
   Future<Map<String, dynamic>> deleteChats(
-      String uid, List<ChatBubble> chatBubles) async {
+      String uid, List<ChatModel> chatBubles) async {
     try {
-      for (ChatBubble chatBubble in chatBubles) {
-        if (chatBubble.chatModel.chatId == "0") {
+      for (ChatModel chatModel in chatBubles) {
+        if (chatModel.chatId == "0") {
           continue;
         }
         usersCollection
             .doc(uid)
             .collection("chats")
-            .doc(chatBubble.chatModel.chatId)
+            .doc(chatModel.chatId)
             .delete();
       }
 
@@ -235,7 +236,6 @@ class FirestoreDbService {
       if (!resUser.exists) {
         return {'success': false, 'error': 'User not found'};
       }
-
       Map<String, String> patientProfileModel = {
         'id': uid,
         'name': resUser.get('name'),
@@ -249,6 +249,11 @@ class FirestoreDbService {
         'email': resUser.get('email'),
         'age': getAge(resUser.get('birthday'))
       };
+      final QuerySnapshot<Object?> snp =
+          await usersCollection.doc(uid).collection('data').get();
+      if (snp.docs.isEmpty) {
+        return {'success': true, 'data_new': [], "data_old": []};
+      }
 
       final snapshot = await usersCollection
           .doc(uid)
@@ -338,6 +343,7 @@ class FirestoreDbService {
         'data_old': oldReports,
       };
     } catch (e) {
+      print(e.toString());
       return {
         'success': false,
         'error': e.toString(),
@@ -410,19 +416,25 @@ class FirestoreDbService {
         // Check if the document exists
         if (doc.exists) {
           people.add({
+            'id': doc.id,
             'name': doc.get("name"),
             'mobile': doc.get("mobile"),
-          });
-        } else {
-          people.add({
-            'name': "",
-            'mobile': "",
           });
         }
       }
       return {'success': true, 'data': people};
     } catch (e) {
       // Handle errors and return failure
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> removeEmergencyContact(
+      String uid, String id) async {
+    try {
+      await usersCollection.doc(uid).collection("emergency").doc(id).delete();
+      return {'success': true, 'message': "Delete contact successfully!"};
+    } catch (e) {
       return {'success': false, 'error': e.toString()};
     }
   }
