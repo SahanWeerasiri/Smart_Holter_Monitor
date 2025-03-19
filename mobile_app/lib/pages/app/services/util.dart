@@ -3,7 +3,7 @@ String getAge(String birthday) {
   final data = birthday.split('-');
   int year = int.parse(data[0]);
   int month = int.parse(data[1]);
-  int day = int.parse(data[2]);
+  int day = int.parse(data[2].split(' ')[0]);
   DateTime currentDate = DateTime.now();
   int age = currentDate.year - year;
   int monthDiff = currentDate.month - month;

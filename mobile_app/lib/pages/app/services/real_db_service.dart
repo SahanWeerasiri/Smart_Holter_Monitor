@@ -47,6 +47,9 @@ class RealDbService {
     return {
       'success': true,
       'other': ref.child('other').get(),
+      'details': ref.child('details').get(),
+      'state': ref.child('state').get(),
+      'hospitalId': ref.child('hospitalId').get(),
     };
   }
 }

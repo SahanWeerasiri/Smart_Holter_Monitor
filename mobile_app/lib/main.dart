@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:health_care/constants/consts.dart';
 import 'package:health_care/pages/app/before_login.dart';
 import 'package:health_care/pages/app/home.dart';
 import 'package:health_care/pages/app/login.dart';
 import 'package:health_care/pages/app/signup.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'pages/app/splash.dart';
+import 'package:health_care/pages/app/splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,12 +19,33 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'SmartCare',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: CustomColors().blue),
-        useMaterial3: true,
+        primarySwatch: Colors.teal,
+        fontFamily: 'Poppins',
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.teal,
+          elevation: 0,
+          centerTitle: true,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 15),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          contentPadding: const EdgeInsets.all(15),
+        ),
       ),
-      home: Splash(),
+      home: const SplashScreen(),
       routes: {
         // Sample routes
         '/login': (context) => const Login(),
