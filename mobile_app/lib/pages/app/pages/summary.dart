@@ -123,15 +123,10 @@ class _SummaryState extends State<Summary> {
       final data = event.snapshot.value;
 
       if (data is List) {
-        print("Data received");
-        print(data.length);
-
         // Filter out null values and ensure each item is a Map
         final validData = data.whereType<Map<dynamic, dynamic>>().toList();
 
         if (validData.isNotEmpty) {
-          print(validData);
-
           // Sort the list by timestamp in descending order
           validData.sort((a, b) {
             final timestampA = a['timestamp'] as String? ?? '';
@@ -153,14 +148,6 @@ class _SummaryState extends State<Summary> {
               ..sort((a, b) =>
                   DateTime.parse(a.key).compareTo(DateTime.parse(b.key))),
           );
-
-          // Print the sorted map
-          for (final key in sortedMap.keys) {
-            print('Timestamp: $key, Value: ${sortedMap[key]}');
-          }
-
-          print(sortedMap.values.last);
-
           // Calculate the current heart rate and average heart rate
           final currentHeartRate = sortedMap.values.last;
           final avgHeartRate = currentHeartRate + 2; // Example calculation
@@ -533,7 +520,7 @@ class _SummaryState extends State<Summary> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          patient.docId,
+                          patient.doctorMobile,
                           style: const TextStyle(
                             fontSize: 14,
                             color: Colors.grey,
@@ -541,7 +528,7 @@ class _SummaryState extends State<Summary> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          patient.doctorHospitalId,
+                          patient.hoispitalName,
                           style: const TextStyle(
                             fontSize: 14,
                             color: Colors.grey,
@@ -610,20 +597,20 @@ class _SummaryState extends State<Summary> {
                   ),
                 ),
               ),
-              Center(
-                child: Text(
-                  patient.docId,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
+              // Center(
+              //   child: Text(
+              //     patient.docId,
+              //     style: const TextStyle(
+              //       fontSize: 16,
+              //       color: Colors.grey,
+              //     ),
+              //   ),
+              // ),
               const SizedBox(height: 24),
               const Divider(),
               const SizedBox(height: 16),
               _buildDoctorDetailItem(
-                  Icons.business, 'Hospital', patient.doctorHospitalId),
+                  Icons.business, 'Hospital', patient.hoispitalName),
               const SizedBox(height: 16),
               _buildDoctorDetailItem(
                   Icons.phone, 'Phone', patient.doctorMobile),

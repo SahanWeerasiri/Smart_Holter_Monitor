@@ -10,7 +10,7 @@ class FirestoreDbService {
   final CollectionReference usersCollection =
       FirebaseFirestore.instance.collection('user_accounts');
   final CollectionReference doctorCollection =
-      FirebaseFirestore.instance.collection('doctor_accounts');
+      FirebaseFirestore.instance.collection('users');
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -436,6 +436,22 @@ class FirestoreDbService {
       return {'success': true, 'message': "Delete contact successfully!"};
     } catch (e) {
       return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchHospital(String id) async {
+    final DocumentSnapshot<Object?> snapshot =
+        await doctorCollection.doc(id).get();
+    if (snapshot.exists) {
+      return {
+        'success': true,
+        'data': {
+          'name': snapshot.get("name"),
+          'mobile': snapshot.get("mobile"),
+        }
+      };
+    } else {
+      return {'success': false, 'error': 'Hospital not found'};
     }
   }
 }

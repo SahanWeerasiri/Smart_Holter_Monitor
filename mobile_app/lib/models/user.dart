@@ -28,6 +28,8 @@ class Account {
   String deviceDeadline = "";
   bool deviceState = false;
   String deviceHospitalId = "";
+  String hoispitalName = "";
+  String hospitalMobile = "";
 
   List<Map<String, dynamic>> emergency = [];
   List<Map<String, dynamic>> reports = [];
@@ -109,6 +111,14 @@ class Account {
           reports
               .addAll(List<Map<String, dynamic>>.from(data5["data_old"] ?? []));
         }
+
+        Map<String, dynamic> data6 =
+            await FirestoreDbService().fetchHospital(doctorHospitalId);
+        if (data6['success']) {
+          hoispitalName = data6["data"]["name"] ?? "";
+          hospitalMobile = data6["data"]["mobile"] ?? "";
+        }
+
         print("Reports initialized");
       } catch (e) {
         print("Error initializing account: $e");
@@ -143,5 +153,7 @@ class Account {
     deviceHospitalId = "";
     emergency = [];
     reports = [];
+    hoispitalName = "";
+    hospitalMobile = "";
   }
 }
