@@ -546,6 +546,7 @@ class _ProfileState extends State<Profile> {
   }
 
   Widget _buildConnectedDeviceSection() {
+    print(user.deviceDeadline);
     final deadline = DateTime.parse(user.deviceDeadline);
     final daysLeft = deadline.difference(DateTime.now()).inDays;
 
