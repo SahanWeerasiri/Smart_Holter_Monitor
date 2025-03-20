@@ -3,6 +3,7 @@ Type  : GerberX2
 From  : Variant [[No Variations]] of Project [Smart_Cardiac_Monitor.PrjPcb]
    Generated File[PCB1_Copper_Signal_Top.gbr]
    Generated File[PCB1_Copper_Signal_1.gbr]
+   Generated File[PCB1_Copper_Plane_1.gbr]
    Generated File[PCB1_Copper_Signal_Bot.gbr]
    Generated File[PCB1_Legend_Top.gbr]
    Generated File[PCB1_Legend_Bot.gbr]
@@ -11,14 +12,17 @@ From  : Variant [[No Variations]] of Project [Smart_Cardiac_Monitor.PrjPcb]
    Generated File[PCB1_Paste_Top.gbr]
    Generated File[PCB1_Paste_Bot.gbr]
    Generated File[PCB1_Mechanical_1.gbr]
+   Generated File[PCB1_Board_Shape.gbr]
    Generated File[PCB1_Profile.gbr]
    Generated File[PCB1_NPTH_Drill.gbr]
    Generated File[PCB1_PTH_Drill.gbr]
+   Generated File[PCB1_Drawing_1.gbr]
+   Generated File[PCB1_Drillmap_1.gbr]
    Generated File[PCB1.EXTREP]
    Generated File[PCB1.REP]
 
 
-Files Generated   : 15
+Files Generated   : 19
 Documents Printed : 0
 
-Finished Output Generation At 8:38:30 PM On 3/18/2025
+Finished Output Generation At 2:32:21 PM On 3/19/2025
