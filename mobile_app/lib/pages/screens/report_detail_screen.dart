@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care/models/report.dart';
 import 'package:health_care/models/user.dart';
+import 'package:health_care/pages/app/services/firestore_db_service.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -8,12 +10,14 @@ class ReportDetailScreen extends StatefulWidget {
   final Report report;
   final Account patient;
   final ReportDoctor doctor;
+  final List<Map<String, int>> heartRateData;
 
   const ReportDetailScreen({
     super.key,
     required this.report,
     required this.patient,
     required this.doctor,
+    required this.heartRateData,
   });
 
   @override
@@ -35,6 +39,13 @@ class _ReportDetailScreenState extends State<ReportDetailScreen>
       _startTime = widget.report.heartRateData.first.timestamp;
       _endTime = widget.report.heartRateData.last.timestamp;
     }
+    _update();
+  }
+
+  Future<void> _update() async {
+    await FirestoreDbService().updateReportSeen(
+        FirebaseAuth.instance.currentUser!.uid, widget.report.reportId);
+    print("Read");
   }
 
   @override
@@ -198,35 +209,23 @@ class _ReportDetailScreenState extends State<ReportDetailScreen>
               ),
             ),
             const SizedBox(height: 16),
-            Row(
+            Column(
               children: [
-                Expanded(
-                  child: _buildTimeSelector(
-                    'Start',
-                    _startTime,
-                    (newTime) {
-                      if (newTime.isBefore(_endTime)) {
-                        setState(() {
-                          _startTime = newTime;
-                        });
-                      }
-                    },
-                  ),
-                ),
+                _buildDateTimeSelector('Start', _startTime, (newDateTime) {
+                  if (newDateTime.isBefore(_endTime)) {
+                    setState(() {
+                      _startTime = newDateTime;
+                    });
+                  }
+                }),
                 const SizedBox(width: 16),
-                Expanded(
-                  child: _buildTimeSelector(
-                    'End',
-                    _endTime,
-                    (newTime) {
-                      if (newTime.isAfter(_startTime)) {
-                        setState(() {
-                          _endTime = newTime;
-                        });
-                      }
-                    },
-                  ),
-                ),
+                _buildDateTimeSelector('End', _endTime, (newDateTime) {
+                  if (newDateTime.isAfter(_startTime)) {
+                    setState(() {
+                      _endTime = newDateTime;
+                    });
+                  }
+                }),
               ],
             ),
           ],
@@ -235,8 +234,9 @@ class _ReportDetailScreenState extends State<ReportDetailScreen>
     );
   }
 
-  Widget _buildTimeSelector(
-      String label, DateTime time, Function(DateTime) onChanged) {
+  Widget _buildDateTimeSelector(
+      String label, DateTime dateTime, Function(DateTime) onChanged) {
+    final dateFormat = DateFormat('yyyy-MM-dd');
     final timeFormat = DateFormat('HH:mm');
 
     return Column(
@@ -252,21 +252,30 @@ class _ReportDetailScreenState extends State<ReportDetailScreen>
         const SizedBox(height: 4),
         InkWell(
           onTap: () async {
-            final TimeOfDay? selectedTime = await showTimePicker(
+            final DateTime? selectedDate = await showDatePicker(
               context: context,
-              initialTime: TimeOfDay.fromDateTime(time),
+              initialDate: dateTime,
+              firstDate: DateTime(2000),
+              lastDate: DateTime(2100),
             );
 
-            if (selectedTime != null) {
-              final newDateTime = DateTime(
-                time.year,
-                time.month,
-                time.day,
-                selectedTime.hour,
-                selectedTime.minute,
+            if (selectedDate != null) {
+              final TimeOfDay? selectedTime = await showTimePicker(
+                context: context,
+                initialTime: TimeOfDay.fromDateTime(dateTime),
               );
 
-              onChanged(newDateTime);
+              if (selectedTime != null) {
+                final newDateTime = DateTime(
+                  selectedDate.year,
+                  selectedDate.month,
+                  selectedDate.day,
+                  selectedTime.hour,
+                  selectedTime.minute,
+                );
+
+                onChanged(newDateTime);
+              }
             }
           },
           child: Container(
@@ -279,7 +288,7 @@ class _ReportDetailScreenState extends State<ReportDetailScreen>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  timeFormat.format(time),
+                  '${dateFormat.format(dateTime)} ${timeFormat.format(dateTime)}',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
@@ -297,17 +306,60 @@ class _ReportDetailScreenState extends State<ReportDetailScreen>
     );
   }
 
+  DateTime convertTimestamp(String timestamp) {
+    // Replace the first two colons (in the date part) with hyphens
+    String normalizedTimestamp =
+        timestamp.replaceFirst(':', '-').replaceFirst(':', '-');
+
+    // Replace the last colon (before milliseconds) with a dot
+    normalizedTimestamp = normalizedTimestamp.replaceFirst(
+      RegExp(r':\d{3}$'),
+      '.${normalizedTimestamp.substring(normalizedTimestamp.length - 3)}',
+    );
+    print(DateTime.parse(normalizedTimestamp));
+    return DateTime.parse(normalizedTimestamp);
+  }
+
   Widget _buildHeartRateChart(int channel) {
-    // Filter data based on selected time range
-    final filteredData = widget.report.heartRateData
-        .where((data) =>
-            data.timestamp.isAfter(_startTime) &&
-            data.timestamp.isBefore(_endTime))
-        .toList();
+    // Select the appropriate channel data
+    Map<String, int> channelData;
+    switch (channel) {
+      case 1:
+        channelData = widget.heartRateData[0]; // Channel 1
+        break;
+      case 2:
+        channelData = widget.heartRateData[1]; // Channel 2
+        break;
+      case 3:
+        channelData = widget.heartRateData[2]; // Channel 3
+        break;
+      default:
+        channelData = widget.heartRateData[0]; // Default to Channel 1
+    }
+
+    // Convert the channel data into a list of maps with timestamp and value
+    List<Map<String, dynamic>> dataPoints = channelData.entries.map((entry) {
+      return {
+        'timestamp': entry.key,
+        'value': entry.value,
+      };
+    }).toList();
+
+    // Filter data based on the selected time range
+    final filteredData = dataPoints.where((data) {
+      final timestamp = DateTime.parse(data['timestamp']);
+      return timestamp.isAfter(_startTime) && timestamp.isBefore(_endTime);
+    }).toList();
+
+    // Debug print to verify filtered data
+    debugPrint('Filtered Data: ${filteredData.length} points');
 
     if (filteredData.isEmpty) {
       return const Center(
-        child: Text('No data available for selected time range'),
+        child: Text(
+          'No data available for the selected time range',
+          style: TextStyle(color: Colors.grey, fontSize: 14),
+        ),
       );
     }
 
@@ -316,21 +368,7 @@ class _ReportDetailScreenState extends State<ReportDetailScreen>
 
     for (int i = 0; i < filteredData.length; i++) {
       final data = filteredData[i];
-      int value;
-
-      switch (channel) {
-        case 1:
-          value = data.channel1;
-          break;
-        case 2:
-          value = data.channel2;
-          break;
-        case 3:
-          value = data.channel3;
-          break;
-        default:
-          value = data.channel1;
-      }
+      final value = data['value'] as int;
 
       spots.add(FlSpot(i.toDouble(), value.toDouble()));
     }
@@ -352,45 +390,10 @@ class _ReportDetailScreenState extends State<ReportDetailScreen>
             sideTitles: SideTitles(showTitles: false),
           ),
           bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: 30,
-              interval: 10,
-              getTitlesWidget: (value, meta) {
-                if (value % 10 != 0) return const SizedBox();
-                if (filteredData.length <= value.toInt()) {
-                  return const SizedBox();
-                }
-
-                final time = DateFormat('HH:mm').format(
-                  filteredData[value.toInt()].timestamp,
-                );
-
-                return Text(
-                  time,
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 10,
-                  ),
-                );
-              },
-            ),
+            sideTitles: SideTitles(showTitles: false), // Hide X-axis values
           ),
           leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              interval: 20,
-              getTitlesWidget: (value, meta) {
-                return Text(
-                  value.toInt().toString(),
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 10,
-                  ),
-                );
-              },
-              reservedSize: 40,
-            ),
+            sideTitles: SideTitles(showTitles: false), // Hide Y-axis values
           ),
         ),
         borderData: FlBorderData(
@@ -399,8 +402,8 @@ class _ReportDetailScreenState extends State<ReportDetailScreen>
         ),
         minX: 0,
         maxX: filteredData.length.toDouble() - 1,
-        minY: 40,
-        maxY: 120,
+        minY: 0,
+        maxY: 4096,
         lineBarsData: [
           LineChartBarData(
             spots: spots,

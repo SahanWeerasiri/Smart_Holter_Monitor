@@ -47,6 +47,7 @@ class RealDbService {
     // Await the values from the database
     final otherSnapshot = await ref.child('other').get();
     final detailsSnapshot = await ref.child('details').get();
+    final deadlineSnapshot = await ref.child('deadline').get();
     final stateSnapshot = await ref.child('idDone').get();
     final hospitalIdSnapshot = await ref.child('hospitalId').get();
 
@@ -54,6 +55,7 @@ class RealDbService {
       'success': true,
       'other': otherSnapshot.value as String? ?? "",
       'details': detailsSnapshot.value as String? ?? "",
+      'deadline': deadlineSnapshot.value as String? ?? "",
       'idDone': stateSnapshot.value as bool? ?? false,
       'hospitalId': hospitalIdSnapshot.value as String? ?? "",
     };

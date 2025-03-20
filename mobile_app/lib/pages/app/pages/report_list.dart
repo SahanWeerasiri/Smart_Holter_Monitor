@@ -80,6 +80,7 @@ class _ReportListState extends State<ReportList> {
     });
     Map<String, dynamic> res =
         await FirestoreDbService().fetchReportsV2(patient.uid);
+    print(res.toString());
     if (res['success']) {
       setState(() {
         _newReportList.clear();
@@ -226,8 +227,7 @@ class _ReportListState extends State<ReportList> {
     final report = Report.fromMap(reportData['report']);
     final patient = Account.fromMap(reportData['patient']);
     final doctor = ReportDoctor.fromMap(reportData['doctor']);
-    FirestoreDbService().updateReportSeen(patient.uid, report.reportId);
-
+    final data = reportData['data'];
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
@@ -240,7 +240,10 @@ class _ReportListState extends State<ReportList> {
             context,
             MaterialPageRoute(
               builder: (context) => ReportDetailScreen(
-                  report: report, patient: patient, doctor: doctor),
+                  report: report,
+                  patient: patient,
+                  doctor: doctor,
+                  heartRateData: data),
             ),
           );
         },

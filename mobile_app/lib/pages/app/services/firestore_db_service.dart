@@ -339,7 +339,7 @@ class FirestoreDbService {
       }
 
       print("ready to return");
-      print(newReports.first['patient']['name']);
+      // print(newReports.first['patient']['name']);
       return {
         'success': true,
         'data_new': newReports,
@@ -356,6 +356,7 @@ class FirestoreDbService {
 
   Future<Map<String, dynamic>> updateReportSeen(
       String uid, String reportId) async {
+    print(reportId);
     try {
       // Fetch the document snapshot
 

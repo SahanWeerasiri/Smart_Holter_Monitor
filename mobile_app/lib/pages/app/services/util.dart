@@ -24,6 +24,7 @@ List<Map<String, int>> convertToInt(Map<dynamic, dynamic> data) {
       final timestamps = channelData['key'] as List<dynamic>?;
       final values = channelData['value'] as List<dynamic>?;
 
+      // Validate the data
       if (timestamps != null &&
           values != null &&
           timestamps.length == values.length) {
@@ -43,9 +44,20 @@ List<Map<String, int>> convertToInt(Map<dynamic, dynamic> data) {
 
         // Add the channel map to the result list
         result.add(channelMap);
+      } else {
+        print('Invalid data for channel: $channel');
       }
+    } else {
+      print('Invalid channel data format for channel: $channel');
     }
   });
+
+  // Print the first channel's data for debugging
+  // if (result.isNotEmpty) {
+  //   // print('First channel data: ${result[0]}');
+  // } else {
+  //   print('No valid channel data found');
+  // }
 
   return result;
 }
