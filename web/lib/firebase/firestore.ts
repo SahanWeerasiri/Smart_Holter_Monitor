@@ -654,124 +654,128 @@ export const removeHolterMonitor = async (monitorId: string) => {
     const patientQuery = query(collection(db, "user_accounts"), where("deviceId", "==", monitorId));
     const querySnapshot = await getDocs(patientQuery);
 
-
-
     if (querySnapshot.empty) {
-      logOperation("Patient not found", { monitorId })
-      throw new Error("Patient not found")
+      logOperation("Patient not found", { monitorId });
+      throw new Error("Patient not found");
     }
+
     const patientDoc = querySnapshot.docs[0];
     const patientId = patientDoc.id;
-    logOperation("Removing holter monitor", { patientId })
-
-
-    // const patientData = patientDoc.data()
-    // if (!patientData.monitorId) {
-    //   logOperation("Patient does not have a monitor assigned", { patientId })
-    //   throw new Error("Patient does not have a monitor assigned")
-    // }
+    logOperation("Removing holter monitor", { patientId });
 
     // Update device in Realtime Database
-    const deviceRef = ref(rtdb, `devices/${monitorId}`)
-    const deviceSnapshot = await get(deviceRef);
+    const deviceRef = ref(rtdb, `devices/${monitorId}`);
+    const deviceRef2 = ref(rtdb, `devices/${monitorId}/data`);
+    const deviceSnapshot = await get(deviceRef2);
     const deviceData = deviceSnapshot.exists() ? deviceSnapshot.val() : {};
+    console.log(deviceData);
 
     await update(deviceRef, {
       assigned: 0,
       deadline: "",
       isDone: false,
-      data: null
-    })
+      data: null,
+      beats: null,
+    });
 
     // Update patient in Firestore
     await updateDoc(doc(db, "user_accounts", patientId), {
       deviceId: "Device",
       assignedDate: null,
-      data: null
-    })
-
-    const data = {
-      c1: {
-        key: [] as string[],
-        value: [] as number[]
-      },
-      c2: {
-        key: [] as string[],
-        value: [] as number[]
-      },
-      c3: {
-        key: [] as string[],
-        value: [] as number[]
-      }
-    };
-
-    // Iterate over each channel (c1, c2, c3)
-    Object.keys(deviceData).forEach((channel, index) => {
-      const channelData = deviceData[channel as keyof typeof deviceData];
-
-      // Initialize lists for keys and values
-      const keys: string[] = [];
-      const values: number[] = [];
-
-      // Iterate over each key-value pair in the channel
-      Object.keys(channelData).forEach((key) => {
-        const entry = channelData[key];
-        keys.push(key);
-        values.push(entry.value);
-      });
-
-      // Assign keys and values to the corresponding channel in `data`
-      if (index === 0) {
-        data.c1.key = keys;
-        data.c1.value = values;
-      } else if (index === 1) {
-        data.c2.key = keys;
-        data.c2.value = values;
-      } else if (index === 2) {
-        data.c3.key = keys;
-        data.c3.value = values;
-      }
+      data: null,
     });
 
+    // Initialize the data structure
+    const data = {
+      c1: { key: [] as string[], value: [] as number[] },
+      c2: { key: [] as string[], value: [] as number[] },
+      c3: { key: [] as string[], value: [] as number[] },
+    };
 
-    await addDoc(collection(db, "user_accounts", patientId, "data"), {
-      data: data, // Correct way to add fetched device data
+    // Safely populate the data structure
+    const channels = ["c1", "c2", "c3"];
+    console.log(deviceData);
+    console.log(deviceData[channels[0]]);
+    console.log(deviceData[channels[0]][0]);
+    console.log(deviceData[channels[0]][0][0]);
+    console.log(deviceData[channels[0]][0][1]);
+    for (let i = 0; i < 3; i++) {
+      if (deviceData[channels[i]]) {
+        const channelData = deviceData[channels[i]];
+        const keys: string[] = [];
+        const values: number[] = [];
+
+        for (let j = 0; j < channelData.length; j++) {
+          const t = channelData[j];
+          keys.push(t[0]);
+          values.push(parseInt(t[1]));
+        }
+        if (i == 0) {
+          data.c1 = { key: keys, value: values };
+        } else if (i == 1) {
+          data.c2 = { key: keys, value: values };
+        } else {
+          data.c3 = { key: keys, value: values };
+        }
+
+      } else {
+        console.warn(`Channel ${channels[i]} not found in device data`);
+      }
+    }
+
+    console.log(data);
+
+    // Add the data to Firestore
+    const docRef = await addDoc(collection(db, "user_accounts", patientId, "data"), {
+      data: data,
       timestamp: new Date(),
       aiSuggestion: "",
       title: "",
       brief: "",
-      doctorId: "",
+      doctorId: patientDoc.data().docId,
       age: getAge(patientDoc.data().birthday),
       gender: "",
       deviceId: monitorId,
       docSuggestions: "",
       anomalies: "",
       isSeen: false,
-      isFinished: false
+      isFinished: false,
     });
 
-    const q = query(
-      collection(db, "user_accounts", patientId, "data"),
-      orderBy("timestamp", "desc"),
-      limit(1)
-    );
-
-    const temp = await getDocs(q);
-
-    await updateDoc(doc(db, "user_accounts", patientId, "data", temp.docs[0].id), {
-      reportId: temp.docs[0].id
-    })
+    // Update the document with the reportId
+    await updateDoc(doc(db, "user_accounts", patientId, "data", docRef.id), {
+      reportId: docRef.id,
+    });
 
     await addLog(
-      "Holter monitor is removed", `Holter monitor is removed from ${patientId}`, ["hospital", "remove"])
+      "Holter monitor is removed",
+      `Holter monitor is removed from ${patientId}`,
+      ["hospital", "remove"]
+    );
 
-    logOperation("Holter monitor removed", { patientId, monitorId: monitorId })
-    return true
+    // const docRef = await updateDoc(doc(db, "user_accounts", patientId, "data", "gQtIDGIp6XRSvJI1ruhg"), {
+    //   data: data,
+    //   timestamp: new Date(),
+    //   aiSuggestion: "",
+    //   title: "",
+    //   brief: "",
+    //   doctorId: patientDoc.data().docId,
+    //   age: getAge(patientDoc.data().birthday),
+    //   gender: "",
+    //   deviceId: monitorId,
+    //   docSuggestions: "",
+    //   anomalies: "",
+    //   isSeen: false,
+    //   isFinished: false,
+    // });
+
+    logOperation("Holter monitor removed", { patientId, monitorId });
+    return true;
   } catch (error) {
-    logOperation("Error removing holter monitor", error)
-    throw error
+    logOperation("Error removing holter monitor", error);
+    throw error;
   }
-}
+};
 
 export const updatePatientStatus = async (patientId: string, status: string) => {
   try {

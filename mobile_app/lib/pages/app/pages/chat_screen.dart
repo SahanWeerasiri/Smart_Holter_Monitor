@@ -6,6 +6,8 @@ import 'package:health_care/models/user.dart';
 import 'package:health_care/pages/app/additional/chat_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care/pages/app/services/firestore_db_service.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -30,6 +32,8 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   List<ChatModel> _chatMessages = [];
+  final languages = ["English", "Sinhala", "Tamil"];
+  String _selectedLanguage = "English";
 
   @override
   void dispose() {
@@ -80,40 +84,81 @@ class _ChatScreenState extends State<ChatScreen> {
         );
       });
     }
+    setState(() {
+      _selectedLanguage = user.language;
+    });
     // setState(() {
     //   _isLoading = false;
     // });
   }
 
-  void sendToAI(ChatModel chatModel) async {
+  void sendToAI(ChatModel chatModel, String msg) async {
     String d =
         "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day} ${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
-    final aiResponse = ChatModel("I got your msg", d, false, "AI", "0");
 
-    Map<String, dynamic> res =
-        await FirestoreDbService().sendChats(user.uid, aiResponse);
+    // Define the URL with the IP and port
+    const String url =
+        'http://10.10.30.65:8000/chat'; // Replace `your-endpoint` with the actual API endpoint
 
-    if (res['success']) {
-      aiResponse.chatId = res['key'];
-      setState(() {
-        _chatMessages.add(aiResponse);
-      });
-    } else {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(res['error']),
-            backgroundColor: Colors.red,
-          ),
-        );
-      });
+    // Define the payload (data to send in the POST request)
+    final Map<String, String> payload = {
+      'message': msg,
+      'language': _selectedLanguage,
+    };
+
+    try {
+      // Make the POST request
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(payload),
+      );
+
+      print(response.body);
+
+      // Check if the request was successful
+      if (response.statusCode == 200) {
+        // Parse the response body
+        final Map<String, dynamic> responseData = json.decode(response.body);
+
+        // Extract the AI's response from the JSON
+        final String aiMessage = responseData['response'];
+
+        // Create a new ChatModel object for the AI's response
+        final aiResponse = ChatModel(aiMessage, d, false, "AI", "0");
+
+        Map<String, dynamic> res =
+            await FirestoreDbService().sendChats(user.uid, aiResponse);
+
+        if (res['success']) {
+          aiResponse.chatId = res['key'];
+          setState(() {
+            _chatMessages.add(aiResponse);
+          });
+        } else {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(res['error']),
+                backgroundColor: Colors.red,
+              ),
+            );
+          });
+        }
+      } else {
+        print('Request failed with status code: ${response.statusCode}');
+        print('Response: ${response.body}');
+      }
+    } catch (e) {
+      print('An error occurred: $e');
     }
   }
 
   void onSend() async {
+    String msg = _messageController.text;
     String d =
         "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day} ${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}";
-    final chatModel = ChatModel(_messageController.text, d, true, "Me", "0");
+    final chatModel = ChatModel(msg, d, true, "Me", "0");
 
     _messageController.clear();
     Future.delayed(const Duration(milliseconds: 100), () {
@@ -132,7 +177,7 @@ class _ChatScreenState extends State<ChatScreen> {
       setState(() {
         _chatMessages.add(chatModel);
       });
-      sendToAI(chatModel);
+      sendToAI(chatModel, msg);
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -349,6 +394,26 @@ class _ChatScreenState extends State<ChatScreen> {
                 ],
               ),
               const Spacer(),
+              DropdownButton<String>(
+                value: _selectedLanguage,
+                onChanged: (String? newValue) async {
+                  setState(() {
+                    _selectedLanguage = newValue!;
+                    user.language = newValue;
+                  });
+                  await FirestoreDbService()
+                      .updateLanguage(user.uid, newValue!);
+
+                  // Handle language change here
+                },
+                items: languages.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(width: 12),
               IconButton(
                 icon: const Icon(Icons.delete_outline),
                 onPressed: () {
@@ -460,12 +525,12 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: () {
-              onSend();
-            },
-            child: const Text('Start Conversation'),
-          ),
+          // ElevatedButton(
+          //   onPressed: () {
+          //     onSend();
+          //   },
+          //   child: const Text('Start Conversation'),
+          // ),
         ],
       ),
     );
