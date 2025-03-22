@@ -108,6 +108,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     try {
       // Make the POST request
+      print(payload);
       final response = await http.post(
         Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
@@ -116,10 +117,14 @@ class _ChatScreenState extends State<ChatScreen> {
 
       print(response.body);
 
+      final decodedResponse =
+          utf8.decode(response.bodyBytes); // Use bodyBytes instead of body
+      print(decodedResponse);
+
       // Check if the request was successful
       if (response.statusCode == 200) {
         // Parse the response body
-        final Map<String, dynamic> responseData = json.decode(response.body);
+        final Map<String, dynamic> responseData = json.decode(decodedResponse);
 
         // Extract the AI's response from the JSON
         final String aiMessage = responseData['response'];
@@ -539,6 +544,9 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget _buildMessageBubble(ChatModel message) {
     final isUser = message.isSender;
 
+    // Detect if the message is in a right-to-left (RTL) language
+    final bool isRTL = _isRTL(message.msg);
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -572,13 +580,20 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: isRTL
+                    ? CrossAxisAlignment.end // Align RTL text to the right
+                    : CrossAxisAlignment.start, // Align LTR text to the left
                 children: [
                   Text(
                     message.msg,
                     style: TextStyle(
                       color: isUser ? Colors.white : Colors.black,
+                      fontSize: 16,
                     ),
+                    overflow: TextOverflow.visible,
+                    softWrap: true,
+                    textDirection:
+                        isRTL ? TextDirection.rtl : TextDirection.ltr,
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -588,6 +603,8 @@ class _ChatScreenState extends State<ChatScreen> {
                       color:
                           isUser ? Colors.white.withOpacity(0.7) : Colors.grey,
                     ),
+                    textDirection:
+                        isRTL ? TextDirection.rtl : TextDirection.ltr,
                   ),
                 ],
               ),
@@ -597,6 +614,13 @@ class _ChatScreenState extends State<ChatScreen> {
         ],
       ),
     );
+  }
+
+// Helper function to detect RTL languages
+  bool _isRTL(String text) {
+    final rtlRegex = RegExp(
+        r'[\u0590-\u05FF\u0600-\u06FF\u0750-\u077F\u0870-\u089F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]');
+    return rtlRegex.hasMatch(text);
   }
 }
 
