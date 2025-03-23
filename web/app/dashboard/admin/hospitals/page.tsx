@@ -168,7 +168,7 @@ export default function HospitalsPage() {
                                         <TableHead className="text-right">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
-                                <TableBody key="0">
+                                <TableBody>
                                     {filteredHospitals.map((hospital) => (
                                         <TableRow key={hospital.id} className="group">
                                             <TableCell>
