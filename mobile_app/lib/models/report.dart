@@ -1,3 +1,5 @@
+import 'package:health_care/models/user.dart';
+
 class Doctor {
   final String id;
   final String name;
@@ -45,42 +47,54 @@ class Doctor {
 }
 
 class Report {
-  final String id;
-  final String title;
-  final DateTime date;
-  final Doctor? doctor;
-  final String patientName;
-  final String summary;
-  final String anomalyDetection;
-  final String doctorSuggestions;
+  final String reportId;
+  final String brief;
+  final String timestamp;
+  final String docSuggestions;
   final String aiSuggestions;
+  final String anomalies;
+  final bool isSeen;
+  final String deviceId;
+  final bool isEditing;
+  final String age;
+  final String docId;
+  final Doctor? doctor;
+  final Account? patient;
   final List<HeartRateData> heartRateData;
 
   Report({
-    required this.id,
-    required this.title,
-    required this.date,
-    this.doctor,
-    required this.patientName,
-    required this.summary,
-    required this.anomalyDetection,
-    required this.doctorSuggestions,
+    required this.reportId,
+    required this.brief,
+    required this.timestamp,
+    required this.docSuggestions,
     required this.aiSuggestions,
+    required this.anomalies,
+    required this.isSeen,
+    required this.deviceId,
+    required this.isEditing,
+    required this.age,
+    required this.docId,
+    this.doctor,
+    this.patient,
     required this.heartRateData,
   });
 
   // Convert Report to a Map
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'title': title,
-      'date': date.toIso8601String(),
-      'doctor': doctor?.toMap(),
-      'patientName': patientName,
-      'summary': summary,
-      'anomalyDetection': anomalyDetection,
-      'doctorSuggestions': doctorSuggestions,
+      'reportId': reportId,
+      'brief': brief,
+      'timestamp': timestamp,
+      'docSuggestions': docSuggestions,
       'aiSuggestions': aiSuggestions,
+      'anomalies': anomalies,
+      'isSeen': isSeen,
+      'deviceId': deviceId,
+      'isEditing': isEditing,
+      'age': age,
+      'docId': docId,
+      'doctor': doctor?.toMap(),
+      'patient': patient?.toMap(),
       'heartRateData': heartRateData.map((hr) => hr.toMap()).toList(),
     };
   }
@@ -88,15 +102,19 @@ class Report {
   // Create Report from a Map
   factory Report.fromMap(Map<String, dynamic> map) {
     return Report(
-      id: map['id'],
-      title: map['title'],
-      date: DateTime.parse(map['date']),
-      doctor: map['doctor'] != null ? Doctor.fromMap(map['doctor']) : null,
-      patientName: map['patientName'],
-      summary: map['summary'],
-      anomalyDetection: map['anomalyDetection'],
-      doctorSuggestions: map['doctorSuggestions'],
+      reportId: map['reportId'],
+      brief: map['brief'],
+      timestamp: map['timestamp'],
+      docSuggestions: map['docSuggestions'],
       aiSuggestions: map['aiSuggestions'],
+      anomalies: map['anomalies'],
+      isSeen: map['isSeen'] == 'true',
+      deviceId: map['deviceId'],
+      isEditing: map['isEditing'] == 'true',
+      age: map['age'],
+      docId: map['docId'],
+      doctor: map['doctor'] != null ? Doctor.fromMap(map['doctor']) : null,
+      patient: map['patient'] != null ? Account.fromMap(map['patient']) : null,
       heartRateData: (map['heartRateData'] as List<dynamic>?)
               ?.map((hr) => HeartRateData.fromMap(hr))
               .toList() ??
@@ -135,6 +153,36 @@ class HeartRateData {
       channel1: map['channel1'],
       channel2: map['channel2'],
       channel3: map['channel3'],
+    );
+  }
+}
+
+class ReportDoctor {
+  final String name;
+  final String mobile;
+  final String email;
+
+  ReportDoctor({
+    required this.name,
+    required this.mobile,
+    required this.email,
+  });
+
+  // Convert HeartRateData to a Map
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'mobile': mobile,
+      'email': email,
+    };
+  }
+
+  // Create HeartRateData from a Map
+  factory ReportDoctor.fromMap(Map<String, dynamic> map) {
+    return ReportDoctor(
+      name: map['doctorName'],
+      mobile: map['doctorMobile'],
+      email: map['doctorEmail'],
     );
   }
 }

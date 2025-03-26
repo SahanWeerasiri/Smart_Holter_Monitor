@@ -9,7 +9,6 @@ import 'package:health_care/constants/consts.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care/models/user.dart';
 // import 'package:health_care/pages/app/services/firestore_db_service.dart';
-import 'package:health_care/pages/app/services/util.dart';
 // import 'package:iconly/iconly.dart';
 // import 'package:url_launcher/url_launcher.dart';
 
@@ -22,7 +21,8 @@ class Summary extends StatefulWidget {
 
 class _SummaryState extends State<Summary> {
   Account patient = Account.instance;
-  bool isLoading = false;
+  bool isLoading =
+      true; // Start with isLoading true to show a loading indicator
   int currentHeartRate = 0;
   num avgHeartRate = 0.0;
   Color stateBoxColor = StyleSheet().stateHeartBoxBad;
@@ -30,11 +30,22 @@ class _SummaryState extends State<Summary> {
   bool state = false;
 
   @override
-  initState() {
+  void initState() {
     super.initState();
-    Account().initialize();
-    patient = Account.instance;
-    print(patient.name);
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    await patient.initialize(); // Wait for the account data to be initialized
+
+    setState(() {
+      isLoading = false;
+    });
+
     fetchDeviceData(patient.deviceId);
   }
 
@@ -100,58 +111,69 @@ class _SummaryState extends State<Summary> {
   // }
 
   Future<void> fetchDeviceData(String device) async {
+    if (device == "Device") {
+      return;
+    }
     final FirebaseDatabase database = FirebaseDatabase.instance;
     // Reference to the device's data
-    final ref = database.ref('devices').child(device).child('data');
+    final ref = database.ref('devices').child(device).child('beats');
+
     // Listen for real-time updates
     ref.onValue.listen((DatabaseEvent event) {
-      final data = event.snapshot.value as Map<dynamic, dynamic>?;
       if (!mounted) return;
 
-      if (data != null && data.isNotEmpty) {
-        // Convert the map to a sorted list of entries (descending by timestamp)
-        final sortedEntries = data.entries.toList()
-          ..sort((a, b) =>
-              b.key.compareTo(a.key)); // Sort by key (time_stamp) descending
+      // Safely handle the snapshot value
+      final data = event.snapshot.value;
 
-        // final values =
-        //     sortedEntries.map((entry) => entry.value as num).toList();
-        // final avgValue = values.isNotEmpty
-        //     ? values.reduce((a, b) => a + b) / values.length
-        //     : 0;
+      if (data is List) {
+        // Filter out null values and ensure each item is a Map
+        final validData = data.whereType<Map<dynamic, dynamic>>().toList();
 
-        // // The latest entry will now be the first
-        // final latestEntry = sortedEntries.first;
+        if (validData.isNotEmpty) {
+          // Sort the list by timestamp in descending order
+          validData.sort((a, b) {
+            final timestampA = a['timestamp'] as String? ?? '';
+            final timestampB = b['timestamp'] as String? ?? '';
+            return timestampB.compareTo(timestampA); // Descending order
+          });
 
-        Map<String, int> testMap = {};
-        for (MapEntry me in sortedEntries) {
-          testMap[me.key] = me.value as int;
-        }
-        var sortedMap = Map.fromEntries(
-          testMap.entries.toList()
-            ..sort((a, b) =>
-                DateTime.parse(a.key).compareTo(DateTime.parse(b.key))),
-        );
-        testMap = sortedMap;
-
-        for (String key in testMap.keys) {
-          print(key);
-          print(testMap[key]);
-        }
-
-        setState(() {
-          // currentHeartRate = latestEntry.value;
-
-          currentHeartRate = getHeartBeat(testMap);
-          // avgHeartRate = avgValue;
-          avgHeartRate = currentHeartRate + 2;
-          if (60 <= currentHeartRate && currentHeartRate <= 100) {
-            stateBoxColor = StyleSheet().stateHeartBoxGood;
-          } else {
-            stateBoxColor = StyleSheet().stateHeartBoxBad;
+          // Create a map of timestamp to value
+          final Map<String, int> testMap = {};
+          for (final entry in validData) {
+            final timestamp = entry['timestamp'] as String? ?? '';
+            final value = entry['value'] as int? ?? 0;
+            testMap[timestamp] = value;
           }
-        });
+
+          // Sort the map by timestamp in ascending order
+          final sortedMap = Map.fromEntries(
+            testMap.entries.toList()
+              ..sort((a, b) =>
+                  DateTime.parse(a.key).compareTo(DateTime.parse(b.key))),
+          );
+          // Calculate the current heart rate and average heart rate
+          final currentHeartRate = sortedMap.values.last;
+          final avgHeartRate = currentHeartRate + 2; // Example calculation
+
+          // Update the state
+          setState(() {
+            this.currentHeartRate = currentHeartRate;
+            this.avgHeartRate = avgHeartRate;
+            if (60 <= currentHeartRate && currentHeartRate <= 100) {
+              stateBoxColor = StyleSheet().stateHeartBoxGood;
+            } else {
+              stateBoxColor = StyleSheet().stateHeartBoxBad;
+            }
+          });
+        } else {
+          // If no valid data is available, reset the values
+          setState(() {
+            currentHeartRate = 0;
+            avgHeartRate = 0.0;
+          });
+        }
       } else {
+        // If the data is not a List, reset the values
         setState(() {
           currentHeartRate = 0;
           avgHeartRate = 0.0;
@@ -163,6 +185,27 @@ class _SummaryState extends State<Summary> {
         currentHeartRate = 0;
         avgHeartRate = 0.0;
       });
+    });
+
+    final ref2 = database.ref('devices').child(device).child('isDone');
+
+    // Listen for real-time updates
+    ref2.onValue.listen((DatabaseEvent event) {
+      if (!mounted) return;
+
+      // Safely handle the snapshot value
+      final data = event.snapshot.value as bool;
+      if (data) {
+        setState(() {
+          patient.deviceState = true;
+        });
+      } else {
+        setState(() {
+          patient.deviceState = false;
+        });
+      }
+    }, onError: (error) {
+      if (!mounted) return;
     });
   }
 
@@ -261,22 +304,35 @@ class _SummaryState extends State<Summary> {
     Color statusColor;
     IconData statusIcon;
 
-    switch (patientData.deviceState.toLowerCase()) {
-      case 'good':
-        statusColor = Colors.green;
-        statusIcon = Icons.check_circle;
-        break;
-      case 'moderate':
-        statusColor = Colors.orange;
-        statusIcon = Icons.warning;
-        break;
-      case 'bad':
+    // switch (patientData.deviceState) {
+    //   case 'good':
+    //     statusColor = Colors.green;
+    //     statusIcon = Icons.check_circle;
+    //     break;
+    //   case 'moderate':
+    //     statusColor = Colors.orange;
+    //     statusIcon = Icons.warning;
+    //     break;
+    //   case 'bad':
+    //     statusColor = Colors.red;
+    //     statusIcon = Icons.error;
+    //     break;
+    //   default:
+    //     statusColor = Colors.grey;
+    //     statusIcon = Icons.help;
+    // }
+
+    if (patientData.deviceState) {
+      statusColor = Colors.green;
+      statusIcon = Icons.check_circle;
+    } else {
+      if (patientData.deviceId == "Device") {
         statusColor = Colors.red;
-        statusIcon = Icons.error;
-        break;
-      default:
-        statusColor = Colors.grey;
-        statusIcon = Icons.help;
+        statusIcon = Icons.device_unknown;
+      } else {
+        statusColor = Colors.orange;
+        statusIcon = Icons.monitor;
+      }
     }
 
     return Card(
@@ -292,21 +348,21 @@ class _SummaryState extends State<Summary> {
               children: [
                 Expanded(
                   child: _buildHeartRateItem(
-                    'Current BPM',
+                    'Heart Rate (BPM)',
                     currentHeartRate.toString(),
                     Icons.favorite,
                     Colors.red,
                   ),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildHeartRateItem(
-                    'Average BPM',
-                    avgHeartRate.toString(),
-                    Icons.favorite_border,
-                    Colors.red,
-                  ),
-                ),
+                // const SizedBox(width: 16),
+                // Expanded(
+                //   child: _buildHeartRateItem(
+                //     'Average BPM',
+                //     avgHeartRate.toString(),
+                //     Icons.favorite_border,
+                //     Colors.red,
+                //   ),
+                // ),
               ],
             ),
             const Divider(height: 32),
@@ -330,7 +386,11 @@ class _SummaryState extends State<Summary> {
                         ),
                       ),
                       Text(
-                        patientData.deviceState,
+                        patientData.deviceState
+                            ? 'Completed'
+                            : patientData.deviceId == "Device"
+                                ? 'No Device'
+                                : 'Still Monitoring',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -449,14 +509,12 @@ class _SummaryState extends State<Summary> {
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    backgroundImage:
-                        // patient.doctorImageURL != null ?
-                        NetworkImage(patient.doctorImageURL),
-                    // : null,
-                    child:
-                        // patient.doctorImageURL == null ?
-                        const Icon(Icons.person, size: 30),
-                    // : null,
+                    backgroundImage: patient.doctorImageURL != null
+                        ? NetworkImage(patient.doctorImageURL)
+                        : null,
+                    child: patient.doctorImageURL == null
+                        ? const Icon(Icons.person, size: 30)
+                        : null,
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -472,7 +530,7 @@ class _SummaryState extends State<Summary> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          patient.docId,
+                          patient.doctorMobile,
                           style: const TextStyle(
                             fontSize: 14,
                             color: Colors.grey,
@@ -480,7 +538,7 @@ class _SummaryState extends State<Summary> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          patient.doctorHospitalId,
+                          patient.hoispitalName,
                           style: const TextStyle(
                             fontSize: 14,
                             color: Colors.grey,
@@ -530,16 +588,14 @@ class _SummaryState extends State<Summary> {
               const SizedBox(height: 24),
               Center(
                 child: CircleAvatar(
-                    radius: 50,
-                    backgroundImage:
-                        // patient.doctorImageURL != null ?
-                        NetworkImage(patient.doctorImageURL),
-                    // : null,
-                    child:
-                        // patient.doctorImageURL == null ?
-                        const Icon(Icons.person, size: 50)
-                    // : null,
-                    ),
+                  radius: 50,
+                  backgroundImage: patient.doctorImageURL != null
+                      ? NetworkImage(patient.doctorImageURL)
+                      : null,
+                  child: patient.doctorImageURL == null
+                      ? const Icon(Icons.person, size: 50)
+                      : null,
+                ),
               ),
               const SizedBox(height: 16),
               Center(
@@ -551,20 +607,20 @@ class _SummaryState extends State<Summary> {
                   ),
                 ),
               ),
-              Center(
-                child: Text(
-                  patient.docId,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
+              // Center(
+              //   child: Text(
+              //     patient.docId,
+              //     style: const TextStyle(
+              //       fontSize: 16,
+              //       color: Colors.grey,
+              //     ),
+              //   ),
+              // ),
               const SizedBox(height: 24),
               const Divider(),
               const SizedBox(height: 16),
               _buildDoctorDetailItem(
-                  Icons.business, 'Hospital', patient.doctorHospitalId),
+                  Icons.business, 'Hospital', patient.hoispitalName),
               const SizedBox(height: 16),
               _buildDoctorDetailItem(
                   Icons.phone, 'Phone', patient.doctorMobile),

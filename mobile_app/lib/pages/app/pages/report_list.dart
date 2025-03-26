@@ -1,15 +1,9 @@
-// import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:health_care/components/list/design1/list1.dart';
-// import 'package:health_care/components/list/design1/list_item_data.dart';
-// import 'package:health_care/constants/consts.dart';
 import 'package:flutter/material.dart';
 import 'package:health_care/models/report.dart';
 import 'package:health_care/models/user.dart';
 import 'package:health_care/pages/app/additional/simple_dialogue_report_viewer.dart';
 import 'package:health_care/pages/app/services/firestore_db_service.dart';
 import 'package:health_care/pages/screens/report_detail_screen.dart';
-// import 'package:iconly/iconly.dart';
-import 'package:intl/intl.dart';
 
 class ReportList extends StatefulWidget {
   const ReportList({super.key});
@@ -28,78 +22,48 @@ class _ReportListState extends State<ReportList> {
 
   Future<void> showReport(Map<String, dynamic> dataModel) async {
     showDialog(
-        context: context,
-        builder: (context) => DialogReport(
-              reportId: dataModel['report']['reportId'],
-              aiSuggestions: dataModel['report']['aiSuggestions'],
-              anomalyDetails: dataModel['report']['anomalies'],
-              overallSummary: dataModel['report']['brief'],
-              description: dataModel['report']['description'],
-              doctorName: dataModel['doctor']['doctorName'],
-              doctorSpecialization: dataModel['doctor']['doctorEmail'],
-              patientAge: dataModel['patient']['age'],
-              patientId: dataModel['patient']['id'],
-              patientName: dataModel['patient']['name'],
-              avgHeartRate: dataModel['report']['avgHeart'],
-              doctorSuggestions: dataModel['report']['docSuggestions'],
-              reportDate: dataModel['report']['timestamp'],
-              graphData: dataModel['data'],
-              isNew: true,
-            )
-        //
-        // text: "Report",
-        // reportModel: report,
-        // basicColor: StyleSheet().uiBackground,
-        // fontColor: StyleSheet().doctorDetailsPopPrimary,
-        // subTextFontColor: StyleSheet().doctorDetailsPopPSecondary,
-        // onPressed: () {
-        //   FirestoreDbService()
-        //       .updateReportSeen(widget.user!.uid, report.reportId);
-        //   setState(() {
-        //     _newReportList.clear();
-        //     _oldReportList.clear();
-        //   });
-        //   fetchReports();
-        //   Navigator.pop(context);
-        // },
-        // btnText: "Mark As Read",
-        // btnBackColor: StyleSheet().btnBackground,
-        // btnTextColor: StyleSheet().btnText,
-
-        );
+      context: context,
+      builder: (context) => DialogReport(
+        reportId: dataModel['report']['reportId'],
+        aiSuggestions: dataModel['report']['aiSuggestions'],
+        anomalyDetails: dataModel['report']['anomalies'],
+        overallSummary: dataModel['report']['brief'],
+        description: dataModel['report']['description'],
+        doctorName: dataModel['doctor']['doctorName'],
+        doctorSpecialization: dataModel['doctor']['doctorEmail'],
+        patientAge: dataModel['patient']['age'],
+        patientId: dataModel['patient']['id'],
+        patientName: dataModel['patient']['name'],
+        avgHeartRate: dataModel['report']['avgHeart'],
+        doctorSuggestions: dataModel['report']['docSuggestions'],
+        reportDate: dataModel['report']['timestamp'],
+        graphData: dataModel['data'],
+        isNew: true,
+      ),
+    );
   }
 
   Future<void> showOldReport(Map<String, dynamic> dataModel) async {
     showDialog(
-        context: context,
-        builder: (context) => DialogReport(
-              reportId: dataModel['report']['reportId'],
-              aiSuggestions: dataModel['report']['aiSuggestions'],
-              anomalyDetails: dataModel['report']['anomalies'],
-              overallSummary: dataModel['report']['brief'],
-              description: dataModel['report']['description'],
-              doctorName: dataModel['doctor']['doctorName'],
-              doctorSpecialization: dataModel['doctor']['doctorEmail'],
-              patientAge: dataModel['patient']['age'],
-              patientId: dataModel['patient']['id'],
-              patientName: dataModel['patient']['name'],
-              avgHeartRate: dataModel['report']['avgHeart'],
-              doctorSuggestions: dataModel['report']['docSuggestions'],
-              reportDate: dataModel['report']['timestamp'],
-              graphData: dataModel['data'],
-              isNew: false,
-            )
-        // text: "Report",
-        // reportModel: report,
-        // basicColor: StyleSheet().uiBackground,
-        // fontColor: StyleSheet().doctorDetailsPopPrimary,
-        // subTextFontColor: StyleSheet().doctorDetailsPopPSecondary,
-        // onPressed: () {
-        //   Navigator.pop(context);
-        // },
-        // btnBackColor: StyleSheet().btnBackground,
-        // btnTextColor: StyleSheet().btnText,
-        );
+      context: context,
+      builder: (context) => DialogReport(
+        reportId: dataModel['report']['reportId'],
+        aiSuggestions: dataModel['report']['aiSuggestions'],
+        anomalyDetails: dataModel['report']['anomalies'],
+        overallSummary: dataModel['report']['brief'],
+        description: dataModel['report']['description'],
+        doctorName: dataModel['doctor']['doctorName'],
+        doctorSpecialization: dataModel['doctor']['doctorEmail'],
+        patientAge: dataModel['patient']['age'],
+        patientId: dataModel['patient']['id'],
+        patientName: dataModel['patient']['name'],
+        avgHeartRate: dataModel['report']['avgHeart'],
+        doctorSuggestions: dataModel['report']['docSuggestions'],
+        reportDate: dataModel['report']['timestamp'],
+        graphData: dataModel['data'],
+        isNew: false,
+      ),
+    );
   }
 
   @override
@@ -107,7 +71,6 @@ class _ReportListState extends State<ReportList> {
     super.initState();
     Account().initialize();
     patient = Account.instance;
-    print(patient.uid);
     fetchReports();
   }
 
@@ -117,8 +80,11 @@ class _ReportListState extends State<ReportList> {
     });
     Map<String, dynamic> res =
         await FirestoreDbService().fetchReportsV2(patient.uid);
+    print(res.toString());
     if (res['success']) {
       setState(() {
+        _newReportList.clear();
+        _oldReportList.clear();
         for (Map<String, dynamic> dataModel in res['data_new']) {
           _newReportList.add(dataModel);
         }
@@ -181,7 +147,9 @@ class _ReportListState extends State<ReportList> {
       );
     }
 
-    if (patient.uid.isNotEmpty && patient.reports.isEmpty) {
+    if (patient.uid.isNotEmpty &&
+        _newReportList.isEmpty &&
+        _oldReportList.isEmpty) {
       return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -215,15 +183,51 @@ class _ReportListState extends State<ReportList> {
           ),
         ),
         const SizedBox(height: 16),
-        ...patient.reports
-            .map((report) => _buildReportCard(context, report as Report)),
+        if (_newReportList.isNotEmpty)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'New Reports',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              ..._newReportList
+                  .map((report) => _buildReportCard(context, report)),
+            ],
+          ),
+        if (_oldReportList.isNotEmpty)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              const Text(
+                'Old Reports',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              ..._oldReportList
+                  .map((report) => _buildReportCard(context, report)),
+            ],
+          ),
       ],
     );
   }
 
-  Widget _buildReportCard(BuildContext context, Report report) {
-    final dateFormat = DateFormat('MMM dd, yyyy');
+  Widget _buildReportCard(
+      BuildContext context, Map<String, dynamic> reportData) {
+    print("all good");
 
+    final report = Report.fromMap(reportData['report']);
+    final patient = Account.fromMap(reportData['patient']);
+    final doctor = ReportDoctor.fromMap(reportData['doctor']);
+    final data = reportData['data'];
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
@@ -235,7 +239,11 @@ class _ReportListState extends State<ReportList> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ReportDetailScreen(report: report),
+              builder: (context) => ReportDetailScreen(
+                  report: report,
+                  patient: patient,
+                  doctor: doctor,
+                  heartRateData: data),
             ),
           );
         },
@@ -255,7 +263,7 @@ class _ReportListState extends State<ReportList> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      report.title,
+                      "General Report - ${report.timestamp}",
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -274,7 +282,7 @@ class _ReportListState extends State<ReportList> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    dateFormat.format(report.date),
+                    report.timestamp,
                     style: const TextStyle(
                       color: Colors.grey,
                     ),
@@ -294,80 +302,3 @@ class _ReportListState extends State<ReportList> {
     );
   }
 }
-
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   AppSizes().initSizes(context);
-
-  //   if (isLoading) {
-  //     return Center(
-  //         child: CircularProgressIndicator(
-  //       color: StyleSheet().btnBackground,
-  //       backgroundColor: StyleSheet().uiBackground,
-  //     ));
-  //   }
-
-  //   return Center(
-  //       child: Container(
-  //           color: StyleSheet().uiBackground,
-  //           padding: EdgeInsets.all(AppSizes().getBlockSizeHorizontal(5)),
-  //           child: Column(
-  //             children: [
-  //               Container(
-  //                 padding: EdgeInsets.only(
-  //                     left: AppSizes().getBlockSizeHorizontal(3)),
-  //                 child: Row(
-  //                   mainAxisAlignment: MainAxisAlignment.start,
-  //                   children: [
-  //                     Text(
-  //                       "Latest Report",
-  //                       style: TextStyle(
-  //                         fontWeight: FontWeight.bold,
-  //                         fontSize: 15,
-  //                       ),
-  //                     )
-  //                   ],
-  //                 ),
-  //               ),
-  //               Expanded(
-  //                   child: List1(
-  //                       color: StyleSheet().uiBackground,
-  //                       data: _newReportList.map((report) {
-  //                         return ListItem1Data(
-  //                             title: truncateString(report['report']['brief']),
-  //                             icon: IconlyLight.document,
-  //                             onPressed: () {
-  //                               showReport(report);
-  //                             });
-  //                       }).toList())),
-  //               Container(
-  //                 padding: EdgeInsets.only(
-  //                     left: AppSizes().getBlockSizeHorizontal(3)),
-  //                 child: Row(
-  //                   mainAxisAlignment: MainAxisAlignment.start,
-  //                   children: [
-  //                     Text(
-  //                       "Old Reports",
-  //                       style: TextStyle(
-  //                         fontWeight: FontWeight.bold,
-  //                         fontSize: 15,
-  //                       ),
-  //                     )
-  //                   ],
-  //                 ),
-  //               ),
-  //               Expanded(
-  //                   child: List1(
-  //                       color: StyleSheet().uiBackground,
-  //                       data: _oldReportList.map((report) {
-  //                         return ListItem1Data(
-  //                             title: truncateString(report['report']['brief']),
-  //                             icon: IconlyLight.document,
-  //                             onPressed: () {
-  //                               showOldReport(report);
-  //                             });
-  //                       }).toList())),
-  //             ],
-  //           )));
-  // }

@@ -26,8 +26,10 @@ class Account {
   String doctorHospitalId = "";
   String deviceDescription = "";
   String deviceDeadline = "";
-  String deviceState = "";
+  bool deviceState = false;
   String deviceHospitalId = "";
+  String hoispitalName = "";
+  String hospitalMobile = "";
 
   List<Map<String, dynamic>> emergency = [];
   List<Map<String, dynamic>> reports = [];
@@ -39,6 +41,70 @@ class Account {
   Account._internal();
 
   static Account get instance => _instance;
+
+  // Convert Account to a Map
+  Map<String, dynamic> toMap() {
+    return {
+      'uid': uid,
+      'name': name,
+      'address': address,
+      'mobile': mobile,
+      'email': email,
+      'birthday': birthday,
+      'profileImage': profileImage,
+      'language': language,
+      'age': age,
+      'deviceId': deviceId,
+      'docId': docId,
+      'isDone': isDone,
+      'doctorName': doctorName,
+      'doctorMobile': doctorMobile,
+      'doctorEmail': doctorEmail,
+      'doctorAddress': doctorAddress,
+      'doctorImageURL': doctorImageURL,
+      'doctorHospitalId': doctorHospitalId,
+      'deviceDescription': deviceDescription,
+      'deviceDeadline': deviceDeadline,
+      'deviceState': deviceState,
+      'deviceHospitalId': deviceHospitalId,
+      'hoispitalName': hoispitalName,
+      'hospitalMobile': hospitalMobile,
+      'emergency': emergency,
+      'reports': reports,
+    };
+  }
+
+  // Create Account from a Map
+  factory Account.fromMap(Map<String, dynamic> map) {
+    Account account = Account._internal();
+    account.uid = map['uid'] ?? "";
+    account.name = map['name'] ?? "";
+    account.address = map['address'] ?? "";
+    account.mobile = map['mobile'] ?? "";
+    account.email = map['email'] ?? "";
+    account.birthday = map['birthday'] ?? "";
+    account.profileImage = map['profileImage'] ?? "";
+    account.language = map['language'] ?? "";
+    account.age = map['age'] ?? "";
+    account.deviceId = map['deviceId'] ?? "";
+    account.docId = map['docId'] ?? "";
+    account.isDone = map['isDone'] ?? false;
+    account.doctorName = map['doctorName'] ?? "";
+    account.doctorMobile = map['doctorMobile'] ?? "";
+    account.doctorEmail = map['doctorEmail'] ?? "";
+    account.doctorAddress = map['doctorAddress'] ?? "";
+    account.doctorImageURL = map['doctorImageURL'] ?? "";
+    account.doctorHospitalId = map['doctorHospitalId'] ?? "";
+    account.deviceDescription = map['deviceDescription'] ?? "";
+    account.deviceDeadline = map['deviceDeadline'] ?? "";
+    account.deviceState = map['deviceState'] ?? false;
+    account.deviceHospitalId = map['deviceHospitalId'] ?? "";
+    account.hoispitalName = map['hoispitalName'] ?? "";
+    account.hospitalMobile = map['hospitalMobile'] ?? "";
+    account.emergency = List<Map<String, dynamic>>.from(map['emergency'] ?? []);
+    account.reports = List<Map<String, dynamic>>.from(map['reports'] ?? []);
+    return account;
+  }
 
   Future<void> initialize() async {
     User? currentUser = FirebaseAuth.instance.currentUser;
@@ -83,10 +149,11 @@ class Account {
         if (deviceId != "Device") {
           Map<String, dynamic> data3 =
               await RealDbService().fetchDeviceDetails(deviceId);
+          print("Device data fetched");
           if (data3['success']) {
             deviceDescription = data3["other"] ?? "";
             deviceDeadline = data3["deadline"] ?? "";
-            deviceState = data3["state"] ?? "";
+            deviceState = data3["idDone"] ?? false;
             deviceHospitalId = data3["hospitalId"] ?? "";
           }
         }
@@ -108,12 +175,18 @@ class Account {
           reports
               .addAll(List<Map<String, dynamic>>.from(data5["data_old"] ?? []));
         }
+
+        Map<String, dynamic> data6 =
+            await FirestoreDbService().fetchHospital(doctorHospitalId);
+        if (data6['success']) {
+          hoispitalName = data6["data"]["name"] ?? "";
+          hospitalMobile = data6["data"]["mobile"] ?? "";
+        }
+
         print("Reports initialized");
       } catch (e) {
         print("Error initializing account: $e");
       }
-    } else {
-      clear();
     }
   }
 
@@ -137,9 +210,11 @@ class Account {
     doctorImageURL = "";
     deviceDescription = "";
     deviceDeadline = "";
-    deviceState = "";
+    deviceState = false;
     deviceHospitalId = "";
     emergency = [];
     reports = [];
+    hoispitalName = "";
+    hospitalMobile = "";
   }
 }
