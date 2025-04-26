@@ -29,15 +29,16 @@ class _ReportDetailScreenState extends State<ReportDetailScreen>
   late TabController _tabController;
   DateTime _startTime = DateTime.now().subtract(const Duration(hours: 24));
   DateTime _endTime = DateTime.now();
+  String label = "Normal";
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
 
-    if (widget.report.heartRateData.isNotEmpty) {
-      _startTime = widget.report.heartRateData.first.timestamp;
-      _endTime = widget.report.heartRateData.last.timestamp;
+    if (widget.heartRateData.isNotEmpty) {
+      _startTime = DateTime.parse(widget.heartRateData.first.entries.first.key);
+      _endTime = _startTime.add(const Duration(seconds: 10));
     }
     _update();
   }
@@ -152,6 +153,19 @@ class _ReportDetailScreenState extends State<ReportDetailScreen>
                 ),
               ),
             ),
+            const SizedBox(height: 12),
+            Center(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: label != "Normal"
+                      ? Colors.red
+                      : Colors.green, // Fixed ternary operator
+                ),
+              ),
+            ),
             const SizedBox(height: 24),
             _buildSectionCard('Summary', widget.report.brief),
             const SizedBox(height: 16),
@@ -159,8 +173,8 @@ class _ReportDetailScreenState extends State<ReportDetailScreen>
             const SizedBox(height: 16),
             _buildSectionCard(
                 'Doctor Suggestions', widget.report.docSuggestions),
-            const SizedBox(height: 16),
-            _buildSectionCard('AI Suggestions', widget.report.aiSuggestions),
+            // const SizedBox(height: 16),
+            // _buildSectionCard('AI Suggestions', widget.report.aiSuggestions),
           ],
         ),
       ),
@@ -215,17 +229,18 @@ class _ReportDetailScreenState extends State<ReportDetailScreen>
                   if (newDateTime.isBefore(_endTime)) {
                     setState(() {
                       _startTime = newDateTime;
+                      _endTime = newDateTime.add(const Duration(seconds: 10));
                     });
                   }
                 }),
-                const SizedBox(width: 16),
-                _buildDateTimeSelector('End', _endTime, (newDateTime) {
-                  if (newDateTime.isAfter(_startTime)) {
-                    setState(() {
-                      _endTime = newDateTime;
-                    });
-                  }
-                }),
+                // const SizedBox(width: 16),
+                // _buildDateTimeSelector('End', _endTime, (newDateTime) {
+                //   if (newDateTime.isAfter(_startTime)) {
+                //     setState(() {
+                //       _endTime = newDateTime;
+                //     });
+                //   }
+                // }),
               ],
             ),
           ],
@@ -375,11 +390,35 @@ class _ReportDetailScreenState extends State<ReportDetailScreen>
 
     return LineChart(
       LineChartData(
-        gridData: const FlGridData(
+        lineTouchData: LineTouchData(
+          enabled: true,
+          handleBuiltInTouches: true,
+          touchCallback: (p0, p1) => {
+            //zoom
+          },
+        ),
+        gridData: FlGridData(
           show: true,
           drawVerticalLine: true,
-          horizontalInterval: 20,
-          verticalInterval: 10,
+          drawHorizontalLine: true,
+          horizontalInterval: 40, // Adjust the interval for horizontal lines
+          verticalInterval: 40, // Adjust the interval for vertical lines
+          getDrawingHorizontalLine: (value) {
+            return FlLine(
+              color: const Color.fromARGB(255, 255, 2, 2)
+                  .withOpacity(0.5), // Grid line color
+              strokeWidth: 1,
+              dashArray: [1, 2], // Dash pattern: 5 pixels drawn, 5 pixels gap
+            );
+          },
+          getDrawingVerticalLine: (value) {
+            return FlLine(
+              color: const Color.fromARGB(255, 255, 0, 0)
+                  .withOpacity(0.5), // Grid line color
+              strokeWidth: 1,
+              dashArray: [1, 1], // Dash pattern: 5 pixels drawn, 5 pixels gap
+            );
+          },
         ),
         titlesData: FlTitlesData(
           show: true,
@@ -398,23 +437,34 @@ class _ReportDetailScreenState extends State<ReportDetailScreen>
         ),
         borderData: FlBorderData(
           show: true,
-          border: Border.all(color: Colors.grey.shade300),
+          border: Border.all(
+            color: Colors.grey.withOpacity(0.5),
+            width: 1,
+          ),
         ),
         minX: 0,
         maxX: filteredData.length.toDouble() - 1,
         minY: 0,
         maxY: 4096,
+        backgroundColor: const Color.fromARGB(255, 255, 146, 146)
+            .withOpacity(0.8), // Light pink background
         lineBarsData: [
           LineChartBarData(
             spots: spots,
+            aboveBarData: BarAreaData(
+              show: true,
+              color: Colors.black
+                  .withOpacity(0.1), // Light black for area above the line
+            ),
             isCurved: true,
-            color: Colors.teal,
-            barWidth: 2,
+            color: Colors.black, // Black for the main line
+            barWidth: 3,
             isStrokeCapRound: true,
             dotData: const FlDotData(show: false),
             belowBarData: BarAreaData(
               show: true,
-              color: Colors.teal.withOpacity(0.2),
+              color: Colors.black
+                  .withOpacity(0.1), // Light black for area below the line
             ),
           ),
         ],

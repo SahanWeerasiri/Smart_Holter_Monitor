@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
 // import 'package:health_care/components/buttons/custom_text_button/custom_text_button.dart';
 // import 'package:health_care/components/list/design1/list_item1.dart';
@@ -405,16 +404,26 @@ class _ProfileState extends State<Profile> {
               final pickedFile =
                   await ImagePicker().pickImage(source: ImageSource.gallery);
               if (pickedFile != null) {
+                // Read the file as bytes
+                final bytes = await pickedFile.readAsBytes();
+
+                // Encode the bytes to Base64
+                final encodedImage = base64Encode(bytes);
+
                 setState(() {
-                  user.profileImage = pickedFile.path;
+                  user.profileImage =
+                      encodedImage; // Store the Base64 encoded string
                 });
+
+                // Update the profile in Firestore with the encoded image
                 await FirestoreDbService().updateProfile(
                   user.uid,
                   user.mobile,
                   user.language,
                   user.address,
-                  user.profileImage,
+                  user.profileImage, // Now contains the Base64 encoded string
                 );
+
                 // Upload logic to store image in Firebase or backend can be added here.
               }
             },
@@ -425,7 +434,8 @@ class _ProfileState extends State<Profile> {
                   radius: 50,
                   backgroundColor: Colors.grey[200],
                   backgroundImage: user.profileImage.isNotEmpty
-                      ? FileImage(File(user.profileImage)) as ImageProvider
+                      ? MemoryImage(base64Decode(
+                          user.profileImage)) // Decode Base64 string
                       : null,
                   child: user.profileImage.isEmpty
                       ? const Icon(

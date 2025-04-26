@@ -13,6 +13,7 @@ import {
   Legend,
   ResponsiveContainer,
   ReferenceArea,
+  ReferenceLine,
 } from "recharts"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -32,6 +33,10 @@ import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { CalendarIcon } from "lucide-react"
 import { format } from "date-fns"
+import DateTimePicker from "react-datetime-picker";
+import "react-datetime-picker/dist/DateTimePicker.css";
+import "react-calendar/dist/Calendar.css";
+import "react-clock/dist/Clock.css";
 
 export default function CreateReportPage() {
   const router = useRouter()
@@ -43,6 +48,34 @@ export default function CreateReportPage() {
   const [generatingAI, setGeneratingAI] = useState(false)
   const [patient, setPatient] = useState<Patient>()
   const [displayData, setDisplayData] = useState<ChannelData[]>([])
+  type Value = Date | null;
+  const handleDateTimeChange = (value: Value) => {
+    // Only update the state if the value is not null
+    // if (value) {
+    setStartDate(value!);
+    setEndDate(new Date(value!.getTime() + 10 * 1000));
+    if (!startDate || !endDate || !ecgData) return
+
+    const startTime = startDate.getTime()
+    const endTime = endDate.getTime()
+
+    // Convert to hours from start for filtering
+    const startingTime = new Date(ecgData.c1[0].key).getTime()
+    const startHours = (startTime - startingTime) / (1000 * 60 * 60)
+    const endHours = (endTime - startingTime) / (1000 * 60 * 60)
+
+    // Update timeRange for use in report creation
+    setTimeRange([startHours, endHours])
+
+    // Filter data for chart display
+    const filtered = processedData.filter(
+      (point: { time: number }) => point.time >= startHours && point.time <= endHours,
+    )
+
+    setFilteredChartData(filtered)
+    toast.success("Time range filter applied")
+    // }
+  };
   const [reportData, setReportData] = useState<ReportData>({
     id: "",
     title: "Holter Monitor Report",
@@ -247,6 +280,14 @@ export default function CreateReportPage() {
 
         const reportData = await getLatestReport(patientId)
         setReportData(reportData)
+        setStartDate(new Date(reportData.data[0][0].key))
+        const startDateTime = new Date(reportData.data[0][0].key);
+
+        // Add 10 seconds to the start date and time
+        const endDateTime = new Date(startDateTime.getTime() + 10 * 1000); // 10 seconds in milliseconds
+
+        // Set the end date and time in state
+        setEndDate(endDateTime);
         console.log("Report data", reportData.data)
 
         const data: ChannelData = {
@@ -498,18 +539,149 @@ export default function CreateReportPage() {
           <CardDescription>Select a time range to analyze the ECG data</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={ecgData.c1} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" label={{ value: "Time (hours)", position: "insideBottomRight", offset: -10 }} />
-                <YAxis label={{ value: "Heart Rate (bpm)", angle: -90, position: "insideLeft" }} />
+          <div className="h-[900px]">
+            <ResponsiveContainer width="100%" height="33%">
+              <LineChart data={ecgData.c1 || []} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#ff0000" />
+                <XAxis
+                  dataKey="time"
+                  label={{ value: "Time (seconds)", position: "insideBottomRight", offset: -10 }}
+                />
+                <YAxis label={{ value: "Voltage (V)", angle: -90, position: "insideLeft" }} />
                 <Tooltip
-                  formatter={(value, name) => [`${value} bpm`, name]}
+                  formatter={(value) => [`${value}`, "Heart Rate (Channel 01)"]}
                   labelFormatter={(label) => `Time: ${label} hours`}
                 />
                 <Legend />
-                {/* Line for the first dataset (c1) */}
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#000000"
+                  dot={false}
+                  activeDot={{ r: 8 }}
+                  name="Heart Rate (Channel 01)"
+                />
+                {ecgData.c1 &&
+                  ecgData.c1
+                    .map((point, index) => (
+                      <ReferenceLine key={index} x={point.key} stroke="#000000" strokeDasharray="3 3" />
+                    ))}
+              </LineChart>
+            </ResponsiveContainer>
+            {/* <ResponsiveContainer width="100%" height="33%">
+                              <LineChart
+                                data={
+                                  report.data[0]
+                                    ? report.data[0].filter((point) => {
+                                      const pointTime = new Date(point.key).getTime(); // Convert point time to timestamp
+                                      return (
+                                        pointTime >= selectedDateTime!.getTime() && // Check if point is after or equal to startTime
+                                        pointTime <= endDateTime!.getTime() // Check if point is before or equal to endTime
+                                      );
+                                    })
+                                    : []
+                                }
+                                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                              >
+                                <CartesianGrid strokeDasharray="3 3" stroke="#ff0000" />
+                                <XAxis
+                                  dataKey="time"
+                                  label={{ value: "Time (seconds)", position: "insideBottomRight", offset: -10 }}
+                                />
+                                <YAxis label={{ value: "Voltage (V)", angle: -90, position: "insideLeft" }} />
+                                <Tooltip
+                                  formatter={(value) => [`${value}`, "Heart Rate (Channel 01)"]}
+                                  labelFormatter={(label) => `Time: ${label} hours`}
+                                />
+                                <Legend />
+                                <Line
+                                  type="monotone"
+                                  dataKey="value"
+                                  stroke="#000000"
+                                  dot={false}
+                                  activeDot={{ r: 8 }}
+                                  name="Heart Rate (Channel 01)"
+                                />
+                                {report.data &&
+                                  report.data
+                                    .filter((point) => {
+                                      const pointTime = new Date(point[0].key).getTime(); // Convert point time to timestamp
+                                      return (
+                                        pointTime >= selectedDateTime!.getTime() && // Check if point is after or equal to startTime
+                                        pointTime <= endDateTime!.getTime() // Check if point is before or equal to endTime
+                                      );
+                                    })
+                                    .map((point, index) => (
+                                      <ReferenceLine key={index} x={point[0].key} stroke="#000000" strokeDasharray="3 3" />
+                                    ))}
+                              </LineChart>
+                            </ResponsiveContainer> */}
+            <ResponsiveContainer width="100%" height="33%">
+              <LineChart data={ecgData.c2 || []} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#ff0000" />
+                <XAxis
+                  dataKey="time"
+                  label={{ value: "Time (seconds)", position: "insideBottomRight", offset: -10 }}
+                />
+                <YAxis label={{ value: "Voltage (V)", angle: -90, position: "insideLeft" }} />
+                <Tooltip
+                  formatter={(value) => [`${value}`, "Heart Rate (Channel 02)"]}
+                  labelFormatter={(label) => `Time: ${label} hours`}
+                />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#000000"
+                  dot={false}
+                  activeDot={{ r: 8 }}
+                  name="Heart Rate (Channel 02)"
+                />
+                {ecgData.c2 &&
+                  ecgData.c2
+                    .map((point, index) => (
+                      <ReferenceLine key={index} x={point.key} stroke="#000000" strokeDasharray="3 3" />
+                    ))}
+              </LineChart>
+            </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height="33%">
+              <LineChart data={ecgData.c3 || []} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#ff0000" />
+                <XAxis
+                  dataKey="time"
+                  label={{ value: "Time (seconds)", position: "insideBottomRight", offset: -10 }}
+                />
+                <YAxis label={{ value: "Voltage(V)", angle: -90, position: "insideLeft" }} />
+                <Tooltip
+                  formatter={(value) => [`${value}`, "Heart Rate (Channel 03)"]}
+                  labelFormatter={(label) => `Time: ${label} hours`}
+                />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#000000"
+                  dot={false}
+                  activeDot={{ r: 8 }}
+                  name="Heart Rate (Channel 03)"
+                />
+                {ecgData.c3 &&
+                  ecgData.c3
+                    .map((point, index) => (
+                      <ReferenceLine key={index} x={point.key} stroke="#000000" strokeDasharray="3 3" />
+                    ))}
+              </LineChart>
+            </ResponsiveContainer>
+            {/* <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={ecgData.c1} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="time" label={{ value: "Time (hours)", position: "insideBottomRight", offset: -10 }} />
+                <YAxis label={{ value: "Voltage (V)", angle: -90, position: "insideLeft" }} />
+                <Tooltip
+                  formatter={(value, name) => [`${value}`, name]}
+                  labelFormatter={(label) => `Time: ${label} hours`}
+                />
+                <Legend />
                 <Line
                   type="monotone"
                   dataKey="value"
@@ -518,7 +690,6 @@ export default function CreateReportPage() {
                   dot={false}
                   name="Heart Rate (C1)"
                 />
-                {/* Line for the second dataset (c2) */}
                 <Line
                   type="monotone"
                   dataKey="value"
@@ -527,7 +698,6 @@ export default function CreateReportPage() {
                   dot={false}
                   name="Heart Rate (C2)"
                 />
-                {/* Line for the third dataset (c3) */}
                 <Line
                   type="monotone"
                   dataKey="value"
@@ -544,14 +714,14 @@ export default function CreateReportPage() {
                   fillOpacity={0.1}
                 />
               </LineChart>
-            </ResponsiveContainer>
+            </ResponsiveContainer> */}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Start Date & Time</Label>
               <div className="flex flex-col space-y-2">
-                <Popover>
+                {/* <Popover>
                   <PopoverTrigger asChild>
                     <Button variant={"outline"} className="w-full justify-start text-left font-normal">
                       <CalendarIcon className="mr-2 h-4 w-4" />
@@ -575,11 +745,19 @@ export default function CreateReportPage() {
                       />
                     </div>
                   </PopoverContent>
-                </Popover>
+                </Popover> */}
+                <DateTimePicker
+                  onChange={handleDateTimeChange} // Update the selected date and time
+                  value={startDate} // Set the current value
+                  format="y-MM-dd HH:mm:ss" // Display format with seconds
+                  clearIcon={null} // Remove the clear icon (optional)
+                  disableClock={false} // Enable the clock for time selection
+                  className="w-full" // Make the picker take full width
+                />
               </div>
             </div>
 
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <Label>End Date & Time</Label>
               <div className="flex flex-col space-y-2">
                 <Popover>
@@ -608,10 +786,10 @@ export default function CreateReportPage() {
                   </PopoverContent>
                 </Popover>
               </div>
-            </div>
+            </div> */}
           </div>
 
-          <div className="flex justify-end">
+          {/* <div className="flex justify-end">
             <Button
               onClick={() => {
                 if (!startDate || !endDate || !ecgData) return
@@ -638,7 +816,7 @@ export default function CreateReportPage() {
             >
               Apply Filter
             </Button>
-          </div>
+          </div> */}
         </CardContent>
       </Card>
 
@@ -721,6 +899,7 @@ export default function CreateReportPage() {
                     value={reportData.aiSuggestion}
                     onChange={handleInputChange}
                     rows={6}
+                    readOnly={true}
                   />
                   <p className="text-sm text-muted-foreground">
                     Note: AI suggestions are for reference only and should be reviewed by a medical professional.
