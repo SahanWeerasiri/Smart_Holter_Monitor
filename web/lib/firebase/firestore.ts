@@ -1275,6 +1275,7 @@ export const getLatestReport = async (patientId: string) => {
 
     // console.log((reportData.data.c1.key as Array<any>).length)
     const data = [];
+    let count = 0;
     const channels = [reportData.data.c1, reportData.data.c2, reportData.data.c3];
     // console.log(channels);
     for (const channel of channels) {
@@ -1285,10 +1286,14 @@ export const getLatestReport = async (patientId: string) => {
       const temp = [];
       for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
-        const value = values[i];
+        let value = values[i] / 4095 * 5;
+        if (count == 2) {
+          value = -value + 5;
+        }
         // console.log(`Key: ${key}, Value: ${value}`);
         temp.push({ key, value })
       }
+      count++;
       data.push(temp);
     }
 

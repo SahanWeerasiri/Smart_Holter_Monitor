@@ -484,7 +484,7 @@ export default function ReportDetailPage() {
                         ))}
                   </LineChart>
                 </ResponsiveContainer>
-                <ResponsiveContainer width="100%" height="33%">
+                {/* <ResponsiveContainer width="100%" height="33%">
                   <LineChart data={report.data[1] || []} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#ff0000" />
                     <XAxis
@@ -511,8 +511,56 @@ export default function ReportDetailPage() {
                           <ReferenceLine key={index} x={point[0].key} stroke="#000000" strokeDasharray="3 3" />
                         ))}
                   </LineChart>
-                </ResponsiveContainer>
+                </ResponsiveContainer> */}
                 <ResponsiveContainer width="100%" height="33%">
+                  <LineChart
+                    data={
+                      report.data[1]
+                        ? report.data[1].filter((point) => {
+                          const pointTime = new Date(point.key).getTime(); // Convert point time to timestamp
+                          return (
+                            pointTime >= selectedDateTime!.getTime() && // Check if point is after or equal to startTime
+                            pointTime <= endDateTime!.getTime() // Check if point is before or equal to endTime
+                          );
+                        })
+                        : []
+                    }
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#ff0000" />
+                    <XAxis
+                      dataKey="time"
+                      label={{ value: "Time (seconds)", position: "insideBottomRight", offset: -10 }}
+                    />
+                    <YAxis label={{ value: "Voltage (V)", angle: -90, position: "insideLeft" }} />
+                    <Tooltip
+                      formatter={(value) => [`${value}`, "Heart Rate (Channel 01)"]}
+                      labelFormatter={(label) => `Time: ${label} hours`}
+                    />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#000000"
+                      dot={false}
+                      activeDot={{ r: 8 }}
+                      name="Heart Rate (Channel 02)"
+                    />
+                    {report.data &&
+                      report.data
+                        .filter((point) => {
+                          const pointTime = new Date(point[1].key).getTime(); // Convert point time to timestamp
+                          return (
+                            pointTime >= selectedDateTime!.getTime() && // Check if point is after or equal to startTime
+                            pointTime <= endDateTime!.getTime() // Check if point is before or equal to endTime
+                          );
+                        })
+                        .map((point, index) => (
+                          <ReferenceLine key={index} x={point[1].key} stroke="#000000" strokeDasharray="3 3" />
+                        ))}
+                  </LineChart>
+                </ResponsiveContainer>
+                {/* <ResponsiveContainer width="100%" height="33%">
                   <LineChart data={report.data[2] || []} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#ff0000" />
                     <XAxis
@@ -537,6 +585,54 @@ export default function ReportDetailPage() {
                       report.data
                         .map((point, index) => (
                           <ReferenceLine key={index} x={point[0].key} stroke="#000000" strokeDasharray="3 3" />
+                        ))}
+                  </LineChart>
+                </ResponsiveContainer> */}
+                <ResponsiveContainer width="100%" height="33%">
+                  <LineChart
+                    data={
+                      report.data[2]
+                        ? report.data[2].filter((point) => {
+                          const pointTime = new Date(point.key).getTime(); // Convert point time to timestamp
+                          return (
+                            pointTime >= selectedDateTime!.getTime() && // Check if point is after or equal to startTime
+                            pointTime <= endDateTime!.getTime() // Check if point is before or equal to endTime
+                          );
+                        })
+                        : []
+                    }
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#ff0000" />
+                    <XAxis
+                      dataKey="time"
+                      label={{ value: "Time (seconds)", position: "insideBottomRight", offset: -10 }}
+                    />
+                    <YAxis label={{ value: "Voltage (V)", angle: -90, position: "insideLeft" }} />
+                    <Tooltip
+                      formatter={(value) => [`${value}`, "Heart Rate (Channel 01)"]}
+                      labelFormatter={(label) => `Time: ${label} hours`}
+                    />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#000000"
+                      dot={false}
+                      activeDot={{ r: 8 }}
+                      name="Heart Rate (Channel 01)"
+                    />
+                    {report.data &&
+                      report.data
+                        .filter((point) => {
+                          const pointTime = new Date(point[2].key).getTime(); // Convert point time to timestamp
+                          return (
+                            pointTime >= selectedDateTime!.getTime() && // Check if point is after or equal to startTime
+                            pointTime <= endDateTime!.getTime() // Check if point is before or equal to endTime
+                          );
+                        })
+                        .map((point, index) => (
+                          <ReferenceLine key={index} x={point[2].key} stroke="#000000" strokeDasharray="3 3" />
                         ))}
                   </LineChart>
                 </ResponsiveContainer>

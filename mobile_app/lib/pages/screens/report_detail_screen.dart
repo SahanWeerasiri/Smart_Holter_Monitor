@@ -173,8 +173,8 @@ class _ReportDetailScreenState extends State<ReportDetailScreen>
             const SizedBox(height: 16),
             _buildSectionCard(
                 'Doctor Suggestions', widget.report.docSuggestions),
-            const SizedBox(height: 16),
-            _buildSectionCard('AI Suggestions', widget.report.aiSuggestions),
+            // const SizedBox(height: 16),
+            // _buildSectionCard('AI Suggestions', widget.report.aiSuggestions),
           ],
         ),
       ),
