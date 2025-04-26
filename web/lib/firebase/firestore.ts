@@ -725,19 +725,22 @@ export const removeHolterMonitor = async (monitorId: string) => {
 
     console.log(data);
 
+    const anomaly_description = await getAnaomayDescription(data);
+    const response = await getAISuggestions(anomaly_description);
+
     // Add the data to Firestore
     const docRef = await addDoc(collection(db, "user_accounts", patientId, "data"), {
       data: data,
       timestamp: new Date(),
-      aiSuggestion: "",
-      title: "",
-      brief: "",
+      aiSuggestion: anomaly_description,
+      title: response["title"],
+      brief: response["brief"],
       doctorId: patientDoc.data().docId,
       age: getAge(patientDoc.data().birthday),
       gender: "",
       deviceId: monitorId,
       docSuggestions: "",
-      anomalies: "",
+      anomalies: anomaly_description,
       isSeen: false,
       isFinished: false,
     });
@@ -774,6 +777,39 @@ export const removeHolterMonitor = async (monitorId: string) => {
   } catch (error) {
     logOperation("Error removing holter monitor", error);
     throw error;
+  }
+};
+
+
+const getAnaomayDescription = async (data: any) => {
+  try {
+    // Validate input
+    if (!data) {
+      throw new Error('Invalid anomaly detection input');
+    }
+    const suggestions = new Map<string, string>();
+
+    return suggestions;
+  } catch (error) {
+    console.error('Error getting AI suggestions:', error);
+    // Return empty Map or rethrow error depending on your needs
+    return new Map<string, string>();
+  }
+}
+
+const getAISuggestions = async (anomaly_detection: Record<string, any>): Promise<Map<string, string>> => {
+  try {
+    // Validate input
+    if (!anomaly_detection || typeof anomaly_detection !== 'object') {
+      throw new Error('Invalid anomaly detection input');
+    }
+    const suggestions = new Map<string, string>();
+
+    return suggestions;
+  } catch (error) {
+    console.error('Error getting AI suggestions:', error);
+    // Return empty Map or rethrow error depending on your needs
+    return new Map<string, string>();
   }
 };
 
