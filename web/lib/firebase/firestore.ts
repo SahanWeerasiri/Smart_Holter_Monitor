@@ -1533,6 +1533,7 @@ export const updateDoctorProfile = async (profileData: any) => {
       specialization: profileData.specialization,
       mobile: profileData.contactNumber,
       bio: profileData.bio,
+      pic: profileData.photoURL,
       updatedAt: new Date(),
     })
 

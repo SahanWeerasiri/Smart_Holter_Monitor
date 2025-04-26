@@ -10,6 +10,7 @@ import { AlertCircle, Save, Lock, User, Mail, Building, Phone } from "lucide-rea
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { getDoctorProfile, updateDoctorProfile, updatePassword } from "@/lib/firebase/firestore"
+import { Camera, Upload, Trash2, Loader2 } from "lucide-react"
 
 interface DoctorProfile {
   id: string
@@ -29,6 +30,8 @@ export default function ProfilePage() {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const [activeTab, setActiveTab] = useState("profile")
+  const [newImage, setNewImage] = useState<string | null>(null)
+  const [imageFile, setImageFile] = useState<File | null>(null)
 
   const [profileForm, setProfileForm] = useState({
     name: "",
@@ -65,6 +68,33 @@ export default function ProfilePage() {
     fetchProfile()
   }, [])
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Check if the file is an image
+    if (!file.type.match('image.*')) {
+      setError('Please select an image file')
+      return
+    }
+
+    // Check file size (e.g., 2MB limit)
+    if (file.size > 2 * 1024 * 1024) {
+      setError('Image size should be less than 2MB')
+      return
+    }
+
+    setImageFile(file)
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      if (event.target?.result) {
+        setNewImage(event.target.result as string)
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+
   const handleUpdateProfile = async () => {
     try {
       setError("")
@@ -76,12 +106,20 @@ export default function ProfilePage() {
         return
       }
 
-      await updateDoctorProfile({
+      // Prepare update data
+      const updateData: Partial<DoctorProfile> = {
         name: profileForm.name,
         specialization: profileForm.specialization,
         contactNumber: profileForm.contactNumber,
         bio: profileForm.bio,
-      })
+      }
+
+      // If new image was selected, include it in the update
+      if (newImage) {
+        updateData.photoURL = "data:image/jpeg;base64," + newImage
+      }
+
+      await updateDoctorProfile(updateData)
 
       setSuccess("Profile updated successfully")
 
@@ -90,12 +128,14 @@ export default function ProfilePage() {
         if (!prev) return null
         return {
           ...prev,
-          name: profileForm.name,
-          specialization: profileForm.specialization,
-          contactNumber: profileForm.contactNumber,
-          bio: profileForm.bio,
+          ...updateData,
+          photoURL: newImage || prev.photoURL,
         }
       })
+
+      // Reset image state after successful update
+      setNewImage(null)
+      setImageFile(null)
     } catch (error) {
       console.error("Error updating profile:", error)
       setError("Failed to update profile. Please try again.")
@@ -220,47 +260,112 @@ export default function ProfilePage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Profile Information</CardTitle>
-                  <CardDescription>Update your personal information</CardDescription>
+                  <CardDescription>Update your personal information and profile picture</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input
-                      id="name"
-                      value={profileForm.name}
-                      onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
+                <CardContent className="space-y-6">
+                  {/* Profile Picture Section */}
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="relative group">
+                      <Avatar className="h-32 w-32">
+                        <AvatarImage src={newImage || profile?.photoURL || ""} alt={profile?.name || "Doctor"} />
+                        <AvatarFallback className="text-4xl">
+                          {profile?.name?.split(' ').map(n => n[0]).join('') || "DR"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <label
+                        htmlFor="profile-image"
+                        className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full cursor-pointer"
+                      >
+                        <Camera className="h-6 w-6 text-white" />
+                      </label>
+                    </div>
+                    <div className="flex gap-2">
+                      <label htmlFor="profile-image">
+                        <Button variant="outline" size="sm" type="button">
+                          <Upload className="mr-2 h-4 w-4" />
+                          {newImage ? "Change Photo" : "Upload Photo"}
+                        </Button>
+                      </label>
+                      {newImage && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          type="button"
+                          onClick={() => {
+                            setNewImage(null);
+                            setImageFile(null);
+                          }}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Remove
+                        </Button>
+                      )}
+                    </div>
+                    <input
+                      id="profile-image"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageChange}
                     />
+                    {imageFile && (
+                      <p className="text-sm text-muted-foreground">
+                        Selected: {imageFile.name} ({(imageFile.size / 1024).toFixed(2)} KB)
+                      </p>
+                    )}
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="specialization">Specialization</Label>
-                    <Input
-                      id="specialization"
-                      value={profileForm.specialization}
-                      onChange={(e) => setProfileForm({ ...profileForm, specialization: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="contactNumber">Contact Number</Label>
-                    <Input
-                      id="contactNumber"
-                      value={profileForm.contactNumber}
-                      onChange={(e) => setProfileForm({ ...profileForm, contactNumber: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="bio">Professional Bio</Label>
-                    <textarea
-                      id="bio"
-                      value={profileForm.bio}
-                      onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
-                      className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    />
+
+                  {/* Profile Form Section */}
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input
+                        id="name"
+                        value={profileForm.name}
+                        onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="specialization">Specialization</Label>
+                      <Input
+                        id="specialization"
+                        value={profileForm.specialization}
+                        onChange={(e) => setProfileForm({ ...profileForm, specialization: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="contactNumber">Contact Number</Label>
+                      <Input
+                        id="contactNumber"
+                        value={profileForm.contactNumber}
+                        onChange={(e) => setProfileForm({ ...profileForm, contactNumber: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="bio">Professional Bio</Label>
+                      <textarea
+                        id="bio"
+                        value={profileForm.bio}
+                        onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
+                        className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        placeholder="Tell us about your professional background and expertise..."
+                      />
+                    </div>
                   </div>
                 </CardContent>
-                <CardFooter>
+                <CardFooter className="flex justify-end">
                   <Button onClick={handleUpdateProfile} disabled={saving}>
-                    <Save className="mr-2 h-4 w-4" />
-                    {saving ? "Saving..." : "Save Changes"}
+                    {saving ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="mr-2 h-4 w-4" />
+                        Save Changes
+                      </>
+                    )}
                   </Button>
                 </CardFooter>
               </Card>

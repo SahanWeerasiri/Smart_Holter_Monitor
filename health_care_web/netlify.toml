@@ -1,6 +1,0 @@
-[build]
-  command = "flutter upgrade && flutter build web"
-  publish = "build/web"
-
-[[plugins]]
-  package = "netlify-plugin-flutter"
