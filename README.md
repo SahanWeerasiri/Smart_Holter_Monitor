@@ -69,16 +69,12 @@ SmartCare is a comprehensive health management platform consisting of a mobile a
 
 3. **Install dependencies**
    ```bash
-   npm install
-   # or
-   yarn install
+   npm install --legacy-peer-deps
    ```
 
 4. **Run the app**
    ```bash
    npm run dev
-   # or
-   yarn dev
    ```
 
 5. **Access the dashboard**  
