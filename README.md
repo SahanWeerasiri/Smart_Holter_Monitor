@@ -1,110 +1,87 @@
 # SmartCare - Health Management System
 
-![SmartCare Logo](https://via.placeholder.com/150) <!-- Replace with actual logo -->
 
-SmartCare is a comprehensive health management platform consisting of a mobile app for patients and a web dashboard for healthcare providers.
 
-## Table of Contents
+**SmartCare** is a comprehensive health management platform that includes:
+- A mobile app for patients
+- A web dashboard for healthcare providers
+
+Together, they support advanced ECG monitoring, AI-assisted diagnosis, and secure health data management.
+
+---
+
+## 📸 Project Gallery
+
+### PCB Views
+- **Real PCB Photo**
+  ![Real PCB](assets/pcb.jpg)
+- **Altium Designer Layout**
+  ![Altium PCB](images/pcb-altium.jpg)
+- **3D Rendered View**
+  ![3D PCB](images/pcb-3d.jpg)
+
+### ECG Signal Snapshots
+- ![ECG Snapshot 1](images/ecg-signal-1.jpg)
+- ![ECG Snapshot 2](images/ecg-signal-2.jpg)
+- ![ECG Snapshot 3](images/ecg-signal-3.jpg)
+
+### Accessories
+- **ECG Cable**
+  ![ECG Cable](images/ecg-cable.jpg)
+
+### Proud Moments
+- **Sliot Competition Winning Moment**
+  ![Winning Moment](images/winning-moment.jpg)
+
+---
+
+## 📚 Table of Contents
 - [Features](#features)
 - [Installation](#installation)
 - [Project Structure](#project-structure)
 - [License](#license)
 
-## Features
+---
 
-### Mobile Application (Patient)
+## 🚀 Features
+
+### 📱 Mobile Application (Patient)
 - **Health Reports**: View and manage ECG and other health reports
 - **AI Chatbot**: Get instant health advice via integrated AI
-- **Doctor & Patient Details**: Access doctor information and manage your profile
-- **Notifications**: Receive alerts for new reports and doctor suggestions
-- **Secure Data**: End-to-end encryption for all health information
+- **Doctor & Patient Details**: Access doctor info and manage profiles
+- **Notifications**: Alerts for new reports and doctor messages
+- **Secure Data**: End-to-end encryption for sensitive health data
 
-### Web Dashboard (Healthcare Providers)
-- **Hospital Dashboard**: Manage smart holter monitors and device assignments
-- **Admin Panel**: Register hospitals/doctors and manage system operations
-- **Doctor Portal**: 
-  - Manage patient lists and assign devices
-  - Generate detailed health reports
-- **AI Assistance**: 
-  - AI-powered report suggestions
-  - Anomaly detection from ML models
-- **Patient Management**: 
-  - Track patient status
-  - View historical data
-  - Manage emergency contacts
+### 💻 Web Dashboard (Healthcare Providers)
 
-## Installation
+#### 🏥 Hospital Dashboard
+- Manage SmartCare Holter monitors
+- Assign devices to patients
 
-### Mobile App (Flutter)
+#### 🛠 Admin Panel
+- Register hospitals and doctors
+- Configure overall system settings
 
-1. **Install Flutter**  
-   Follow the official [Flutter Installation Guide](https://flutter.dev/docs/get-started/install)
+#### 🩺 Doctor Portal
+- Manage patient lists
+- Assign and monitor devices
+- Generate detailed health reports
 
-2. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-repo/smartcare.git
-   cd smartcare/mobile_app
-   ```
+#### 🤖 AI Assistance
+- AI-generated report suggestions
+- ML-based anomaly detection in ECG data
 
-3. **Install dependencies**
-   ```bash
-   flutter pub get
-   ```
-
-4. **Run the app**
-   ```bash
-   flutter run
-   ```
-
-### Web Dashboard (Next.js)
-
-1. **Install Node.js**  
-   Download from [Node.js Official Site](https://nodejs.org/)
-
-2. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-repo/smartcare.git
-   cd smartcare/web
-   ```
-
-3. **Install dependencies**
-   ```bash
-   npm install --legacy-peer-deps
-   ```
-
-4. **Run the app**
-   ```bash
-   npm run dev
-   ```
-
-5. **Access the dashboard**  
-   Open `http://localhost:3000` in your browser
-
-## Project Structure
-
-```
-smartcare/
-├── mobile_app/          # Flutter mobile application
-│   ├── lib/             # Application source code
-│   ├── assets/          # Static files
-│   └── ...              
-│
-├── web/                 # Next.js web application
-│   ├── components/      # React components
-│   ├── pages/           # Application routes
-│   └── ...              
-│
-├── LICENSE
-└── README.md
-```
-
-## License
-
-This project is for educational and research purposes. Please contact the authors for commercial use.
-
-For more details, see the respective `README.md` files in each subdirectory.
+#### 👥 Patient Management
+- Track patient health status
+- Review historical ECG and symptom records
+- Manage emergency contacts
 
 ---
 
-**Contact**: team@smartcare.example.com  
-**Version**: 1.0.0
+## 🛠 Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/your-username/smartcare.git
+cd smartcare
