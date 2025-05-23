@@ -15,7 +15,6 @@ def retrieve_context(query, top_k=4):
     vector_store = FAISS.load_local(path, embeddings, allow_dangerous_deserialization=True)
 
     # Get results from each store
-    all_results = []
     results = vector_store.similarity_search_with_score(query+query+query+query+query, k=top_k)
 
     results.sort(key=lambda x: x[1], reverse=True)

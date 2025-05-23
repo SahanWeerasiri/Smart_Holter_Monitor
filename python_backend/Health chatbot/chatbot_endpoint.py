@@ -44,7 +44,8 @@ def chat_endpoint(request: ChatRequest):
                 response = translate_text(response, "en", "si")
             elif request.language.lower() == "tamil":
                 response = translate_text(response, "en", "ta")
-                
+        
+        print(response)
         return ChatResponse(response=response)
     except Exception as e:
         print(f"Error in chat_endpoint: {str(e)}")

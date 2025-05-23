@@ -458,4 +458,8 @@ class FirestoreDbService {
       return {'success': false, 'error': 'Hospital not found'};
     }
   }
+
+  Future<void> updateLanguage(String id, String lan) async {
+    await usersCollection.doc(id).update({'language': lan});
+  }
 }

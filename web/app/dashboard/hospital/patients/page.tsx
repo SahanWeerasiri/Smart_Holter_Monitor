@@ -277,7 +277,7 @@ export default function HospitalPatientsPage() {
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Name</TableHead>
-                                        <TableHead>Age/Gender</TableHead>
+                                        <TableHead>Age</TableHead>
                                         <TableHead>Contact</TableHead>
                                         <TableHead>Doctor</TableHead>
                                         <TableHead>Status</TableHead>
@@ -290,7 +290,7 @@ export default function HospitalPatientsPage() {
                                         <TableRow key={patient.id} className="group">
                                             <TableCell className="font-medium">{patient.name}</TableCell>
                                             <TableCell>
-                                                {patient.age} / {patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1)}
+                                                {patient.age}
                                             </TableCell>
                                             <TableCell>{patient.contactNumber}</TableCell>
                                             <TableCell>{patient.doctorName || "Not assigned"}</TableCell>

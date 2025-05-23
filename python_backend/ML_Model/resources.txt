@@ -1,2 +1,1 @@
-https://www.kaggle.com/code/ohseokkim/dectecting-anomaly-using-autoencoder
-https://www.kaggle.com/code/redpen12/anomaly-detection-with-cnn-autoencoders/notebook#Building-CNN-Autoencoder-Model
+https://www.kaggle.com/datasets/akinduhiman/ptb-diagnostic-ecg-dataset
