@@ -40,7 +40,7 @@ Together, they support advanced ECG monitoring, AI-assisted diagnosis, and secur
     <td>
       <p><strong>Normal ECG</strong></p>
       <img src="Assets/ecg.jpg" alt="ECG Snapshot 1" width="600"/><br><br>
-      <p><strong>Trachycardia patient</strong></p>
+      <p><strong>Tachycardia patient</strong></p>
       <img src="Assets/tr.jpg" alt="ECG Snapshot 2" width="600"/><br><br>
       <p><strong>Ventricaular Fibrilation</strong></p>
       <img src="Assets/ventricular.jpg" alt="ECG Snapshot 3" width="600"/>
