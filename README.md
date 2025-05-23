@@ -1,110 +1,105 @@
-# SmartCare - Health Management System
+# SmartCare - Cardiac Ecosystem
 
-![SmartCare Logo](https://via.placeholder.com/150) <!-- Replace with actual logo -->
+**SmartCare** is a comprehensive cardiac holtor monitoring platform that includes:
+- ⚙️ A 4-layer precision ECG acquisition PCB  
+- 📱 A mobile app for patients  
+- 💻 A web dashboard for healthcare providers  
+- 🖼️ A user-friendly enclosure (Still developing using SolidWorks)  
+- 🧠 LSTM-enhanced anomaly detection  
 
-SmartCare is a comprehensive health management platform consisting of a mobile app for patients and a web dashboard for healthcare providers.
-
-## Table of Contents
-- [Features](#features)
-- [Installation](#installation)
-- [Project Structure](#project-structure)
-- [License](#license)
-
-## Features
-
-### Mobile Application (Patient)
-- **Health Reports**: View and manage ECG and other health reports
-- **AI Chatbot**: Get instant health advice via integrated AI
-- **Doctor & Patient Details**: Access doctor information and manage your profile
-- **Notifications**: Receive alerts for new reports and doctor suggestions
-- **Secure Data**: End-to-end encryption for all health information
-
-### Web Dashboard (Healthcare Providers)
-- **Hospital Dashboard**: Manage smart holter monitors and device assignments
-- **Admin Panel**: Register hospitals/doctors and manage system operations
-- **Doctor Portal**: 
-  - Manage patient lists and assign devices
-  - Generate detailed health reports
-- **AI Assistance**: 
-  - AI-powered report suggestions
-  - Anomaly detection from ML models
-- **Patient Management**: 
-  - Track patient status
-  - View historical data
-  - Manage emergency contacts
-
-## Installation
-
-### Mobile App (Flutter)
-
-1. **Install Flutter**  
-   Follow the official [Flutter Installation Guide](https://flutter.dev/docs/get-started/install)
-
-2. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-repo/smartcare.git
-   cd smartcare/mobile_app
-   ```
-
-3. **Install dependencies**
-   ```bash
-   flutter pub get
-   ```
-
-4. **Run the app**
-   ```bash
-   flutter run
-   ```
-
-### Web Dashboard (Next.js)
-
-1. **Install Node.js**  
-   Download from [Node.js Official Site](https://nodejs.org/)
-
-2. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-repo/smartcare.git
-   cd smartcare/web
-   ```
-
-3. **Install dependencies**
-   ```bash
-   npm install --legacy-peer-deps
-   ```
-
-4. **Run the app**
-   ```bash
-   npm run dev
-   ```
-
-5. **Access the dashboard**  
-   Open `http://localhost:3000` in your browser
-
-## Project Structure
-
-```
-smartcare/
-├── mobile_app/          # Flutter mobile application
-│   ├── lib/             # Application source code
-│   ├── assets/          # Static files
-│   └── ...              
-│
-├── web/                 # Next.js web application
-│   ├── components/      # React components
-│   ├── pages/           # Application routes
-│   └── ...              
-│
-├── LICENSE
-└── README.md
-```
-
-## License
-
-This project is for educational and research purposes. Please contact the authors for commercial use.
-
-For more details, see the respective `README.md` files in each subdirectory.
+Together, they support advanced ECG monitoring, AI-assisted diagnosis, and secure health data management.
 
 ---
 
-**Contact**: team@smartcare.example.com  
-**Version**: 1.0.0
+## 📸 Project Gallery
+
+<table>
+  <tr>
+    <th>PCB Views</th>
+    <th>ECG Signal Snapshots</th>
+    <th>Accessories</th>
+  </tr>
+  <tr>
+    <td>
+      <p><strong>Real PCB Photo</strong></p>
+      <img src="Assets/pcb.jpg" alt="Real PCB" width="400"/><br><br>
+      <p><strong>Altium Designer Layout</strong></p>
+      <img src="Assets/altium.jpg" alt="Altium PCB" width="400"/><br><br>
+      <p><strong>3D Rendered View</strong></p>
+      <img src="Assets/3d.jpg" alt="3D PCB" width="400"/>
+    </td>
+    <td>
+      <p><strong>ECG Snapshot 1</strong></p>
+      <img src="Assets/ecg.jpg" alt="ECG Snapshot 1" width="500"/><br><br>
+      <p><strong>ECG Snapshot 2</strong></p>
+      <img src="Assets/tr.jpg" alt="ECG Snapshot 2" width="500"/><br><br>
+      <p><strong>ECG Snapshot 3</strong></p>
+      <img src="Assets/ventricular.jpg" alt="ECG Snapshot 3" width=500"/>
+    </td>
+    <td>
+      <p><strong>ECG Cable</strong></p>
+      <img src="Assets/cable.jpg" alt="ECG Cable" width="600"/>
+      <p><strong>Fluke Simulator</strong></p>
+      <img src="Assets/fluke.jpg" alt="Fluke" width="600"/>
+    </td>
+  </tr>
+</table>
+
+---
+
+
+
+
+
+## 🚀 Features
+
+### 📱 Mobile Application (Patient)
+- **Health Reports**: View and manage ECG and other health reports
+- **AI Chatbot**: Get instant health advice via integrated AI
+- **Doctor & Patient Details**: Access doctor info and manage profiles
+- **Notifications**: Alerts for new reports and doctor messages
+- **Secure Data**: End-to-end encryption for sensitive health data
+
+### 💻 Web Dashboard (Healthcare Providers)
+
+#### 🏥 Hospital Dashboard
+- Manage SmartCare Holter monitors
+- Assign devices to patients
+
+#### 🛠 Admin Panel
+- Register hospitals and doctors
+- Configure overall system settings
+
+#### 🩺 Doctor Portal
+- Manage patient lists
+- Assign and monitor devices
+- Generate detailed health reports
+
+#### 🤖 AI Assistance
+- AI-generated report suggestions
+- ML-based anomaly detection in ECG data
+
+#### 👥 Patient Management
+- Track patient health status
+- Review historical ECG and symptom records
+- Manage emergency contacts
+
+---
+
+## 🏆 SLIOT 2025 – Open Category winners
+
+We are proud to announce that **SmartCare** won the **championship title at SLIOT 2025**, Sri Lanka's largest innovation and IoT competition.
+
+🏅 **SLIOT** is one of the most prestigious innovation competitions in the country, showcasing groundbreaking student-led solutions that can impact society.
+
+Our project was selected as the winner for its:
+- Innovation in wearable healthcare monitoring
+- Seamless integration of AI for anomaly detection
+- Medical Graded data access for both patients and healthcare providers
+
+![SLIOT Winning Moment](Assets/sliot.jpg)
+
+> 🏆 This win recognizes our team's dedication to creating meaningful, life-saving health technologies.
+
+---
+
